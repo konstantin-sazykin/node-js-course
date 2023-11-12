@@ -7,5 +7,6 @@ export const app = express();
 dotenv.config()
 
 app.use(express.json());
-app.use(`${process.env.BASE_PATH}/api`, router);
+// app.use(`${process.env.BASE_PATH}/api`, router);
+app.use(`/`, router);
 
