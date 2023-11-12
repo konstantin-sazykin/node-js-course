@@ -17,7 +17,7 @@ router.get('/videos', (request: Request, response: Response) => {
   response.send(videos);
 });
 
-router.delete('/videos/testing/all-data', (request: Request, response: Response) => {
+router.delete('/testing/all-data', (request: Request, response: Response) => {
   videos.length = 0;
 
   return response.sendStatus(204);
@@ -215,7 +215,8 @@ router.put(
     }
 
     if (publicationDate) {
-      if (isNaN(Date.parse(publicationDate))) {
+      const parsedDate = Date.parse(publicationDate);
+      if (isNaN(parsedDate) || new Date(parsedDate).toISOString() !== publicationDate ) {
         errors.errorsMessages.push({
           field: 'publicationDate',
           message: 'Invalid publicationDate field',

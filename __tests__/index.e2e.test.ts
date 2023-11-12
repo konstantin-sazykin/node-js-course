@@ -7,7 +7,7 @@ describe('/videos', () => {
   let newVideo: VideoType | null = null;
 
   beforeAll(() => {
-    request(app).delete('/videos/testing/all-data').expect(204);
+    request(app).delete('/testing/all-data').expect(204);
   });
 
   it('should return empty array and status 200', async () => {
