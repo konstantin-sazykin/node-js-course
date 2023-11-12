@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "name": "node-js-course-sprint-1",
   "builds": [
     { "src": "src/index.ts", "use": "@vercel/node"}
