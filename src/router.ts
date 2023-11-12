@@ -13,8 +13,8 @@ const router = Router();
 
 const videos: VideoType[] = [];
 
-router.get('/videos', (req: Request, res: Response) => {
-  res.send(videos);
+router.get('/videos', (request: Request, response: Response) => {
+  response.send(videos);
 });
 
 router.delete('/videos/testing/all-data', (request: Request, response: Response) => {
@@ -23,18 +23,20 @@ router.delete('/videos/testing/all-data', (request: Request, response: Response)
   return response.sendStatus(204);
 });
 
-router.get('/videos/:id', (req: RequestType<{ id: string }, {}>, res: Response) => {
-  const id = +req.params.id;
+router.get('/videos/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {
+  const id = +request.params.id;
 
-  // написать тест для невалидного id
+  if (!id || isNaN(id)) {
+    return response.sendStatus(404);
+  }
 
   const video = videos.find((v) => v.id === id);
 
   if (!video) {
-    return res.sendStatus(404);
+    return response.sendStatus(404);
   }
 
-  return res.send(video);
+  return response.send(video);
 });
 
 router.post('/videos', (req: RequestType<{}, CreateVideoDTO>, res: Response) => {
@@ -100,8 +102,22 @@ router.post('/videos', (req: RequestType<{}, CreateVideoDTO>, res: Response) => 
   res.status(201).send(newVideo);
 });
 
-router.delete('/videod/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {
+router.delete('/videos/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {
+  const id = +request.params.id;
 
+  if (!id || isNaN(id)) {
+    return response.sendStatus(404);
+  }
+
+  const deletedVideoIndex = videos.findIndex((v) => v.id === id);
+
+  if (deletedVideoIndex === -1) {
+    return response.sendStatus(404);
+  }
+
+  videos.splice(deletedVideoIndex, 1);
+
+  return response.sendStatus(204);
 });
 
 router.put(
@@ -113,7 +129,7 @@ router.put(
     };
 
     if (!id || isNaN(id)) {
-      errors.errorsMessages.push({ field: 'id', message: 'Invalid video id' });
+      return response.sendStatus(404);
     }
 
     const { title, author, canBeDownloaded, minAgeRestriction, publicationDate } = request.body;
@@ -166,7 +182,7 @@ router.put(
       if (!hasError) {
         updatedVideo.availableResolutions = availableResolutions;
       }
-    } else if(availableResolutions === null) {
+    } else if (availableResolutions === null) {
       updatedVideo.availableResolutions = null;
     }
 
@@ -213,7 +229,7 @@ router.put(
       return response.status(400).send(errors);
     }
 
-    videos[videoForUpdateIndex] = { ...updatedVideo }
+    videos[videoForUpdateIndex] = { ...updatedVideo };
     return response.sendStatus(204);
   }
 );

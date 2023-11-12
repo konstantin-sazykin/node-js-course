@@ -103,7 +103,7 @@ describe('/api/videos', () => {
     const updateVideoResult = await request(app)
       .put(`/api/videos/${newVideo?.id}`)
       .send({
-        title: { a: 'b'},
+        title: { a: 'b' },
         author: ['test'],
         availableResolutions: ['P142'],
         canBeDownloaded: 'true',
@@ -111,28 +111,43 @@ describe('/api/videos', () => {
         publicationDate: 'tomorrow',
       });
 
-      const expectedErrors = [
-        { message: 'Invalid title', field: 'title' },
-        { message: 'Invalid author', field: 'author' },
-        {
-          message: 'Invalid available resolution',
-          field: 'availableResolutions'
-        },
-        {
-          field: 'canBeDownloaded',
-          message: 'Invalid canBeDownloaded field'
-        },
-        {
-          field: 'minAgeRestriction',
-          message: 'Invalid minAgeRestriction field'
-        },
-        {
-          field: 'publicationDate',
-          message: 'Invalid publicationDate field'
-        }
-      ]
+    const expectedErrors = [
+      { message: 'Invalid title', field: 'title' },
+      { message: 'Invalid author', field: 'author' },
+      {
+        message: 'Invalid available resolution',
+        field: 'availableResolutions',
+      },
+      {
+        field: 'canBeDownloaded',
+        message: 'Invalid canBeDownloaded field',
+      },
+      {
+        field: 'minAgeRestriction',
+        message: 'Invalid minAgeRestriction field',
+      },
+      {
+        field: 'publicationDate',
+        message: 'Invalid publicationDate field',
+      },
+    ];
 
-      expect(updateVideoResult.body.errorsMessages).toEqual(expectedErrors);
-      
+    expect(updateVideoResult.body.errorsMessages).toEqual(expectedErrors);
+  });
+
+  it(`should'nt delete video with incorrrect id`, async () => {
+    const deleteVideoResult = await request(app).delete('/api/videos/121212');
+
+    expect(deleteVideoResult.statusCode).toBe(404);
+  });
+
+  it('should delete video with correct id', async () => {
+    const deleteVideoResult = await request(app).delete(`/api/videos/${newVideo?.id}`);
+
+    expect(deleteVideoResult.statusCode).toBe(204);
+
+    const allVideos = await request(app).get('/api/videos');
+
+    expect(allVideos.body).toEqual([]);
   });
 });
