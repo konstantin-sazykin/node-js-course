@@ -8,8 +8,6 @@ import {
   RequestType,
   UpdateVideoDTO,
 } from './types';
-import { request } from 'http';
-import { type } from 'os';
 
 const router = Router();
 
@@ -102,7 +100,9 @@ router.post('/videos', (req: RequestType<{}, CreateVideoDTO>, res: Response) => 
   res.status(201).send(newVideo);
 });
 
-router.delete('/videod/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {});
+router.delete('/videod/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {
+
+});
 
 router.put(
   '/videos/:id',
