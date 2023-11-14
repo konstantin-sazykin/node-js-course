@@ -1,36 +1,31 @@
 import { Request, Response, Router } from 'express';
 
-import {
-  ResolutionsEnum,
-  CreateVideoDTO,
-  ErrorType,
-  VideoType,
-  RequestType,
-  UpdateVideoDTO,
-} from './types';
+import { ErrorType, RequestType } from './../../types/common';
+import { CreateVideoDTO, UpdateVideoDTO } from './../../types/video/input';
+import { VideoType, ResolutionsEnum } from './../../types/video/output';
+import { db } from '../db/db';
 
-const router = Router();
+export const videoRoute = Router();
 
-const videos: VideoType[] = [];
-
-router.get('/videos', (request: Request, response: Response) => {
-  response.send(videos);
+videoRoute.get('/', (request: Request, response: Response) => {
+  response.send(db.videos);
 });
 
-router.delete('/testing/all-data', (request: Request, response: Response) => {
-  videos.length = 0;
+// TODO вынести в тестовый роут
+// videoRoute.delete('/testing/all-data', (request: Request, response: Response) => {
+//   db.videos.length = 0;
 
-  return response.sendStatus(204);
-});
+//   return response.sendStatus(204);
+// });
 
-router.get('/videos/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {
+videoRoute.get('/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {
   const id = +request.params.id;
 
   if (!id || isNaN(id)) {
     return response.sendStatus(404);
   }
 
-  const video = videos.find((v) => v.id === id);
+  const video = db.videos.find((v) => v.id === id);
 
   if (!video) {
     return response.sendStatus(404);
@@ -39,7 +34,7 @@ router.get('/videos/:id', (request: RequestType<{ id: string }, {}>, response: R
   return response.send(video);
 });
 
-router.post('/videos', (req: RequestType<{}, CreateVideoDTO>, res: Response) => {
+videoRoute.post('/', (req: RequestType<{}, CreateVideoDTO>, res: Response) => {
   const errors: ErrorType = {
     errorsMessages: [],
   };
@@ -97,31 +92,31 @@ router.post('/videos', (req: RequestType<{}, CreateVideoDTO>, res: Response) => 
     minAgeRestriction: null,
   };
 
-  videos.push(newVideo);
+  db.videos.push(newVideo);
 
   res.status(201).send(newVideo);
 });
 
-router.delete('/videos/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {
+videoRoute.delete('/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {
   const id = +request.params.id;
 
   if (!id || isNaN(id)) {
     return response.sendStatus(404);
   }
 
-  const deletedVideoIndex = videos.findIndex((v) => v.id === id);
+  const deletedVideoIndex = db.videos.findIndex((v) => v.id === id);
 
   if (deletedVideoIndex === -1) {
     return response.sendStatus(404);
   }
 
-  videos.splice(deletedVideoIndex, 1);
+  db.videos.splice(deletedVideoIndex, 1);
 
   return response.sendStatus(204);
 });
 
-router.put(
-  '/videos/:id',
+videoRoute.put(
+  '/:id',
   (request: RequestType<{ id: string }, UpdateVideoDTO>, response: Response) => {
     const id = +request.params.id;
     const errors: ErrorType = {
@@ -138,8 +133,8 @@ router.put(
 
     const trimmedTitle = title && typeof title === 'string' ? title?.trim() : null;
     const trimmedAuthor = author && typeof author === 'string' ? author?.trim() : null;
-    const videoForUpdateIndex = videos.findIndex((v) => v.id === id);
-    const videoForUpdate = { ...videos[videoForUpdateIndex] };
+    const videoForUpdateIndex = db.videos.findIndex((v) => v.id === id);
+    const videoForUpdate = { ...db.videos[videoForUpdateIndex] };
 
     if (videoForUpdateIndex === -1) {
       return response.sendStatus(404);
@@ -230,9 +225,7 @@ router.put(
       return response.status(400).send(errors);
     }
 
-    videos[videoForUpdateIndex] = { ...updatedVideo };
+    db.videos[videoForUpdateIndex] = { ...updatedVideo };
     return response.sendStatus(204);
   }
 );
-
-export { router };

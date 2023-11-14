@@ -1,8 +1,9 @@
 import express from 'express';
-import { router } from './router';
+
+import { videoRoute } from './routes/video.route';
 
 export const app = express();
 
 app.use(express.json());
 
-app.use(`/`, router);
+app.use(`/videos`, videoRoute);
