@@ -1,4 +1,4 @@
-import { VideoType } from "../../types/video/output"
+import { VideoType } from "../../src/types/video/output"
 
 type DBType = {
   videos: VideoType[],

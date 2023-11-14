@@ -1,7 +1,6 @@
 import request from 'supertest';
 
-import { VideoType } from '../../types/video/output';
-
+import { VideoType } from './../../src/types/video/output';
 import { app } from '../../src/settings';
 
 describe('/videos', () => {
