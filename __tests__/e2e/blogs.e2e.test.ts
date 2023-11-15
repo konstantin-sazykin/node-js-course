@@ -5,11 +5,11 @@ import { ResponseStatusCodesEnum } from '../../src/types/common';
 
 describe('/blogs', () => {
   const authHeaderString = `Basic ${btoa('admin:qwerty')}`;
+  let newBlog = {};
 
   it ('should return empty blog array', async () => {
     const blogResult =  await request(app)
       .get('/blogs')
-      .set('Authorization', authHeaderString);
 
       expect(blogResult.body).toEqual([]);
   });
@@ -21,4 +21,15 @@ describe('/blogs', () => {
 
     expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
   });
+
+  it('should create blog with correct data', async () => {
+    const blogResult = await request(app)
+      .post('/blogs')
+      .send({
+        name: 'Test',
+        description: 'Tttttttt',
+        websiteUrl: 'https://some-url.com',
+      })
+      .set('Authorization', authHeaderString)
+  })
 });

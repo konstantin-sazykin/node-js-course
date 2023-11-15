@@ -5,7 +5,7 @@ export class ApiError {
   errors;
   message;
 
-  constructor(status: number, message: string, errors: ErrorMessageType[] = []) {
+  constructor(status: number, message: string | null, errors: ErrorMessageType[] = []) {
     this.errors = errors;
     this.status = status;
     this.message = message;
@@ -15,8 +15,12 @@ export class ApiError {
     return new ApiError(ResponseStatusCodesEnum.Unathorized, 'Пользователь неавторизован');
   }
 
-  static BadRequest(message: string, errors: ErrorMessageType[] = []) {
-    return new ApiError(ResponseStatusCodesEnum.BadRequest, message, errors);
+  static BadRequest(errors: ErrorMessageType[] | null, message: string | null = 'Непредвиденная ошибка') {
+    if (errors?.length) {
+      return new ApiError(ResponseStatusCodesEnum.BadRequest, null, errors);  
+    }
+    
+    return new ApiError(ResponseStatusCodesEnum.BadRequest, message)
   }
 
   static AccessError() {

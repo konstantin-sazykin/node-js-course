@@ -11,6 +11,6 @@ export const app = express();
 app.use(express.json());
 
 app.use(`/videos`, videoRoute);
-app.use('/blogs', authMiddleware, blogRoute);
+app.use('/blogs', blogRoute);
 app.use('/posts', authMiddleware, postRoute);
 app.use(errorMiddleware);

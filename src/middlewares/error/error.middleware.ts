@@ -3,13 +3,16 @@ import { ApiError } from '../../exeptions/api.error';
 import { ResponseStatusCodesEnum } from '../../types/common';
 
 export const errorMiddleware = (
-  err: ApiError | unknown,
+  error: ApiError | unknown,
   request: Request,
   response: Response,
+  next: NextFunction,
 ) => {
-  if (err instanceof ApiError) {
-    return response.status(err.status).json({ message: err.message, errors: err.errors });
+  if (error instanceof ApiError) {
+    const responseBody = error.errors?.length ? { errorsMessages: error.errors } : { message: error.message };
+  
+    return response.status(error.status).json(responseBody);
   }
 
-  return response.status(ResponseStatusCodesEnum.InternalError).json({ message: 'Непревиденная ошибка сервера' });
+  return response.status(503).json({ message: 'Непревиденная ошибка сервера' });
 };

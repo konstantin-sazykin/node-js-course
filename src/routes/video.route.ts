@@ -1,9 +1,10 @@
 import { Request, Response, Router } from 'express';
 
-import { ErrorType, RequestType } from './../../src/types/common';
-import { CreateVideoDTO, UpdateVideoDTO } from './../../src/types/video/input';
-import { VideoType, ResolutionsEnum } from './../../src/types/video/output';
+
 import { db } from '../db/db';
+import { ErrorType, RequestType } from '../types/common';
+import { CreateVideoDTO, UpdateVideoDTO } from '../types/video/input';
+import { ResolutionsEnum, VideoType } from '../types/video/output';
 
 export const videoRoute = Router();
 
