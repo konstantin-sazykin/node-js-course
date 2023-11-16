@@ -1,7 +1,7 @@
-export type BlogParams = { id: string };
+export type BlogParams = { id: string }
 
-export type CreateBlogDTO = {
-  name: string;
-  description: string;
-  websiteUrl: string;
-};
+export interface CreateBlogDTO {
+  name: string
+  description: string
+  websiteUrl: string
+}

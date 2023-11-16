@@ -17,14 +17,20 @@
     "@types/jest": "^29.5.8",
     "@types/node": "^20.8.10",
     "@types/supertest": "^2.0.16",
+    "concurrently": "^8.2.2",
     "nodemon": "^3.0.1",
+    "prettier": "^3.1.0",
     "ts-node": "^10.9.1",
+    "tsc-alias": "^1.8.8",
     "typescript": "^5.2.2"
   },
   "scripts": {
     "dev:inspect": "yarn nodemon --inspect dist/index.js",
     "dev": "yarn nodemon dist/index.js",
+    "serve": "concurrently \"yarn watch\" \"yarn watch:aliases\" \"yarn dev:inspect\"",
     "watch": "tsc -w",
+    "watch:aliases": "tsc-alias -w",
+    "build": "tsc && tsc-alias",
     "jest": "jest -i"
   }
 }
