@@ -1,12 +1,12 @@
 export interface VideoType {
-  id: number
-  title: string
-  author: string
-  canBeDownloaded: boolean
-  minAgeRestriction: number | null
-  createdAt: string
-  publicationDate: string
-  availableResolutions: AvailableResolutionsType
+  id: number;
+  title: string;
+  author: string;
+  canBeDownloaded: boolean;
+  minAgeRestriction: number | null;
+  createdAt: string;
+  publicationDate: string;
+  availableResolutions: AvailableResolutionsType;
 }
 
 export enum ResolutionsEnum {
@@ -20,4 +20,4 @@ export enum ResolutionsEnum {
   P2160,
 }
 
-export type AvailableResolutionsType = ResolutionsEnum | null | never[]
+export type AvailableResolutionsType = ResolutionsEnum | null | never[];

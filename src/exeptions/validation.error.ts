@@ -1,31 +1,30 @@
-import { type NextFunction, type Request, type Response } from 'express'
-import { validationResult } from 'express-validator'
+import { type NextFunction, type Request, type Response } from 'express';
+import { validationResult } from 'express-validator';
 
-import { ApiError } from './api.error'
-
+import { ApiError } from './api.error';
 
 export const inputModelValidation = (request: Request, response: Response, next: NextFunction) => {
-  const errors = validationResult(request).formatWith(error => {
+  const errors = validationResult(request).formatWith((error) => {
     switch (error.type) {
       case 'field':
         return {
           message: error.msg,
-          field: error.path
-        }
+          field: error.path,
+        };
       default:
         return {
           message: error.msg,
-          field: 'Unknown field'
-        }
+          field: 'Unknown field',
+        };
     }
-  })
-
+  });
 
   if (!errors.isEmpty()) {
-    const reducedErrors = errors.array({ onlyFirstError: true })
+    const reducedErrors = errors.array({ onlyFirstError: true });
 
-    next(ApiError.BadRequest(reducedErrors)); return
+    next(ApiError.BadRequest(reducedErrors));
+    return;
   }
 
-  next()
-}
+  next();
+};

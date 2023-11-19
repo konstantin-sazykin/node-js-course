@@ -1,15 +1,14 @@
-import {type Request} from 'express'
+import { type Request } from 'express';
 
-
-export type RequestType<P, B> = Request<P, {}, B, {}>
+export type RequestType<P, B> = Request<P, {}, B, {}>;
 
 export interface ErrorMessageType {
-  field: string
-  message: string
+  field: string;
+  message: string;
 }
 
 export interface ErrorType {
-  errorsMessages: ErrorMessageType[]
+  errorsMessages: ErrorMessageType[];
 }
 
 export enum ResponseStatusCodesEnum {

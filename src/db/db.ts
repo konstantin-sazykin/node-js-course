@@ -1,14 +1,13 @@
-import {type VideoType} from '@/types/video/output'
-import {type BlogType} from '@/types/blog/output'
-
+import { type VideoType } from '@/types/video/output';
+import { type BlogType } from '@/types/blog/output';
 
 interface DBType {
-  videos: VideoType[]
-  blogs: BlogType[]
+  videos: VideoType[];
+  blogs: BlogType[];
   defaultUser: {
-    login: string
-    password: string
-  }
+    login: string;
+    password: string;
+  };
 }
 
 export const db: DBType = {
@@ -16,6 +15,6 @@ export const db: DBType = {
   blogs: [],
   defaultUser: {
     login: 'admin',
-    password: 'qwerty'
-  }
-}
+    password: 'qwerty',
+  },
+};

@@ -1,13 +1,13 @@
 import {type AvailableResolutionsType} from './output'
 
 
-export interface CreateVideoDTO {
+export interface VideoCreateDTO {
   title: string
   author: string
   availableResolutions: AvailableResolutionsType
 }
 
-export interface UpdateVideoDTO {
+export interface VideoUpdateDTO {
   author: string
   title: string
   availableResolutions: AvailableResolutionsType

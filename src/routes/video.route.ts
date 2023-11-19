@@ -3,7 +3,7 @@ import { type Request, type Response, Router } from 'express'
 
 import { db } from '@/db/db'
 import { type ErrorType, type RequestType } from '@/types/common'
-import { type CreateVideoDTO, type UpdateVideoDTO } from '@/types/video/input'
+import { type VideoCreateDTO, type VideoUpdateDTO } from '@/types/video/input'
 import { ResolutionsEnum, type VideoType } from '@/types/video/output'
 
 
@@ -36,7 +36,7 @@ videoRoute.get('/:id', (request: RequestType<{ id: string }, {}>, response: Resp
   return response.send(video)
 })
 
-videoRoute.post('/', (req: RequestType<{}, CreateVideoDTO>, res: Response) => {
+videoRoute.post('/', (req: RequestType<{}, VideoCreateDTO>, res: Response) => {
   const errors: ErrorType = {
     errorsMessages: []
   }
@@ -119,7 +119,7 @@ videoRoute.delete('/:id', (request: RequestType<{ id: string }, {}>, response: R
 
 videoRoute.put(
   '/:id',
-  (request: RequestType<{ id: string }, UpdateVideoDTO>, response: Response) => {
+  (request: RequestType<{ id: string }, VideoUpdateDTO>, response: Response) => {
     const id = +request.params.id
     const errors: ErrorType = {
       errorsMessages: []
