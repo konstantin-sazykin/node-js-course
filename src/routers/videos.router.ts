@@ -7,9 +7,9 @@ import { type VideoCreateDTO, type VideoUpdateDTO } from '@/types/video/input'
 import { ResolutionsEnum, type VideoType } from '@/types/video/output'
 
 
-export const videoRoute = Router()
+export const videosRouter = Router()
 
-videoRoute.get('/', (request: Request, response: Response) => {
+videosRouter.get('/', (request: Request, response: Response) => {
   response.send(db.videos)
 })
 
@@ -20,7 +20,7 @@ videoRoute.get('/', (request: Request, response: Response) => {
 //   return response.sendStatus(204);
 // });
 
-videoRoute.get('/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {
+videosRouter.get('/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {
   const id = +request.params.id
 
   if (!id || isNaN(id)) {
@@ -36,7 +36,7 @@ videoRoute.get('/:id', (request: RequestType<{ id: string }, {}>, response: Resp
   return response.send(video)
 })
 
-videoRoute.post('/', (req: RequestType<{}, VideoCreateDTO>, res: Response) => {
+videosRouter.post('/', (req: RequestType<{}, VideoCreateDTO>, res: Response) => {
   const errors: ErrorType = {
     errorsMessages: []
   }
@@ -99,7 +99,7 @@ videoRoute.post('/', (req: RequestType<{}, VideoCreateDTO>, res: Response) => {
   res.status(201).send(newVideo)
 })
 
-videoRoute.delete('/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {
+videosRouter.delete('/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {
   const id = +request.params.id
 
   if (!id || isNaN(id)) {
@@ -117,7 +117,7 @@ videoRoute.delete('/:id', (request: RequestType<{ id: string }, {}>, response: R
   return response.sendStatus(204)
 })
 
-videoRoute.put(
+videosRouter.put(
   '/:id',
   (request: RequestType<{ id: string }, VideoUpdateDTO>, response: Response) => {
     const id = +request.params.id
