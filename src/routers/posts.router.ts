@@ -49,13 +49,13 @@ postsRouter.put(
   authMiddleware,
   postCreateValidation(),
   (request: RequestType<PostParams, CreatePostInputModel>, response: Response) => {
-    const updatedPost = PostRepository.updatePost(request.body, request.params.id);
-
-    if (!updatedPost) {
-      throw new ApiError(ResponseStatusCodesEnum.BadRequest, `Некорректный id блога или id поста`);
+    const isPostUpdated = PostRepository.updatePost(request.body, request.params.id);
+    
+    if (!isPostUpdated) {
+      throw new ApiError(ResponseStatusCodesEnum.NotFound, `Некорректный id блога или id поста`);
     }
 
-    response.sendStatus(ResponseStatusCodesEnum.NoContent);
+    return response.sendStatus(ResponseStatusCodesEnum.NoContent);
   }
 );
 

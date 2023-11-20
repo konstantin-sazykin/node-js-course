@@ -19,7 +19,11 @@ const contentValidation = body('content')
   .isLength({ min: 1, max: 1000 })
   .withMessage('Invalid content field');
 
-const blogIdValidation = body('blogId').isUUID().withMessage('Invalid blogId field');
+const blogIdValidation = body('blogId')
+  .isString()
+  .trim()
+  .isUUID(4)
+  .withMessage('Invalid blogId field');
 
 export const postCreateValidation = () => [
   titleValidation,

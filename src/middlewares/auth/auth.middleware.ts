@@ -27,6 +27,6 @@ export const authMiddleware = (request: Request, response: Response, next: NextF
 
     next();
   } catch (error) {
-    next(ApiError.BadRequest(null, 'Не удалось проверить токен пользователя'));
+    next(ApiError.UnauthorizedError());
   }
 };

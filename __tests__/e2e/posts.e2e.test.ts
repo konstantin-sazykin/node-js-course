@@ -124,7 +124,7 @@ describe(RoutesPathsEnum.posts, () => {
       .put(`${RoutesPathsEnum.posts}/${newPost?.id}`)
       .send(updatedPost)
       .set('Authorization', authHeaderString);
-    
+
     expect(postResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
 
     const updatedBlogResult = await request(app).get(`${RoutesPathsEnum.posts}/${newPost?.id}`);
@@ -137,6 +137,37 @@ describe(RoutesPathsEnum.posts, () => {
     }).toEqual(updatedPost);
 
     newPost = { ...updatedBlogResult.body };
+  });
+
+  it('should`nt update post with incorrect id', async () => {
+    const updatedPost = {
+      title: 'Updated Title',
+      content: 'New Content for this post',
+      blogId: newBlog!.id,
+      shortDescription: 'New short description',
+    };
+
+    const postResult = await request(app)
+      .put(`${RoutesPathsEnum.posts}/'1233123-53453512-3445`)
+      .send(updatedPost)
+      .set('Authorization', authHeaderString);
+
+    expect(postResult.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
+  });
+
+  it('shoul`nt update post with incorrect auth header', async () => {
+    const updatedPost = {
+      title: 'Updated Title',
+      content: 'New Content for this post',
+      blogId: newBlog!.id,
+      shortDescription: 'New short description',
+    };
+    const postResult = await request(app)
+      .put(`${RoutesPathsEnum.posts}/'1233123-53453512-3445`)
+      .send(updatedPost)
+      .set('Authorization', 'Basic admin:qwerty');
+
+    expect(postResult.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
   });
 
   it(`should'nt delete post without auth header`, async () => {
