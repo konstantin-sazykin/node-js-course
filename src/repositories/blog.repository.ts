@@ -1,7 +1,6 @@
 import { db } from '../db/db';
 import { CreateBlogInputModel, UpdateBlogInputModel } from '../types/blog/input';
 import { BlogType } from '../types/blog/output';
-import { createUuid } from '../utils/uuid';
 
 export class BlogsRepository {
   static getAllBlogs() {
@@ -15,7 +14,7 @@ export class BlogsRepository {
   static createBlog(data: CreateBlogInputModel) {
     try {
       const newBlog: BlogType = {
-        id: createUuid(),
+        id: String(new Date().getTime()),
         description: data.description,
         name: data.name,
         websiteUrl: data.websiteUrl,

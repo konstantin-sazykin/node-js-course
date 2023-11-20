@@ -1,7 +1,6 @@
 import { db } from '../db/db';
 import { CreatePostInputModel, UpdatePostInputModel } from '../types/post/input';
 import { PostType } from '../types/post/output';
-import { createUuid } from '../utils/uuid';
 
 export class PostRepository {
   static getAllPosts() {
@@ -20,7 +19,7 @@ export class PostRepository {
     }
 
     const newPost: PostType = {
-      id: createUuid(),
+      id: String(new Date().getTime()),
       title: data.title,
       shortDescription: data.shortDescription,
       content: data.content,
