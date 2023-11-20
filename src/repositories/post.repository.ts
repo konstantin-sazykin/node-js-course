@@ -1,7 +1,7 @@
-import { db } from 'src/db/db';
-import { CreatePostInputModel, UpdatePostInputModel } from 'src/types/post/input';
-import { PostType } from 'src/types/post/output';
-import { createUuid } from 'src/utils/uuid';
+import { db } from '../db/db';
+import { CreatePostInputModel, UpdatePostInputModel } from '../types/post/input';
+import { PostType } from '../types/post/output';
+import { createUuid } from '../utils/uuid';
 
 export class PostRepository {
   static getAllPosts() {
@@ -40,7 +40,7 @@ export class PostRepository {
       return null;
     }
 
-    const updatedPostIndex = db.posts.findIndex(post => post.id === id);
+    const updatedPostIndex = db.posts.findIndex((post) => post.id === id);
 
     if (updatedPostIndex === -1) {
       return null;
@@ -48,20 +48,20 @@ export class PostRepository {
 
     db.posts[updatedPostIndex] = {
       ...db.posts[updatedPostIndex],
-      ...data
-    }
+      ...data,
+    };
 
     return true;
   }
 
   static deletePost(id: string) {
-    const deletedPostIndex = db.posts.findIndex(post => post.id === id);
+    const deletedPostIndex = db.posts.findIndex((post) => post.id === id);
 
     if (deletedPostIndex === -1) {
       return null;
     }
 
-    db.posts = db.posts.filter(post => post.id !== id);
+    db.posts = db.posts.filter((post) => post.id !== id);
 
     return true;
   }

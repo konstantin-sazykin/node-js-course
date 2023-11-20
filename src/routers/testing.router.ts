@@ -1,7 +1,7 @@
-import { ApiError } from 'src/exeptions/api.error';
-import { ResponseStatusCodesEnum } from 'src/utils/constants';
-import { TestingRepository } from 'src/repositories/testing.repository';
 import { NextFunction, Request, Response, Router } from 'express';
+import { TestingRepository } from '../repositories/testing.repository';
+import { ResponseStatusCodesEnum } from '../utils/constants';
+import { ApiError } from '../exeptions/api.error';
 
 export const testingRouter = Router();
 

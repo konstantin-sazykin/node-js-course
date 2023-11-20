@@ -1,18 +1,16 @@
 import { type Request, type Response, Router, NextFunction } from 'express';
 
-import { BlogsRepository } from 'src/repositories/blog.repository';
-import { authMiddleware } from 'src/middlewares/auth/auth.middleware';
-import { type RequestType } from 'src/types/common';
-import {
-  UpdateBlogInputModel,
-  type BlogParams,
-  type CreateBlogInputModel,
-} from 'src/types/blog/input';
-import { ApiError } from 'src/exeptions/api.error';
-import { blogParamsValidation, blogPostValidation } from 'src/validators/blog.validator';
-import { QueryBlogOutputModel } from 'src/types/blog/output';
-import { QueryBlogDTO } from 'src/dto/blog.dto';
-import { ResponseStatusCodesEnum } from 'src/utils/constants';
+import { BlogsRepository } from '../repositories/blog.repository';
+import { QueryBlogOutputModel } from '../types/blog/output';
+import { QueryBlogDTO } from '../dto/blog.dto';
+import { RequestType } from '../types/common';
+import { BlogParams, CreateBlogInputModel, UpdateBlogInputModel } from '../types/blog/input';
+import { ResponseStatusCodesEnum } from '../utils/constants';
+import { ApiError } from '../exeptions/api.error';
+import { authMiddleware } from '../middlewares/auth/auth.middleware';
+import { blogPostValidation } from '../validators/blog.validator';
+
+
 
 export const blogsRouter = Router();
 

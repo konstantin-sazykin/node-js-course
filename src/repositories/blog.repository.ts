@@ -1,7 +1,7 @@
-import { db } from 'src/db/db';
-import { CreateBlogInputModel, UpdateBlogInputModel } from 'src/types/blog/input';
-import { BlogType } from 'src/types/blog/output';
-import { createUuid } from 'src/utils/uuid';
+import { db } from '../db/db';
+import { CreateBlogInputModel, UpdateBlogInputModel } from '../types/blog/input';
+import { BlogType } from '../types/blog/output';
+import { createUuid } from '../utils/uuid';
 
 export class BlogsRepository {
   static getAllBlogs() {
