@@ -34,6 +34,7 @@
     "watch": "tsc -w",
     "watch:aliases": "tsc-alias -w",
     "build": "tsc && tsc-alias",
-    "jest": "jest -i"
+    "jest": "jest -i",
+    "jest:watch": "jest --watch"
   }
 }
