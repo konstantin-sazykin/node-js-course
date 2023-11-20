@@ -1,4 +1,4 @@
-import { db } from '@/db/db';
+import { db } from 'src/db/db';
 
 export class TestingRepository {
   static clearAllData() {

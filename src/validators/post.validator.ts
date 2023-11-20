@@ -1,6 +1,5 @@
 import { body, param } from 'express-validator';
-
-import { inputModelValidation } from '@/exeptions/validation.error';
+import { inputModelValidation } from 'src/exeptions/validation.error';
 
 const titleValidation = body('title')
   .isString()

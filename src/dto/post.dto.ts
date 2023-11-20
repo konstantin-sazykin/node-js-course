@@ -1,4 +1,4 @@
-import { QueryPostOutputModel } from "@/types/post/output";
+import { QueryPostOutputModel } from "src/types/post/output";
 
 export class PostDTO implements QueryPostOutputModel {
   id: string;

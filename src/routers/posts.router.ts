@@ -1,12 +1,12 @@
-import { PostDTO } from '@/dto/post.dto';
-import { ApiError } from '@/exeptions/api.error';
-import { authMiddleware } from '@/middlewares/auth/auth.middleware';
-import { PostRepository } from '@/repositories/post.repository';
-import { CreateBlogInputModel } from '@/types/blog/input';
-import { RequestType } from '@/types/common';
-import { CreatePostInputModel, PostParams } from '@/types/post/input';
-import { ResponseStatusCodesEnum } from '@/utils/constants';
-import { postCreateValidation } from '@/validators/post.validator';
+import { PostDTO } from 'src/dto/post.dto';
+import { ApiError } from 'src/exeptions/api.error';
+import { authMiddleware } from 'src/middlewares/auth/auth.middleware';
+import { PostRepository } from 'src/repositories/post.repository';
+import { CreateBlogInputModel } from 'src/types/blog/input';
+import { RequestType } from 'src/types/common';
+import { CreatePostInputModel, PostParams } from 'src/types/post/input';
+import { ResponseStatusCodesEnum } from 'src/utils/constants';
+import { postCreateValidation } from 'src/validators/post.validator';
 import { type Request, type Response, Router } from 'express';
 
 export const postsRouter = Router();

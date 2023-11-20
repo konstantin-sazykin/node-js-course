@@ -1,6 +1,6 @@
-import { type VideoType } from '@/types/video/output';
-import { type BlogType } from '@/types/blog/output';
-import { PostType } from '@/types/post/output';
+import { type VideoType } from 'src/types/video/output';
+import { type BlogType } from 'src/types/blog/output';
+import { PostType } from 'src/types/post/output';
 
 interface DBType {
   videos: VideoType[];

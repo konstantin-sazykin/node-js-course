@@ -1,4 +1,4 @@
-import { QueryBlogOutputModel } from "@/types/blog/output";
+import { QueryBlogOutputModel } from "src/types/blog/output";
 
 export class QueryBlogDTO implements QueryBlogOutputModel {
   id: string;

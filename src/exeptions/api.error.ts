@@ -1,5 +1,5 @@
-import { ResponseStatusCodesEnum } from '@/utils/constants';
-import { type ErrorMessageType } from '@/types/common';
+import { ResponseStatusCodesEnum } from 'src/utils/constants';
+import { type ErrorMessageType } from 'src/types/common';
 
 export class ApiError {
   status;

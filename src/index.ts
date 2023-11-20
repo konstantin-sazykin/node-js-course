@@ -1,4 +1,4 @@
-import { app } from '@/settings'
+import { app } from 'src/settings'
 
 
 const port = 8080

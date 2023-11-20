@@ -1,7 +1,7 @@
-import { db } from '@/db/db';
-import { CreatePostInputModel, UpdatePostInputModel } from '@/types/post/input';
-import { PostType } from '@/types/post/output';
-import { createUuid } from '@/utils/uuid';
+import { db } from 'src/db/db';
+import { CreatePostInputModel, UpdatePostInputModel } from 'src/types/post/input';
+import { PostType } from 'src/types/post/output';
+import { createUuid } from 'src/utils/uuid';
 
 export class PostRepository {
   static getAllPosts() {
