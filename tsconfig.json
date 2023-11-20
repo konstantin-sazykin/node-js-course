@@ -8,8 +8,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    // "baseUrl": "./",
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
      "src/**/*"
