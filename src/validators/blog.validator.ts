@@ -1,4 +1,4 @@
-import {body} from 'express-validator'
+import {body, param} from 'express-validator'
 
 import {inputModelValidation} from '@/exeptions/validation.error'
 
@@ -22,7 +22,6 @@ const descriptionValidation = body('description')
   .withMessage('Invalid description field')
 
 const websiteUrlValidation = body('websiteUrl')
-  .optional({nullable: true})
   .isString()
   .trim()
   .isLength({
@@ -40,4 +39,11 @@ export const blogPostValidation = () => [
   descriptionValidation,
   websiteUrlValidation,
   inputModelValidation
-]
+];
+
+const idValidation = param('id').isUUID();
+
+export const blogParamsValidation = () => [
+  idValidation,
+  inputModelValidation,
+];

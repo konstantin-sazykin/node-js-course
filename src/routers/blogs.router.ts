@@ -1,34 +1,38 @@
 import { type Request, type Response, Router, NextFunction } from 'express';
 
-import { BlogRepository } from '@/repositories/blog.respository';
+import { BlogsRepository } from '@/repositories/blog.repository';
 import { authMiddleware } from '@/middlewares/auth/auth.middleware';
-import { type RequestType, ResponseStatusCodesEnum } from '@/types/common';
-import { type BlogParams, type BlogCreateDTO } from '@/types/blog/input';
+import { type RequestType } from '@/types/common';
+import {
+  UpdateBlogInputModel,
+  type BlogParams,
+  type CreateBlogInputModel,
+} from '@/types/blog/input';
 import { ApiError } from '@/exeptions/api.error';
-import { blogPostValidation } from '@/validators/blog.validator';
-import { db } from '@/db/db';
-import { QueryBlog, QueryBlogDTO } from '@/types/blog/output';
+import { blogParamsValidation, blogPostValidation } from '@/validators/blog.validator';
+import { QueryBlogOutputModel } from '@/types/blog/output';
+import { QueryBlogDTO } from '@/dto/blog.dto';
+import { ResponseStatusCodesEnum } from '@/utils/constants';
 
 export const blogsRouter = Router();
 
-blogsRouter.get('/', (request: Request, response: Response<QueryBlogDTO[]>) => {
-  const blogs = BlogRepository.getAllBlogs();
+blogsRouter.get('/', (request: Request, response: Response<QueryBlogOutputModel[]>) => {
+  const blogs = BlogsRepository.getAllBlogs();
 
-  return response.send(blogs.map((blog) => ({ ...new QueryBlog(blog) })));
+  return response.send(blogs.map((blog) => ({ ...new QueryBlogDTO(blog) })));
 });
 
 blogsRouter.get(
   '/:id',
-  authMiddleware,
-  (request: RequestType<BlogParams, {}>, response: Response<QueryBlogDTO>) => {
+  (request: RequestType<BlogParams, {}>, response: Response<QueryBlogOutputModel>) => {
     const { id } = request.params;
-    const blog = BlogRepository.getBlogById(id);
+    const blog = BlogsRepository.getBlogById(id);
 
     if (!blog) {
       throw new ApiError(ResponseStatusCodesEnum.NotFound, 'Блог с указанны id не найден');
     }
 
-    return response.send({ ...new QueryBlog(blog) });
+    return response.send({ ...new QueryBlogDTO(blog) });
   }
 );
 
@@ -36,16 +40,57 @@ blogsRouter.post(
   '/',
   authMiddleware,
   blogPostValidation(),
-  (request: RequestType<{}, BlogCreateDTO>, response: Response<QueryBlogDTO>) => {
-    const { description, name, websiteUrl } = request.body;
-
-    const id = String(Date.now());
-
-    db.blogs.push({ description, name, websiteUrl, id });
-    const createdBlog = db.blogs.find((blog) => blog.id === id);
+  (request: RequestType<{}, CreateBlogInputModel>, response: Response<QueryBlogOutputModel>) => {
+    const createdBlog = BlogsRepository.createBlog(request.body);
 
     if (createdBlog) {
-      return response.send({ ...new QueryBlog(createdBlog) });
+      return response
+        .status(ResponseStatusCodesEnum.Created)
+        .send({ ...new QueryBlogDTO(createdBlog) });
+    } else {
+      throw new ApiError(ResponseStatusCodesEnum.InternalError, null);
+    }
+  }
+);
+
+blogsRouter.put(
+  '/:id',
+  authMiddleware,
+  blogPostValidation(),
+  (request: RequestType<BlogParams, UpdateBlogInputModel>, response: Response) => {
+    const blogId = request.params.id;
+    const isBlogExists = !!BlogsRepository.getBlogById(blogId);
+
+    if (!isBlogExists) {
+      throw new ApiError(ResponseStatusCodesEnum.NotFound, 'Блог с указанныи id не найден');
+    }
+
+    const isBlogUpdated = BlogsRepository.updateBlog(request.params.id, request.body);
+
+    if (isBlogUpdated) {
+      return response.sendStatus(ResponseStatusCodesEnum.NoContent);
+    } else {
+      throw new ApiError(ResponseStatusCodesEnum.InternalError, null);
+    }
+  }
+);
+
+blogsRouter.delete(
+  '/:id',
+  authMiddleware,
+  (request: RequestType<BlogParams, {}>, response: Response) => {
+    const blogId = request.params.id;
+
+    const isBlogExists = !!BlogsRepository.getBlogById(blogId);
+
+    if (!isBlogExists) {
+      throw new ApiError(ResponseStatusCodesEnum.NotFound, 'Блог с указанныи id не найден');
+    }
+
+    const isBlogDeleted = BlogsRepository.deleteBlog(blogId);
+
+    if (isBlogDeleted) {
+      return response.sendStatus(ResponseStatusCodesEnum.NoContent);
     } else {
       throw new ApiError(ResponseStatusCodesEnum.InternalError, null);
     }
