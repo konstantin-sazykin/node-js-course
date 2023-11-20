@@ -37,10 +37,8 @@ export class BlogsRepository {
       }
 
       db.blogs[updatedBlogIndex] = {
-        id,
-        description: data.description,
-        name: data.name,
-        websiteUrl: data.websiteUrl,
+        ...db.blogs[updatedBlogIndex],
+        ...data
       };
 
       return true;
