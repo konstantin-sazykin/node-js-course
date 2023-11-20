@@ -118,9 +118,9 @@ describe('/blogs', () => {
 
     expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
 
-    const unDeletedPostResult = await request(app).get(`${RoutesPathsEnum.blogs}/${newBlog?.id}`);
+    const unDeletedBlogResult = await request(app).get(`${RoutesPathsEnum.blogs}/${newBlog?.id}`);
 
-    expect(unDeletedPostResult.body).toEqual(newBlog);
+    expect(unDeletedBlogResult.body).toEqual(newBlog);
   });
 
   it(`should'nt delete blog with incorrect id`, async () => {
@@ -130,9 +130,9 @@ describe('/blogs', () => {
 
     expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
 
-    const unDeletedPostResult = await request(app).get(`${RoutesPathsEnum.blogs}/${newBlog?.id}`);
+    const unDeletedBlogResult = await request(app).get(`${RoutesPathsEnum.blogs}/${newBlog?.id}`);
 
-    expect(unDeletedPostResult.body).toEqual(newBlog);
+    expect(unDeletedBlogResult.body).toEqual(newBlog);
   });
 
   it(`should delete blog with auth header`, async () => {
