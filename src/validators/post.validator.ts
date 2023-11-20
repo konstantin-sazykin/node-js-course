@@ -22,7 +22,7 @@ const contentValidation = body('content')
 const blogIdValidation = body('blogId')
   .isString()
   .trim()
-  .isUUID(4)
+  .isLength({ min: 1, max: 15 })
   .withMessage('Invalid blogId field');
 
 export const postCreateValidation = () => [

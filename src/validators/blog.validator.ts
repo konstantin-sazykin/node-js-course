@@ -40,7 +40,7 @@ export const blogPostValidation = () => [
   inputModelValidation
 ];
 
-const idValidation = param('id').isUUID();
+const idValidation = param('id').isString().trim().isLength({ min: 1, max: 15 });
 
 export const blogParamsValidation = () => [
   idValidation,
