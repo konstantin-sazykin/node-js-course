@@ -1,7 +1,8 @@
-import { app } from "./settings";
+import { app } from '@/settings'
 
-const port = 8080;
+
+const port = 8080
 
 app.listen(port, () => {
-  console.log(`Server was started on port  ${port}`);
+  console.log(`Server was started on port  ${port}`)
 })

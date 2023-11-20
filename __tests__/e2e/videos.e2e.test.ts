@@ -1,7 +1,7 @@
 import request from 'supertest';
 
-import { app } from './../src/settings';
-import { VideoType } from './../src/types';
+import { VideoType } from './../../src/types/video/output';
+import { app } from '../../src/settings';
 
 describe('/videos', () => {
   let newVideo: VideoType | null = null;
