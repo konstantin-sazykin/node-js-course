@@ -14,7 +14,11 @@ describe(RoutesPathsEnum.posts, () => {
   let newPost: QueryPostOutputModel | null = null;
 
   beforeAll(async () => {
-    await postCollection.drop();
+    await launchDb();
+    
+    if (postCollection) {
+      await postCollection.drop();
+    }
 
     request(app).delete(RoutesPathsEnum.testingAllData).expect(204);
   });
@@ -182,15 +186,15 @@ describe(RoutesPathsEnum.posts, () => {
     expect(unDeletedPostResult.body).toEqual(newPost);
   });
 
-  // it(`should delete blog with auth header`, async () => {
-  //   const postResult = await request(app)
-  //     .delete(`${RoutesPathsEnum.posts}/${newPost?.id}`)
-  //     .set('Authorization', authHeaderString);
+  it(`should delete blog with auth header`, async () => {
+    const postResult = await request(app)
+      .delete(`${RoutesPathsEnum.posts}/${newPost?.id}`)
+      .set('Authorization', authHeaderString);
 
-  //   expect(postResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
+    expect(postResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
 
-  //   const allPostssResult = await request(app).get(RoutesPathsEnum.posts);
+    const allPostssResult = await request(app).get(RoutesPathsEnum.posts);
 
-  //   expect(allPostssResult.body).toEqual([]);
-  // });
+    expect(allPostssResult.body).toEqual([]);
+  });
 });

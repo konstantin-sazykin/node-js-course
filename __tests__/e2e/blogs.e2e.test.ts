@@ -10,7 +10,12 @@ describe('/blogs', () => {
   let newBlog: QueryBlogOutputModel | null = null;
 
   beforeAll( async () => {
-    await blogCollection.drop();
+    await launchDb();
+
+    if (blogCollection) {
+      await blogCollection.drop();
+    }
+    
 
     request(app).delete(RoutesPathsEnum.testingAllData).expect(204);
   });
@@ -138,15 +143,15 @@ describe('/blogs', () => {
     expect(unDeletedBlogResult.body).toEqual(newBlog);
   });
 
-  // it(`should delete blog with auth header`, async () => {
-  //   const blogResult = await request(app)
-  //     .delete(`${RoutesPathsEnum.blogs}/${newBlog?.id}`)
-  //     .set('Authorization', authHeaderString);
+  it(`should delete blog with auth header`, async () => {
+    const blogResult = await request(app)
+      .delete(`${RoutesPathsEnum.blogs}/${newBlog?.id}`)
+      .set('Authorization', authHeaderString);
 
-  //   expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
+    expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
 
-  //   const allBlogsResult = await request(app).get(RoutesPathsEnum.blogs);
+    const allBlogsResult = await request(app).get(RoutesPathsEnum.blogs);
 
-  //   expect(allBlogsResult.body).toEqual([]);
-  // });
+    expect(allBlogsResult.body).toEqual([]);
+  });
 });
