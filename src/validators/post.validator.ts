@@ -1,8 +1,6 @@
-import { body, param, validationResult } from 'express-validator';
+import { body } from 'express-validator';
 import { inputModelValidation } from '../exeptions/validation.error';
-import { NextFunction, Request, Response } from 'express';
-import { ApiError } from '../exeptions/api.error';
-import { ResponseStatusCodesEnum } from '../utils/constants';
+
 
 const titleValidation = body('title')
   .isString()
