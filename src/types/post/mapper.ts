@@ -9,9 +9,10 @@ export class PostMapper implements QueryPostOutputModel {
   public shortDescription: string;
   public title: string;
   public createdAt?: string | undefined;
+  public isMembership?: boolean | undefined;
 
-  constructor(video: WithId<PostType>) {
-    const { _id, blogId, blogName, content, shortDescription, title, createdAt } = video;
+  constructor(post: WithId<PostType>) {
+    const { _id, blogId, blogName, content, shortDescription, title, createdAt, isMembership } = post;
 
     this.id = _id.toString();
     this.blogId = blogId;
@@ -20,5 +21,6 @@ export class PostMapper implements QueryPostOutputModel {
     this.shortDescription = shortDescription;
     this.title = title;
     this.createdAt = createdAt;
+    this.isMembership = isMembership;
   }
 }

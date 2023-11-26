@@ -8,12 +8,14 @@ export class BlogMapper implements QueryBlogOutputModel {
   description: string;
   websiteUrl: string;
   createdAt: string | undefined;
+  isMembership?: boolean | undefined;
 
-  constructor({ _id, name, description, websiteUrl, createdAt }: WithId<BlogType>) {
+  constructor({ _id, name, description, websiteUrl, createdAt, isMembership }: WithId<BlogType>) {
     this.id = _id.toString();
     this.name = name;
     this.description = description;
     this.websiteUrl = websiteUrl;
     this.createdAt = createdAt;
+    this.isMembership = isMembership;
   }
 }
