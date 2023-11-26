@@ -13,7 +13,7 @@ describe('/blogs', () => {
     await launchDb();
 
     if (blogCollection) {
-      await blogCollection.drop();
+      await blogCollection.drop().catch(err => console.log(err));
     }
     
 

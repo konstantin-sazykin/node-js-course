@@ -17,7 +17,7 @@ describe(RoutesPathsEnum.posts, () => {
     await launchDb();
     
     if (postCollection) {
-      await postCollection.drop();
+      await postCollection.drop().catch(err => console.log(err));
     }
 
     request(app).delete(RoutesPathsEnum.testingAllData).expect(204);
@@ -39,7 +39,7 @@ describe(RoutesPathsEnum.posts, () => {
     const createdPost: CreatePostInputModel = {
       title: 'Some title',
       content: 'Some content',
-      blogId: 'b7aa9820f30f677',
+      blogId: '65637ae50e9d04bcf9842c83',
       shortDescription: 'Some short description',
     };
 
@@ -52,7 +52,7 @@ describe(RoutesPathsEnum.posts, () => {
     const createdPost: CreatePostInputModel = {
       title: 'Some title',
       content: 'Some content',
-      blogId: 'b7aa9820f30f677',
+      blogId: '65637ae50e9d04bcf9842c83',
       shortDescription: 'Some short description',
     };
 
@@ -77,7 +77,7 @@ describe(RoutesPathsEnum.posts, () => {
     const updatedPost = {
       title: null,
       content: 123,
-      blogId: 'b7aa9820f30f677' + 12,
+      blogId: '65637ae50e9d04bcf9842c83' + 12,
       shortDescription: [],
     };
 
@@ -110,7 +110,7 @@ describe(RoutesPathsEnum.posts, () => {
     const updatedPost = {
       title: 'Updated Title',
       content: 'New Content for this post',
-      blogId: 'b7aa9820f30f677',
+      blogId: '65637ae50e9d04bcf9842c83',
       shortDescription: 'New short description',
     };
 
@@ -137,7 +137,7 @@ describe(RoutesPathsEnum.posts, () => {
     const updatedPost = {
       title: 'Updated Title',
       content: 'New Content for this post',
-      blogId: 'b7aa9820f30f677',
+      blogId: '65637ae50e9d04bcf9842c83',
       shortDescription: 'New short description',
     };
 
@@ -153,7 +153,7 @@ describe(RoutesPathsEnum.posts, () => {
     const updatedPost = {
       title: 'Updated Title',
       content: 'New Content for this post',
-      blogId: 'b7aa9820f30f677',
+      blogId: '65637ae50e9d04bcf9842c83',
       shortDescription: 'New short description',
     };
     const postResult = await request(app)
