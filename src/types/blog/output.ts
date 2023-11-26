@@ -1,8 +1,9 @@
 export interface BlogType {
-  id: string
-  name: string
-  description: string
-  websiteUrl: string
+  name: string;
+  description: string;
+  websiteUrl: string;
+  createdAt?: string;
+  isMembership?: boolean;
 }
 
 export type QueryBlogOutputModel = {
@@ -10,5 +11,6 @@ export type QueryBlogOutputModel = {
   name: string;
   description: string;
   websiteUrl: string;
-}
-
+  createdAt?: string;
+  isMembership?: boolean;
+};

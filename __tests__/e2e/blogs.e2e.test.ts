@@ -1,14 +1,22 @@
-import { BlogType } from './../../src/types/blog/output';
+import { QueryBlogOutputModel } from './../../src/types/blog/output';
 import request from 'supertest';
 
 import { ResponseStatusCodesEnum, RoutesPathsEnum } from '../../src/utils/constants';
 import { app } from '../../src/settings';
+import { blogCollection, launchDb } from '../../src/db/db';
 
 describe('/blogs', () => {
   const authHeaderString = `Basic ${btoa('admin:qwerty')}`;
-  let newBlog: BlogType | null = null;
+  let newBlog: QueryBlogOutputModel | null = null;
 
-  beforeAll(() => {
+  beforeAll( async () => {
+    await launchDb();
+
+    if (blogCollection) {
+      await blogCollection.drop();
+    }
+    
+
     request(app).delete(RoutesPathsEnum.testingAllData).expect(204);
   });
 

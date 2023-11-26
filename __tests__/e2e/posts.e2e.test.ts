@@ -1,32 +1,26 @@
 import { CreateBlogInputModel } from './../../src/types/blog/input';
 import { CreatePostInputModel } from './../../src/types/post/input';
-import { PostType } from './../../src/types/post/output';
-import { BlogType } from './../../src/types/blog/output';
+import { PostType, QueryPostOutputModel } from './../../src/types/post/output';
+import { BlogType, QueryBlogOutputModel } from './../../src/types/blog/output';
 import request from 'supertest';
 
 import { ResponseStatusCodesEnum, RoutesPathsEnum } from '../../src/utils/constants';
 import { app } from '../../src/settings';
+import { launchDb, postCollection } from '../../src/db/db';
+
 
 describe(RoutesPathsEnum.posts, () => {
   const authHeaderString = `Basic ${btoa('admin:qwerty')}`;
-  let newBlog: BlogType | null = null;
-  let newPost: PostType | null = null;
+  let newPost: QueryPostOutputModel | null = null;
 
   beforeAll(async () => {
+    await launchDb();
+    
+    if (postCollection) {
+      await postCollection.drop();
+    }
+
     request(app).delete(RoutesPathsEnum.testingAllData).expect(204);
-
-    const createdBlog: CreateBlogInputModel = {
-      name: 'New Blog',
-      description: 'New Blog For Testing Posts',
-      websiteUrl: 'https://test-com.lt',
-    };
-
-    const blogResult = await request(app)
-      .post(RoutesPathsEnum.blogs)
-      .send(createdBlog)
-      .set('Authorization', authHeaderString);
-
-    newBlog = blogResult.body;
   });
 
   it('should return empty posts array', async () => {
@@ -45,7 +39,7 @@ describe(RoutesPathsEnum.posts, () => {
     const createdPost: CreatePostInputModel = {
       title: 'Some title',
       content: 'Some content',
-      blogId: newBlog!.id,
+      blogId: 'b7aa9820f30f677',
       shortDescription: 'Some short description',
     };
 
@@ -58,7 +52,7 @@ describe(RoutesPathsEnum.posts, () => {
     const createdPost: CreatePostInputModel = {
       title: 'Some title',
       content: 'Some content',
-      blogId: newBlog!.id,
+      blogId: 'b7aa9820f30f677',
       shortDescription: 'Some short description',
     };
 
@@ -83,7 +77,7 @@ describe(RoutesPathsEnum.posts, () => {
     const updatedPost = {
       title: null,
       content: 123,
-      blogId: newBlog!.id + 12,
+      blogId: 'b7aa9820f30f677' + 12,
       shortDescription: [],
     };
 
@@ -116,7 +110,7 @@ describe(RoutesPathsEnum.posts, () => {
     const updatedPost = {
       title: 'Updated Title',
       content: 'New Content for this post',
-      blogId: newBlog!.id,
+      blogId: 'b7aa9820f30f677',
       shortDescription: 'New short description',
     };
 
@@ -143,7 +137,7 @@ describe(RoutesPathsEnum.posts, () => {
     const updatedPost = {
       title: 'Updated Title',
       content: 'New Content for this post',
-      blogId: newBlog!.id,
+      blogId: 'b7aa9820f30f677',
       shortDescription: 'New short description',
     };
 
@@ -159,7 +153,7 @@ describe(RoutesPathsEnum.posts, () => {
     const updatedPost = {
       title: 'Updated Title',
       content: 'New Content for this post',
-      blogId: newBlog!.id,
+      blogId: 'b7aa9820f30f677',
       shortDescription: 'New short description',
     };
     const postResult = await request(app)

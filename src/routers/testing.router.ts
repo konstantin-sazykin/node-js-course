@@ -5,8 +5,8 @@ import { ApiError } from '../exeptions/api.error';
 
 export const testingRouter = Router();
 
-testingRouter.delete('/', (request: Request, response: Response, next: NextFunction) => {
-  const isAllDataCleared = TestingRepository.clearAllData();
+testingRouter.delete('/', async (request: Request, response: Response, next: NextFunction) => {
+  const isAllDataCleared = await TestingRepository.clearAllData();
 
   if (isAllDataCleared) {
     response.sendStatus(ResponseStatusCodesEnum.NoContent);

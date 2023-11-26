@@ -1,5 +1,4 @@
 import { type Request, type Response, Router } from 'express'
-import { db } from '../db/db'
 import { ErrorType, RequestType } from '../types/common'
 import { VideoCreateDTO, VideoUpdateDTO } from '../types/video/input'
 import { ResolutionsEnum, VideoType } from '../types/video/output'
@@ -7,16 +6,14 @@ import { ResolutionsEnum, VideoType } from '../types/video/output'
 
 export const videosRouter = Router()
 
+const db: { videos: VideoType[] } = {
+  videos: [],
+};
+
 videosRouter.get('/', (request: Request, response: Response) => {
   response.send(db.videos)
 })
 
-// TODO вынести в тестовый роут
-// videoRoute.delete('/testing/all-data', (request: Request, response: Response) => {
-//   db.videos.length = 0;
-
-//   return response.sendStatus(204);
-// });
 
 videosRouter.get('/:id', (request: RequestType<{ id: string }, {}>, response: Response) => {
   const id = +request.params.id
@@ -229,3 +226,5 @@ videosRouter.put(
     return response.sendStatus(204)
   }
 )
+
+export { db as videoDb }

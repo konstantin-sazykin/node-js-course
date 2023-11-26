@@ -1,6 +1,12 @@
 import { type NextFunction, type Request, type Response } from 'express';
 import { ApiError } from '../../exeptions/api.error';
-import { db } from '../../db/db';
+
+const db = {
+  defaultUser: {
+    login: 'admin',
+    password: 'qwerty'
+  }
+}
 
 export const authMiddleware = (request: Request, response: Response, next: NextFunction) => {
   const authHeader = request.headers.authorization;
