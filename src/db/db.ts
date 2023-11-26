@@ -1,23 +1,33 @@
-import { BlogType } from "../types/blog/output";
-import { PostType } from "../types/post/output";
-import { VideoType } from "../types/video/output";
+import { MongoClient } from 'mongodb';
+import colors from 'colors';
+import dotenv from 'dotenv';
 
-interface DBType {
-  videos: VideoType[];
-  blogs: BlogType[];
-  posts: PostType[];
-  defaultUser: {
-    login: string;
-    password: string;
-  };
+import { BlogType } from '../types/blog/output';
+import { PostType } from '../types/post/output';
+
+dotenv.config();
+
+const mongoUrl = process.env.MONGO_URL;
+
+const client = new MongoClient(mongoUrl!);
+
+const db = client.db('node-js-backend-course');
+
+export const blogCollection = db.collection<BlogType>('blog');
+export const postCollection = db.collection<PostType>('post');
+
+
+export const launchDb = async () => {
+  try {
+    await client.connect();
+
+    console.log(colors.green(`Client connected to DB with URL ${mongoUrl}`));
+    
+  } catch (error) {
+    if (error) {
+      console.log(colors.red(String(error)));
+    }
+
+    await client.close();
+  }
 }
-
-export const db: DBType = {
-  videos: [],
-  blogs: [],
-  posts: [],
-  defaultUser: {
-    login: 'admin',
-    password: 'qwerty',
-  },
-};

@@ -1,67 +1,84 @@
-import { db } from '../db/db';
+import { ObjectId } from 'mongodb';
+import { PostMapper } from './../types/post/mapper';
+import { postCollection } from '../db/db';
 import { CreatePostInputModel, UpdatePostInputModel } from '../types/post/input';
-import { PostType } from '../types/post/output';
+import { QueryPostOutputModel } from '../types/post/output';
 
 export class PostRepository {
-  static getAllPosts() {
-    return db.posts;
+  static async getAllPosts(): Promise<QueryPostOutputModel[]> {
+    const posts = await postCollection.find({}).toArray();
+
+    return posts.map((video) => ({ ...new PostMapper(video) }));
   }
 
-  static findPostsById(id: string) {
-    return db.posts.find((post) => post.id === id) || null;
+  static async findPostsById(id: string): Promise<QueryPostOutputModel | null> {
+    try {
+      const post = await postCollection.findOne({ _id: new ObjectId(id) });
+
+      if (!post) {
+        return null;
+      }
+
+      return {
+        ...new PostMapper(post),
+      };
+    } catch (error) {
+      console.log(error);
+
+      return null;
+    }
   }
 
-  static createPost(data: CreatePostInputModel) {
-    const belongsToBlog = db.blogs.find((blog) => blog.id === data.blogId);
+  static async createPost(data: CreatePostInputModel): Promise<QueryPostOutputModel | null> {
+    try {
+      const result = await postCollection.insertOne({
+        ...data,
+        createdAt: new Date().toISOString(),
+        isMembership: false,
+      });
 
-    if (!belongsToBlog) {
+      if (result.acknowledged) {
+        const createdPost = await postCollection.findOne({ _id: result.insertedId });
+
+        if (createdPost) {
+          return { ...new PostMapper(createdPost) };
+        } else {
+          return null;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.log(error);
+
       return null;
     }
-
-    const newPost: PostType = {
-      id: String(new Date().getTime()),
-      title: data.title,
-      shortDescription: data.shortDescription,
-      content: data.content,
-      blogId: belongsToBlog.id,
-      blogName: belongsToBlog.name,
-    };
-
-    db.posts.push(newPost);
-
-    return newPost;
   }
 
-  static updatePost(data: UpdatePostInputModel, id: string) {
-    const belongsToBlog = db.blogs.find((blog) => blog.id === data.blogId);
+  static async updatePost(data: UpdatePostInputModel, id: string): Promise<boolean> {
+    try {
+      const result = await postCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { ...data } }
+      );
 
-    if (!belongsToBlog) {
-      return null;
+      return !!result.modifiedCount;
+    } catch (error) {
+      console.log(error);
+
+      return false;
     }
-
-    const updatedPostIndex = db.posts.findIndex((post) => post.id === id);
-
-    if (updatedPostIndex === -1) {
-      return null;
-    }
-
-    db.posts[updatedPostIndex] = {
-      ...db.posts[updatedPostIndex],
-      ...data,
-    };
-
-    return true;
   }
 
-  static deletePost(id: string) {
-    const deletedPostIndex = db.posts.findIndex((post) => post.id === id);
+  static async deletePost(id: string): Promise<boolean> {
+    try {
+      const result = await postCollection.deleteOne({ _id: new ObjectId(id) });
 
-    if (deletedPostIndex === -1) {
-      return null;
+      return !!result.deletedCount;
+    } catch (error) {
+      console.log(error);
+
+      return false;
     }
-
-    db.posts = db.posts.filter((post) => post.id !== id);
-
-    return true;
   }
 }

@@ -1,10 +1,11 @@
 export type PostType = {
-  id: string;
   title: string;
   shortDescription: string;
   content: string;
   blogId: string;
-  blogName: string;
+  blogName?: string;
+  createdAt?: string;
+  isMembership?: boolean;
 };
 
 export type QueryPostOutputModel = {
@@ -13,5 +14,7 @@ export type QueryPostOutputModel = {
   shortDescription: string;
   content: string;
   blogId: string;
-  blogName: string;
+  blogName?: string;
+  createdAt?: string;
+  isMembership?: boolean;
 };
