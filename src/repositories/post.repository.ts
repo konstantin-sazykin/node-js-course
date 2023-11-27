@@ -34,7 +34,7 @@ export class PostRepository {
       const result = await postCollection.insertOne({
         ...data,
         createdAt: new Date().toISOString(),
-        isMembership: false,
+        blogName: 'Blog name',
       });
 
       if (result.acknowledged) {

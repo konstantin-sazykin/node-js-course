@@ -7,17 +7,33 @@ import request from 'supertest';
 import { ResponseStatusCodesEnum, RoutesPathsEnum } from '../../src/utils/constants';
 import { app } from '../../src/settings';
 import { launchDb, postCollection } from '../../src/db/db';
+import { BlogsRepository } from '../../src/repositories/blog.repository';
 
 
 describe(RoutesPathsEnum.posts, () => {
   const authHeaderString = `Basic ${btoa('admin:qwerty')}`;
   let newPost: QueryPostOutputModel | null = null;
+  let newBlog: QueryBlogOutputModel;
 
   beforeAll(async () => {
     await launchDb();
     
     if (postCollection) {
       await postCollection.drop().catch(err => console.log(err));
+    }
+
+    const createdBlog: CreateBlogInputModel = {
+      description: 'My blog for testing blogs',
+      name: 'Blog for tests',
+      websiteUrl: 'https://my-test-blog-with-correct-data.com'
+    }
+
+    const blogResult = await BlogsRepository.createBlog(createdBlog);
+
+    if (blogResult) {
+      newBlog = blogResult;
+    } else {
+      throw new Error('Can`t create new Blog for testing posts')
     }
 
     request(app).delete(RoutesPathsEnum.testingAllData).expect(204);
@@ -52,7 +68,7 @@ describe(RoutesPathsEnum.posts, () => {
     const createdPost: CreatePostInputModel = {
       title: 'Some title',
       content: 'Some content',
-      blogId: '65637ae50e9d04bcf9842c83',
+      blogId: newBlog.id,
       shortDescription: 'Some short description',
     };
 
@@ -85,7 +101,7 @@ describe(RoutesPathsEnum.posts, () => {
       { message: 'Invalid value', field: 'title' },
       { message: 'Invalid value', field: 'shortDescription' },
       { message: 'Invalid value', field: 'content' },
-      { message: 'Invalid blogId field', field: 'blogId' },
+      { message: 'Invalid value', field: 'blogId' },
     ];
 
     const postResult = await request(app)
@@ -110,7 +126,7 @@ describe(RoutesPathsEnum.posts, () => {
     const updatedPost = {
       title: 'Updated Title',
       content: 'New Content for this post',
-      blogId: '65637ae50e9d04bcf9842c83',
+      blogId: newBlog.id,
       shortDescription: 'New short description',
     };
 
