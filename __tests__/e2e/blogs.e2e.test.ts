@@ -133,7 +133,7 @@ describe('/blogs', () => {
 
   it(`should'nt delete blog with incorrect id`, async () => {
     const blogResult = await request(app)
-      .delete(`${RoutesPathsEnum.blogs}/tpgldfserq-112dfd-4412113`)
+      .delete(`${RoutesPathsEnum.blogs}/63189b06003380064c4193be`)
       .set('Authorization', authHeaderString);
 
     expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
