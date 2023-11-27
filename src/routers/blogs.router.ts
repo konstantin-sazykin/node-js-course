@@ -86,7 +86,7 @@ blogsRouter.put(
       const isBlogUpdated = await BlogsRepository.updateBlog(request.params.id, request.body);
 
       if (!isBlogUpdated) {
-        throw new ApiError(ResponseStatusCodesEnum.InternalError, null);
+        throw new ApiError(ResponseStatusCodesEnum.NotFound, null);
       }
 
       response.sendStatus(ResponseStatusCodesEnum.NoContent);

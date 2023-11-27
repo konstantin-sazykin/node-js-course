@@ -1,4 +1,4 @@
-import {body, param} from 'express-validator'
+import {body} from 'express-validator'
 import { inputModelValidation } from '../exeptions/validation.error';
 
 
@@ -38,11 +38,4 @@ export const blogPostValidation = () => [
   descriptionValidation,
   websiteUrlValidation,
   inputModelValidation
-];
-
-const idValidation = param('id').isString().trim().isLength({ min: 1, max: 15 });
-
-export const blogParamsValidation = () => [
-  idValidation,
-  inputModelValidation,
 ];
