@@ -4,7 +4,7 @@ export type PostType = {
   content: string;
   blogId: string;
   blogName: string;
-  createdAt?: string;
+  createdAt: string;
 };
 
 export type QueryPostOutputModel = {
@@ -14,5 +14,5 @@ export type QueryPostOutputModel = {
   content: string;
   blogId: string;
   blogName: string;
-  createdAt?: string;
+  createdAt: string;
 };

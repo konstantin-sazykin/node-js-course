@@ -1,7 +1,7 @@
 import { CreateBlogInputModel } from './../../src/types/blog/input';
 import { CreatePostInputModel } from './../../src/types/post/input';
-import { PostType, QueryPostOutputModel } from './../../src/types/post/output';
-import { BlogType, QueryBlogOutputModel } from './../../src/types/blog/output';
+import { QueryPostOutputModel } from './../../src/types/post/output';
+import { QueryBlogOutputModel } from './../../src/types/blog/output';
 import request from 'supertest';
 
 import { ResponseStatusCodesEnum, RoutesPathsEnum } from '../../src/utils/constants';

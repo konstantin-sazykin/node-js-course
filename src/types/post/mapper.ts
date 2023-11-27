@@ -8,7 +8,7 @@ export class PostMapper implements QueryPostOutputModel {
   public content: string;
   public shortDescription: string;
   public title: string;
-  public createdAt?: string | undefined;
+  public createdAt: string;
 
   constructor(post: WithId<PostType>) {
     const { _id, blogId, blogName, content, shortDescription, title, createdAt } = post;
