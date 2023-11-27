@@ -4,15 +4,14 @@ import { PostType, QueryPostOutputModel } from "./output";
 export class PostMapper implements QueryPostOutputModel {
   public id: string;
   public blogId: string;
-  public blogName: string | undefined;
+  public blogName: string;
   public content: string;
   public shortDescription: string;
   public title: string;
   public createdAt?: string | undefined;
-  public isMembership?: boolean | undefined;
 
   constructor(post: WithId<PostType>) {
-    const { _id, blogId, blogName, content, shortDescription, title, createdAt, isMembership } = post;
+    const { _id, blogId, blogName, content, shortDescription, title, createdAt } = post;
 
     this.id = _id.toString();
     this.blogId = blogId;
@@ -21,6 +20,5 @@ export class PostMapper implements QueryPostOutputModel {
     this.shortDescription = shortDescription;
     this.title = title;
     this.createdAt = createdAt;
-    this.isMembership = isMembership;
   }
 }

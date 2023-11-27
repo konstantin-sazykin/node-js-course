@@ -107,7 +107,7 @@ blogsRouter.delete(
       const isBlogDeleted = await BlogsRepository.deleteBlog(blogId);
 
       if (!isBlogDeleted) {
-        throw new ApiError(ResponseStatusCodesEnum.InternalError, null);
+        throw new ApiError(ResponseStatusCodesEnum.NotFound, 'Блог с указанным id не найден');
       }
       response.sendStatus(ResponseStatusCodesEnum.NoContent);
     } catch (error) {
