@@ -1,18 +1,23 @@
-import { type Request, type Response, Router, NextFunction } from 'express';
-import { PostRepository } from '../repositories/post.repository';
-import { CreatePostInputModel, PostParams } from '../types/post/input';
-import { RequestType } from '../types/common';
+import { type Response, Router, NextFunction } from 'express';
+import { CreatePostWithBlogIdInputModel, PostParams, QuerySortedPostsType } from '../types/post/input';
+import { QueryRequestType, RequestType, ResponseWithPagination } from '../types/common';
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { ApiError } from '../exeptions/api.error';
 import { authMiddleware } from '../middlewares/auth/auth.middleware';
-import { postCreateValidation } from '../validators/post.validator';
+import { postWithBlogIdCreateValidation } from '../validators/post.validator';
 import { paramValidation } from '../validators/common';
+import { PostQueryRepository } from '../repositories/post/post.query.repository';
+import { QueryPostOutputModel } from '../types/post/output';
+import { PostSortData } from '../utils/SortData';
+import { PostService } from '../domain/post.service';
 
 export const postsRouter = Router();
 
-postsRouter.get('/', async (request: Request, response: Response, next: NextFunction) => {
+postsRouter.get('/', async (request: QueryRequestType<{}, QuerySortedPostsType>, response: ResponseWithPagination<QueryPostOutputModel>, next: NextFunction) => {
   try {
-    const posts = await PostRepository.getAllPosts();
+    const sortData = new PostSortData(request.query);
+
+    const posts = await PostQueryRepository.getAll(sortData);
 
     response.send(posts);
   } catch (error) {
@@ -25,7 +30,7 @@ postsRouter.get(
   paramValidation(),
   async (request: RequestType<PostParams, {}>, response: Response, next: NextFunction) => {
     try {
-      const findedPost = await PostRepository.findPostsById(request.params.id);
+      const findedPost = await PostQueryRepository.getById(request.params.id);
 
       if (!findedPost) {
         throw new ApiError(ResponseStatusCodesEnum.NotFound, 'Пост с указанныи id не найден');
@@ -41,19 +46,19 @@ postsRouter.get(
 postsRouter.post(
   '/',
   authMiddleware,
-  postCreateValidation(),
+  postWithBlogIdCreateValidation(),
   async (
-    request: RequestType<{}, CreatePostInputModel>,
+    request: RequestType<{}, CreatePostWithBlogIdInputModel>,
     response: Response,
     next: NextFunction
   ) => {
     try {
-      const createdPost = await PostRepository.createPost(request.body);
+      const createdPost = await PostService.createPost(request.body);
 
       if (!createdPost) {
         throw new ApiError(
           ResponseStatusCodesEnum.BadRequest,
-          `Не удалось найти блог с id ${request.body.blogId}`
+          `Не удалось создать пост`
         );
       }
 
@@ -68,14 +73,14 @@ postsRouter.put(
   '/:id',
   authMiddleware,
   paramValidation(),
-  postCreateValidation(),
+  postWithBlogIdCreateValidation(),
   async (
-    request: RequestType<PostParams, CreatePostInputModel>,
+    request: RequestType<PostParams, CreatePostWithBlogIdInputModel>,
     response: Response,
     next: NextFunction
   ) => {
     try {
-      const isPostUpdated = await PostRepository.updatePost(request.body, request.params.id);
+      const isPostUpdated = await PostService.updatePost(request.params.id, request.body);
 
       if (!isPostUpdated) {
         throw new ApiError(ResponseStatusCodesEnum.NotFound, `Некорректный id блога или id поста`);
@@ -93,12 +98,12 @@ postsRouter.delete(
   authMiddleware,
   paramValidation(),
   async (
-    request: RequestType<PostParams, CreatePostInputModel>,
+    request: RequestType<PostParams, CreatePostWithBlogIdInputModel>,
     response: Response,
     next: NextFunction
   ) => {
     try {
-      const isPostDeleted = await PostRepository.deletePost(request.params.id);
+      const isPostDeleted = await PostService.deletePostById(request.params.id);
 
       if (!isPostDeleted) {
         throw new ApiError(

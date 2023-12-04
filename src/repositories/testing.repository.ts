@@ -6,16 +6,18 @@ export class TestingRepository {
     try {
       videoDb.videos = [];
       
-      if (blogCollection) {
-        await blogCollection.drop().catch(err => console.log(err));
-      }
+      // if (blogCollection) {
+        await blogCollection.deleteMany({});
+      // }
 
-      if (postCollection) {
-        await postCollection.drop().catch(err => console.log(err));
-      }
+      // if (postCollection) {
+        await postCollection.deleteMany({});
+      // }
       
       return true;
     } catch (error) {
+      console.log(error);
+      
       return false;
     }
   }

@@ -14,7 +14,6 @@
     "mongodb": "^6.3.0",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
-    "tsconfig-paths-jest": "^0.0.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
@@ -37,7 +36,8 @@
     "watch": "tsc -w",
     "watch:aliases": "tsc-alias -w",
     "build": "tsc && tsc-alias",
-    "jest": "jest -i",
-    "jest:watch": "jest --watch"
+    "jest": "jest -i --forceExit",
+    "jest:last": "jest -i -o --forceExit",
+    "jest:watch": "jest -i --watch"
   }
 }
