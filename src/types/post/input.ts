@@ -1,4 +1,8 @@
+import { QuerySortDataType } from "../common";
+
 export type PostParams = { id: string };
+
+export type QuerySortedPostsType = QuerySortDataType;
 
 export type CreatePostInputModel = {
   title: string;

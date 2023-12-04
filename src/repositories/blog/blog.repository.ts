@@ -1,27 +1,11 @@
 import { ObjectId } from 'mongodb';
 
-import { blogCollection } from '../db/db';
-import { CreateBlogInputModel, UpdateBlogInputModel } from '../types/blog/input';
-import { QueryBlogOutputModel } from '../types/blog/output';
-import { BlogMapper } from '../types/blog/mapper';
+import { blogCollection } from '../../db/db';
+import { CreateBlogInputModel, UpdateBlogInputModel } from '../../types/blog/input';
+import { QueryBlogOutputModel } from '../../types/blog/output';
+import { BlogMapper } from '../../types/blog/mapper';
 
-export class BlogsRepository {
-  static async getAllBlogs(): Promise<QueryBlogOutputModel[]> {
-    const blogs = await blogCollection.find({}).toArray();
-
-    return blogs.map((blog) => ({ ...new BlogMapper(blog) }));
-  }
-
-  static async getBlogById(id: string) {
-    const blog = await blogCollection.findOne({ _id: new ObjectId(id) });
-
-    if (!blog) {
-      return null;
-    }
-
-    return { ...new BlogMapper(blog) };
-  }
-
+export class BlogRepository {
   static async createBlog(data: CreateBlogInputModel): Promise<QueryBlogOutputModel | null> {
     try {
       const result = await blogCollection.insertOne({
@@ -59,7 +43,7 @@ export class BlogsRepository {
     }
   }
 
-  static async deleteBlog(id: string): Promise<Boolean> {
+  static async deleteBlog(id: string): Promise<boolean> {
     try {
       const result = await blogCollection.deleteOne({ _id: new ObjectId(id) });
 

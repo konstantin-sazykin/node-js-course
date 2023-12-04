@@ -6,8 +6,11 @@ import request from 'supertest';
 
 import { ResponseStatusCodesEnum, RoutesPathsEnum } from '../../src/utils/constants';
 import { app } from '../../src/settings';
-import { launchDb, postCollection } from '../../src/db/db';
-import { BlogsRepository } from '../../src/repositories/blog.repository';
+import { closeDbConnection, launchDb } from '../../src/db/db';
+import { BlogRepository } from '../../src/repositories/blog/blog.repository';
+import { TestingRepository } from '../../src/repositories/testing.repository';
+import { PostDataManager } from './dataManager/post.data-manager';
+import { BlogDataManager } from './dataManager/blog.data-manager';
 
 
 describe(RoutesPathsEnum.posts, () => {
@@ -18,20 +21,14 @@ describe(RoutesPathsEnum.posts, () => {
   beforeAll(async () => {
     await launchDb();
     
-    if (postCollection) {
-      await postCollection.drop().catch(err => console.log(err));
-    }
+    await TestingRepository.clearAllData();
 
-    const createdBlog: CreateBlogInputModel = {
-      description: 'My blog for testing blogs',
-      name: 'Blog for tests',
-      websiteUrl: 'https://my-test-blog-with-correct-data.com'
-    }
+    const createdBlog: CreateBlogInputModel = BlogDataManager.createCorrectBlog();
 
-    const blogResult = await BlogsRepository.createBlog(createdBlog);
+    const blogResult = await BlogRepository.createBlog(createdBlog);
 
     if (blogResult) {
-      newBlog = blogResult;
+      newBlog = { ...blogResult };
     } else {
       throw new Error('Can`t create new Blog for testing posts')
     }
@@ -39,10 +36,14 @@ describe(RoutesPathsEnum.posts, () => {
     request(app).delete(RoutesPathsEnum.testingAllData).expect(204);
   });
 
+  afterAll(async () => {
+    await closeDbConnection();
+  });
+
   it('should return empty posts array', async () => {
     const postResult = await request(app).get(RoutesPathsEnum.posts);
 
-    expect(postResult.body).toEqual([]);
+    expect(postResult.body.items).toEqual([]);
   });
 
   it(`should'nt return post with incorrect id`, async () => {
@@ -52,25 +53,15 @@ describe(RoutesPathsEnum.posts, () => {
   });
 
   it(`should'nt create post without auth header`, async () => {
-    const createdPost: CreatePostInputModel = {
-      title: 'Some title',
-      content: 'Some content',
-      blogId: '65637ae50e9d04bcf9842c83',
-      shortDescription: 'Some short description',
-    };
+    const incorrectPost: CreatePostInputModel = PostDataManager.createWithIncorrectBlogIdPost();
 
-    const postResult = await request(app).post(RoutesPathsEnum.posts).send(createdPost);
+    const postResult = await request(app).post(RoutesPathsEnum.posts).send(incorrectPost);
 
     expect(postResult.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
   });
 
   it('should create post with correct data', async () => {
-    const createdPost: CreatePostInputModel = {
-      title: 'Some title',
-      content: 'Some content',
-      blogId: newBlog.id,
-      shortDescription: 'Some short description',
-    };
+    const createdPost: CreatePostInputModel = PostDataManager.createCorrectPost(newBlog.id);
 
     const postResult = await request(app)
       .post(RoutesPathsEnum.posts)
@@ -90,19 +81,9 @@ describe(RoutesPathsEnum.posts, () => {
   });
 
   it('should`nt update post with incorrect data', async () => {
-    const updatedPost = {
-      title: null,
-      content: 123,
-      blogId: '65637ae50e9d04bcf9842c83' + 12,
-      shortDescription: [],
-    };
+    const updatedPost = PostDataManager.createPostFullOfIncorrectData();
 
-    const expectedErrors = [
-      { message: 'Invalid value', field: 'title' },
-      { message: 'Invalid value', field: 'shortDescription' },
-      { message: 'Invalid value', field: 'content' },
-      { message: 'Invalid value', field: 'blogId' },
-    ];
+    const expectedErrors = PostDataManager.getResponseFullOfErrors();
 
     const postResult = await request(app)
       .put(`${RoutesPathsEnum.posts}/${newPost?.id}`)
@@ -123,12 +104,7 @@ describe(RoutesPathsEnum.posts, () => {
   });
 
   it('should update post with correct data', async () => {
-    const updatedPost = {
-      title: 'Updated Title',
-      content: 'New Content for this post',
-      blogId: newBlog.id,
-      shortDescription: 'New short description',
-    };
+    const updatedPost = PostDataManager.createUpdatedCorrectPost(newBlog.id);
 
     const postResult = await request(app)
       .put(`${RoutesPathsEnum.posts}/${newPost?.id}`)
@@ -150,12 +126,7 @@ describe(RoutesPathsEnum.posts, () => {
   });
 
   it('should`nt update post with incorrect id', async () => {
-    const updatedPost = {
-      title: 'Updated Title',
-      content: 'New Content for this post',
-      blogId: '65637ae50e9d04bcf9842c83',
-      shortDescription: 'New short description',
-    };
+    const updatedPost = PostDataManager.createWithIncorrectBlogIdPost();
 
     const postResult = await request(app)
       .put(`${RoutesPathsEnum.posts}/'1233123-53453512-3445`)
@@ -166,12 +137,7 @@ describe(RoutesPathsEnum.posts, () => {
   });
 
   it('shoul`nt update post with incorrect auth header', async () => {
-    const updatedPost = {
-      title: 'Updated Title',
-      content: 'New Content for this post',
-      blogId: '65637ae50e9d04bcf9842c83',
-      shortDescription: 'New short description',
-    };
+    const updatedPost = PostDataManager.createPostFullOfIncorrectData();
     const postResult = await request(app)
       .put(`${RoutesPathsEnum.posts}/'1233123-53453512-3445`)
       .send(updatedPost)
@@ -209,8 +175,9 @@ describe(RoutesPathsEnum.posts, () => {
 
     expect(postResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
 
-    const allPostssResult = await request(app).get(RoutesPathsEnum.posts);
+    const deletedPost = await request(app).get(`${RoutesPathsEnum.posts}/${newPost?.id}`);
 
-    expect(allPostssResult.body).toEqual([]);
+    expect(deletedPost.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
   });
+
 });

@@ -1,5 +1,5 @@
 import { WithId } from 'mongodb';
-import { type Request } from 'express';
+import { Response, type Request } from 'express';
 
 export type RequestType<P, B> = Request<P, {}, B, {}>;
 export type QueryRequestType<P, Q> = Request<P, {}, {}, Q>;
@@ -21,10 +21,19 @@ export type WithIdAndCreatedAt<T> = WithId<T> & {
   createdAt: string;
 }
 
-export type SortDataType = {
-  searchNameTerm: string | undefined;
-  sortBy: string | undefined;
-  sortDirection: 'asc' | 'desc' | undefined;
-  pageNumber: number | undefined;
-  pageSize: number | undefined;
+export type QuerySortDataType = {
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+  pageNumber?: string;
+  pageSize?: string;
 }
+
+export type WithPaginationDataType<T> = {
+  pagesCount: number;
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  items: T[];
+};
+
+export type ResponseWithPagination<T> = Response<WithPaginationDataType<T>>;

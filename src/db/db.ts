@@ -31,3 +31,7 @@ export const launchDb = async () => {
     await client.close();
   }
 }
+
+export const closeDbConnection = async () => {
+  await client.close();
+};

@@ -1,35 +1,11 @@
 import { ObjectId } from 'mongodb';
-import { PostMapper } from './../types/post/mapper';
-import { postCollection } from '../db/db';
-import { CreatePostInputModel, UpdatePostInputModel } from '../types/post/input';
-import { QueryPostOutputModel } from '../types/post/output';
+import { PostMapper } from '../../types/post/mapper';
+import { postCollection } from '../../db/db';
+import { CreatePostInputModel, UpdatePostInputModel } from '../../types/post/input';
+import { QueryPostOutputModel } from '../../types/post/output';
 
 export class PostRepository {
-  static async getAllPosts(): Promise<QueryPostOutputModel[]> {
-    const posts = await postCollection.find({}).toArray();
-
-    return posts.map((video) => ({ ...new PostMapper(video) }));
-  }
-
-  static async findPostsById(id: string): Promise<QueryPostOutputModel | null> {
-    try {
-      const post = await postCollection.findOne({ _id: new ObjectId(id) });
-
-      if (!post) {
-        return null;
-      }
-
-      return {
-        ...new PostMapper(post),
-      };
-    } catch (error) {
-      console.log(error);
-
-      return null;
-    }
-  }
-
-  static async createPost(data: CreatePostInputModel): Promise<QueryPostOutputModel | null> {
+  static async create(data: CreatePostInputModel): Promise<QueryPostOutputModel | null> {
     try {
       const result = await postCollection.insertOne({
         ...data,
@@ -55,7 +31,7 @@ export class PostRepository {
     }
   }
 
-  static async updatePost(data: UpdatePostInputModel, id: string): Promise<boolean> {
+  static async update(data: UpdatePostInputModel, id: string): Promise<boolean> {
     try {
       const result = await postCollection.updateOne(
         { _id: new ObjectId(id) },
@@ -70,7 +46,7 @@ export class PostRepository {
     }
   }
 
-  static async deletePost(id: string): Promise<boolean> {
+  static async delete(id: string): Promise<boolean> {
     try {
       const result = await postCollection.deleteOne({ _id: new ObjectId(id) });
 

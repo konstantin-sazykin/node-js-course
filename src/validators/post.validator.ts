@@ -1,6 +1,7 @@
 import { body } from 'express-validator';
 import { inputModelValidation } from '../exeptions/validation.error';
-import { BlogsRepository } from '../repositories/blog.repository';
+import { BlogRepository } from '../repositories/blog/blog.repository';
+import { BlogQueryRepository } from '../repositories/blog/blog.query.repository';
 
 const titleValidation = body('title')
   .isString()
@@ -25,7 +26,7 @@ const blogIdValidation = body('blogId')
   .trim()
   .isMongoId()
   .custom(async (blogId) => {
-    const isBlogDefined = await BlogsRepository.getBlogById(blogId);
+    const isBlogDefined = await BlogQueryRepository.getBlogById(blogId);
 
     if (!isBlogDefined) {
       throw new Error(`Блог с id ${blogId} не найден`);
