@@ -80,6 +80,18 @@ describe(RoutesPathsEnum.posts, () => {
     }).toEqual(createdPost);
   });
 
+  it('should return empty list if incorrect page', async () => {
+    const result = await request(app).get(`${RoutesPathsEnum.posts}?pageSize=10&pageNumber=2`)
+    
+    expect(result.body?.items).toEqual([]);
+  });
+
+  it('should return list with new post', async () => {
+    const result = await request(app).get(`${RoutesPathsEnum.posts}?pageSize=10&pageNumber=1`)
+
+    expect(result.body?.items[0]).toEqual(newPost);
+  });
+
   it('should`nt update post with incorrect data', async () => {
     const updatedPost = PostDataManager.createPostFullOfIncorrectData();
 

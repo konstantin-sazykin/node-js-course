@@ -63,6 +63,30 @@ describe('/blogs', () => {
     }).toEqual(createdBlog);
   });
 
+  
+  it('should return empty list if incorrect page', async () => {
+    const result = await request(app).get(`${RoutesPathsEnum.blogs}?pageSize=10&pageNumber=2`)
+    
+    expect(result.body?.items).toEqual([]);
+  });
+
+  it('should return empty list if incorrect searchNameTerm', async () => {
+    const result = await request(app).get(`${RoutesPathsEnum.blogs}?searchNameTerm=sett&pageSize=10&pageNumber=1`)
+    
+    expect(result.body?.items).toEqual([]);
+  });
+
+  it('should return list with new post if correct searchNameTerm', async () => {
+    const result = await request(app).get(`${RoutesPathsEnum.blogs}?searchNameTerm=tests&pageSize=10&pageNumber=1`)
+
+    expect(result.body?.items[0]).toEqual(newBlog);
+  });
+  it('should return list with new post', async () => {
+    const result = await request(app).get(`${RoutesPathsEnum.blogs}?pageSize=10&pageNumber=1`)
+
+    expect(result.body?.items[0]).toEqual(newBlog);
+  });
+
   it('should return new blog', async () => {
     const blogReqult = await request(app).get(`${RoutesPathsEnum.blogs}/${newBlog?.id}`);
 
