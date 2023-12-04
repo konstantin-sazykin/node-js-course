@@ -14,12 +14,13 @@ import { authMiddleware } from '../middlewares/auth/auth.middleware';
 import { blogParamValidation, blogPostValidation } from '../validators/blog.validator';
 import { paramValidation } from '../validators/common';
 import { BlogService } from '../domain/blog.service';
-import { BlogSortData } from '../utils/SortData';
+import { BlogSortData, PostSortData } from '../utils/SortData';
 import { BlogQueryRepository } from '../repositories/blog/blog.query.repository';
-import { CreatePostWithBlogIdInputModel } from '../types/post/input';
+import { CreatePostWithBlogIdInputModel, QuerySortedPostsType } from '../types/post/input';
 import { QueryPostOutputModel } from '../types/post/output';
 import { postCreateValidation, postWithBlogIdCreateValidation } from '../validators/post.validator';
 import { PostService } from '../domain/post.service';
+import { PostQueryRepository } from '../repositories/post/post.query.repository';
 
 export const blogsRouter = Router();
 
@@ -65,7 +66,6 @@ blogsRouter.get(
   }
 );
 
-// To delete
 blogsRouter.post(
   '/',
   authMiddleware,
@@ -152,6 +152,26 @@ blogsRouter.post(
       }
 
       response.status(ResponseStatusCodesEnum.Created).send(newPost);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+blogsRouter.get(
+  '/:id/posts',
+  blogParamValidation(),
+  async (
+    request: QueryRequestType<BlogParams, QuerySortedPostsType>,
+    response: ResponseWithPagination<QueryPostOutputModel>,
+    next: NextFunction
+  ) => {
+    try {
+      const blogId = request.params.id;
+      const sortData = new PostSortData(request.query);
+      const posts = await PostQueryRepository.getAllByBlogId(blogId, sortData);
+
+      response.send(posts);
     } catch (error) {
       next(error);
     }

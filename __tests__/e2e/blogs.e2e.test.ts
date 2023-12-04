@@ -86,6 +86,7 @@ describe('/blogs', () => {
 
     expect(result.body?.items[0]).toEqual(newBlog);
   });
+
   it('should return list with new post', async () => {
     const result = await request(app).get(BlogPaths.indexWithPaginationAndSearch(1, 10));
 
@@ -168,7 +169,7 @@ describe('/blogs', () => {
     expect(result.body.errorsMessages).toEqual(PostDataManager.getResponseFullOfErrors())
   });
 
-  it('should not create post for newBlog with incorrect data', async () => {
+  it('should create post for newBlog with correct data', async () => {
     const createdPost = PostDataManager.createCorrectPost();
 
     const result = await request(app)
@@ -178,6 +179,20 @@ describe('/blogs', () => {
 
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.Created);
   });
+
+  it('should not return posts for blog with incorrect id', async () => {
+    const result = await request(app)
+      .get(BlogPaths.postWithBlogId('63189b06003380064c4193be'))
+    
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
+  });
+
+  it('should return new post for blog with correct data', async () => {
+    const result = await request(app)
+    .get(BlogPaths.postWithBlogId(newBlog?.id))
+  
+  expect(result.body.items.length).toBe(1);
+  })
 
   it(`should'nt delete blog without auth header`, async () => {
     const blogResult = await request(app).delete(BlogPaths.blogWithId(newBlog?.id));
