@@ -7,31 +7,33 @@ import { closeDbConnection, launchDb } from '../../src/db/db';
 import { TestingRepository } from '../../src/repositories/testing.repository';
 import { BlogDataManager } from './dataManager/blog.data-manager';
 import { CreateBlogInputModel } from '../../src/types/blog/input';
+import { PostDataManager } from './dataManager/post.data-manager';
+import { BlogPaths } from './Routes/blog.paths';
 
 describe('/blogs', () => {
   const authHeaderString = `Basic ${btoa('admin:qwerty')}`;
   let newBlog: QueryBlogOutputModel | null = null;
 
-  beforeAll( async () => {
+  beforeAll(async () => {
     await launchDb();
-    
+
     await TestingRepository.clearAllData();
 
     request(app).delete(RoutesPathsEnum.testingAllData).expect(204);
   });
-  
+
   afterAll(async () => {
     await closeDbConnection();
   });
 
   it('should return empty blog array', async () => {
-    const blogResult = await request(app).get(RoutesPathsEnum.blogs);
+    const blogResult = await request(app).get(BlogPaths.index);
 
     expect(blogResult.body.items).toEqual([]);
   });
 
   it(`should'nt return blog with incorrect id`, async () => {
-    const blogResult = await request(app).get(`${RoutesPathsEnum.blogs}/4444-4444`);
+    const blogResult = await request(app).get(BlogPaths.blogWithIncorrectId);
 
     expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
   });
@@ -39,7 +41,7 @@ describe('/blogs', () => {
   it(`should'nt create blog without auth header`, async () => {
     const createdBlog: CreateBlogInputModel = BlogDataManager.createCorrectBlog();
 
-    const blogResult = await request(app).post(RoutesPathsEnum.blogs).send(createdBlog);
+    const blogResult = await request(app).post(BlogPaths.index).send(createdBlog);
 
     expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
   });
@@ -48,7 +50,7 @@ describe('/blogs', () => {
     const createdBlog: CreateBlogInputModel = BlogDataManager.createCorrectBlog();
 
     const blogResult = await request(app)
-      .post(RoutesPathsEnum.blogs)
+      .post(BlogPaths.index)
       .send(createdBlog)
       .set('Authorization', authHeaderString);
 
@@ -63,47 +65,50 @@ describe('/blogs', () => {
     }).toEqual(createdBlog);
   });
 
-  
   it('should return empty list if incorrect page', async () => {
-    const result = await request(app).get(`${RoutesPathsEnum.blogs}?pageSize=10&pageNumber=2`)
-    
+    const result = await request(app).get(BlogPaths.indexWithPaginationAndSearch(2, 10));
+
     expect(result.body?.items).toEqual([]);
   });
 
   it('should return empty list if incorrect searchNameTerm', async () => {
-    const result = await request(app).get(`${RoutesPathsEnum.blogs}?searchNameTerm=sett&pageSize=10&pageNumber=1`)
-    
+    const result = await request(app).get(
+      BlogPaths.indexWithPaginationAndSearch(1, 10, { field: 'searchNameTerm', value: 'sett' })
+    );
+
     expect(result.body?.items).toEqual([]);
   });
 
   it('should return list with new post if correct searchNameTerm', async () => {
-    const result = await request(app).get(`${RoutesPathsEnum.blogs}?searchNameTerm=tests&pageSize=10&pageNumber=1`)
+    const result = await request(app).get(
+      BlogPaths.indexWithPaginationAndSearch(1, 10, { field: 'searchNameTerm', value: 'test' })
+    );
 
     expect(result.body?.items[0]).toEqual(newBlog);
   });
   it('should return list with new post', async () => {
-    const result = await request(app).get(`${RoutesPathsEnum.blogs}?pageSize=10&pageNumber=1`)
+    const result = await request(app).get(BlogPaths.indexWithPaginationAndSearch(1, 10));
 
     expect(result.body?.items[0]).toEqual(newBlog);
   });
 
   it('should return new blog', async () => {
-    const blogReqult = await request(app).get(`${RoutesPathsEnum.blogs}/${newBlog?.id}`);
+    const blogReqult = await request(app).get(BlogPaths.blogWithId(newBlog?.id));
 
     expect(blogReqult.body).toEqual(newBlog);
   });
 
   it('should update blog with correct data', async () => {
     const updatedBlog = BlogDataManager.createCorrectUpdatedBlog();
-    
+
     const blogResult = await request(app)
-      .put(`${RoutesPathsEnum.blogs}/${newBlog?.id}`)
+      .put(BlogPaths.blogWithId(newBlog?.id))
       .send(updatedBlog)
       .set('Authorization', authHeaderString);
 
     expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
 
-    const updatedBlogResult = await request(app).get(`${RoutesPathsEnum.blogs}/${newBlog?.id}`);
+    const updatedBlogResult = await request(app).get(BlogPaths.blogWithId(newBlog?.id));
 
     expect({
       name: updatedBlogResult.body.name,
@@ -120,7 +125,7 @@ describe('/blogs', () => {
     const expectedErrors = BlogDataManager.getResponseFullOfErrors();
 
     const blogResult = await request(app)
-      .put(`${RoutesPathsEnum.blogs}/${newBlog?.id}`)
+      .put(BlogPaths.blogWithId(newBlog?.id))
       .send(updatedBlog)
       .set('Authorization', authHeaderString);
 
@@ -129,36 +134,81 @@ describe('/blogs', () => {
     expect(blogResult.body.errorsMessages).toEqual(expectedErrors);
   });
 
+  it('should not create post for newBlog without auth headers', async () => {
+    const createdPost = PostDataManager.createCorrectPost();
+
+    const result = await request(app)
+      .post(BlogPaths.postWithBlogId(newBlog?.id))
+      .send(createdPost);
+    
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
+  });
+
+  it('should not create post for newBlog with incorrect blogId', async () => {
+    const createdPost = PostDataManager.createCorrectPost();
+
+    const result = await request(app)
+      .post(BlogPaths.postWithBlogId('63189b06003380064c4193be'))
+      .send(createdPost)
+      .set('Authorization', authHeaderString);
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
+  });
+
+  it('should not create post for newBlog with incorrect data', async () => {
+    const createdPost = PostDataManager.createPostFullOfIncorrectData();
+
+    const result = await request(app)
+      .post(BlogPaths.postWithBlogId(newBlog?.id))
+      .send(createdPost)
+      .set('Authorization', authHeaderString);
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+
+    expect(result.body.errorsMessages).toEqual(PostDataManager.getResponseFullOfErrors())
+  });
+
+  it('should not create post for newBlog with incorrect data', async () => {
+    const createdPost = PostDataManager.createCorrectPost();
+
+    const result = await request(app)
+      .post(BlogPaths.postWithBlogId(newBlog?.id))
+      .send(createdPost)
+      .set('Authorization', authHeaderString);
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.Created);
+  });
+
   it(`should'nt delete blog without auth header`, async () => {
-    const blogResult = await request(app).delete(`${RoutesPathsEnum.blogs}/${newBlog?.id}`);
+    const blogResult = await request(app).delete(BlogPaths.blogWithId(newBlog?.id));
 
     expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
 
-    const unDeletedBlogResult = await request(app).get(`${RoutesPathsEnum.blogs}/${newBlog?.id}`);
+    const unDeletedBlogResult = await request(app).get(BlogPaths.blogWithId(newBlog?.id));
 
     expect(unDeletedBlogResult.body).toEqual(newBlog);
   });
 
   it(`should'nt delete blog with incorrect id`, async () => {
     const blogResult = await request(app)
-      .delete(`${RoutesPathsEnum.blogs}/63189b06003380064c4193be`)
+      .delete(BlogPaths.blogWithId('63189b06003380064c4193be'))
       .set('Authorization', authHeaderString);
 
     expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
 
-    const unDeletedBlogResult = await request(app).get(`${RoutesPathsEnum.blogs}/${newBlog?.id}`);
+    const unDeletedBlogResult = await request(app).get(BlogPaths.blogWithId(newBlog?.id));
 
     expect(unDeletedBlogResult.body).toEqual(newBlog);
   });
 
   it(`should delete blog with auth header`, async () => {
     const blogResult = await request(app)
-      .delete(`${RoutesPathsEnum.blogs}/${newBlog?.id}`)
+      .delete(BlogPaths.blogWithId(newBlog?.id))
       .set('Authorization', authHeaderString);
 
     expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
 
-    const deletedBlog = await request(app).get(`${RoutesPathsEnum.blogs}/${newBlog?.id}`);
+    const deletedBlog = await request(app).get(BlogPaths.blogWithId(newBlog?.id));
 
     expect(deletedBlog.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
   });

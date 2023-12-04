@@ -1,6 +1,5 @@
 import { body } from 'express-validator';
 import { inputModelValidation } from '../exeptions/validation.error';
-import { BlogRepository } from '../repositories/blog/blog.repository';
 import { BlogQueryRepository } from '../repositories/blog/blog.query.repository';
 
 const titleValidation = body('title')
@@ -34,10 +33,17 @@ const blogIdValidation = body('blogId')
   })
   .withMessage('Invalid blogId field');
 
-export const postCreateValidation = () => [
+export const postWithBlogIdCreateValidation = () => [
   titleValidation,
   shortDescriptionValidation,
   contentValidation,
   blogIdValidation,
   inputModelValidation,
 ];
+
+export const postCreateValidation = () => [
+  titleValidation,
+  shortDescriptionValidation,
+  contentValidation,
+  inputModelValidation,
+]

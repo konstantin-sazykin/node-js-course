@@ -1,10 +1,10 @@
 import { type Response, Router, NextFunction } from 'express';
-import { CreatePostInputModel, PostParams, QuerySortedPostsType } from '../types/post/input';
+import { CreatePostWithBlogIdInputModel, PostParams, QuerySortedPostsType } from '../types/post/input';
 import { QueryRequestType, RequestType, ResponseWithPagination } from '../types/common';
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { ApiError } from '../exeptions/api.error';
 import { authMiddleware } from '../middlewares/auth/auth.middleware';
-import { postCreateValidation } from '../validators/post.validator';
+import { postWithBlogIdCreateValidation } from '../validators/post.validator';
 import { paramValidation } from '../validators/common';
 import { PostQueryRepository } from '../repositories/post/post.query.repository';
 import { QueryPostOutputModel } from '../types/post/output';
@@ -46,9 +46,9 @@ postsRouter.get(
 postsRouter.post(
   '/',
   authMiddleware,
-  postCreateValidation(),
+  postWithBlogIdCreateValidation(),
   async (
-    request: RequestType<{}, CreatePostInputModel>,
+    request: RequestType<{}, CreatePostWithBlogIdInputModel>,
     response: Response,
     next: NextFunction
   ) => {
@@ -73,9 +73,9 @@ postsRouter.put(
   '/:id',
   authMiddleware,
   paramValidation(),
-  postCreateValidation(),
+  postWithBlogIdCreateValidation(),
   async (
-    request: RequestType<PostParams, CreatePostInputModel>,
+    request: RequestType<PostParams, CreatePostWithBlogIdInputModel>,
     response: Response,
     next: NextFunction
   ) => {
@@ -98,7 +98,7 @@ postsRouter.delete(
   authMiddleware,
   paramValidation(),
   async (
-    request: RequestType<PostParams, CreatePostInputModel>,
+    request: RequestType<PostParams, CreatePostWithBlogIdInputModel>,
     response: Response,
     next: NextFunction
   ) => {

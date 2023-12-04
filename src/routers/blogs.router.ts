@@ -2,15 +2,24 @@ import { type Response, Router, NextFunction } from 'express';
 
 import { QueryBlogOutputModel } from '../types/blog/output';
 import { QueryRequestType, RequestType, ResponseWithPagination } from '../types/common';
-import { BlogParams, CreateBlogInputModel, QuerySortedBlogsType, UpdateBlogInputModel } from '../types/blog/input';
+import {
+  BlogParams,
+  CreateBlogInputModel,
+  QuerySortedBlogsType,
+  UpdateBlogInputModel,
+} from '../types/blog/input';
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { ApiError } from '../exeptions/api.error';
 import { authMiddleware } from '../middlewares/auth/auth.middleware';
-import { blogPostValidation } from '../validators/blog.validator';
+import { blogParamValidation, blogPostValidation } from '../validators/blog.validator';
 import { paramValidation } from '../validators/common';
 import { BlogService } from '../domain/blog.service';
 import { BlogSortData } from '../utils/SortData';
 import { BlogQueryRepository } from '../repositories/blog/blog.query.repository';
+import { CreatePostWithBlogIdInputModel } from '../types/post/input';
+import { QueryPostOutputModel } from '../types/post/output';
+import { postCreateValidation, postWithBlogIdCreateValidation } from '../validators/post.validator';
+import { PostService } from '../domain/post.service';
 
 export const blogsRouter = Router();
 
@@ -56,6 +65,7 @@ blogsRouter.get(
   }
 );
 
+// To delete
 blogsRouter.post(
   '/',
   authMiddleware,
@@ -69,7 +79,7 @@ blogsRouter.post(
       const createdBlog = await BlogService.createBlog(request.body);
 
       if (!createdBlog) {
-        throw new ApiError(ResponseStatusCodesEnum.InternalError, 'Не удалось создать блог')
+        throw new ApiError(ResponseStatusCodesEnum.InternalError, 'Не удалось создать блог');
       }
       response.status(ResponseStatusCodesEnum.Created).send(createdBlog);
     } catch (error) {
@@ -116,6 +126,32 @@ blogsRouter.delete(
         throw new ApiError(ResponseStatusCodesEnum.NotFound, 'Блог с указанным id не найден');
       }
       response.sendStatus(ResponseStatusCodesEnum.NoContent);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+blogsRouter.post(
+  '/:id/posts',
+  authMiddleware,
+  blogParamValidation(),
+  postCreateValidation(),
+  async (
+    request: RequestType<BlogParams, CreatePostWithBlogIdInputModel>,
+    response: Response<QueryPostOutputModel>,
+    next: NextFunction
+  ) => {
+    try {
+      const blogId = request.params.id;
+
+      const newPost = await PostService.createPostByBlogId(blogId, request.body);
+
+      if (!newPost) {
+        throw new ApiError(ResponseStatusCodesEnum.InternalError, 'Не удалось создать блог');
+      }
+
+      response.status(ResponseStatusCodesEnum.Created).send(newPost);
     } catch (error) {
       next(error);
     }

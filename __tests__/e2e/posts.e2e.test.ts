@@ -1,5 +1,5 @@
 import { CreateBlogInputModel } from './../../src/types/blog/input';
-import { CreatePostInputModel } from './../../src/types/post/input';
+import { CreatePostWithBlogIdInputModel } from './../../src/types/post/input';
 import { QueryPostOutputModel } from './../../src/types/post/output';
 import { QueryBlogOutputModel } from './../../src/types/blog/output';
 import request from 'supertest';
@@ -53,7 +53,7 @@ describe(RoutesPathsEnum.posts, () => {
   });
 
   it(`should'nt create post without auth header`, async () => {
-    const incorrectPost: CreatePostInputModel = PostDataManager.createWithIncorrectBlogIdPost();
+    const incorrectPost: CreatePostWithBlogIdInputModel = PostDataManager.createWithIncorrectBlogIdPost();
 
     const postResult = await request(app).post(RoutesPathsEnum.posts).send(incorrectPost);
 
@@ -61,7 +61,7 @@ describe(RoutesPathsEnum.posts, () => {
   });
 
   it('should create post with correct data', async () => {
-    const createdPost: CreatePostInputModel = PostDataManager.createCorrectPost(newBlog.id);
+    const createdPost: CreatePostWithBlogIdInputModel = PostDataManager.createCorrectPostWithBlogId(newBlog.id);
 
     const postResult = await request(app)
       .post(RoutesPathsEnum.posts)
@@ -93,9 +93,9 @@ describe(RoutesPathsEnum.posts, () => {
   });
 
   it('should`nt update post with incorrect data', async () => {
-    const updatedPost = PostDataManager.createPostFullOfIncorrectData();
+    const updatedPost = PostDataManager.createPostFullOfIncorrectDataWithId();
 
-    const expectedErrors = PostDataManager.getResponseFullOfErrors();
+    const expectedErrors = PostDataManager.getResponseFullOfErrorsWithBlogId();
 
     const postResult = await request(app)
       .put(`${RoutesPathsEnum.posts}/${newPost?.id}`)
@@ -149,7 +149,7 @@ describe(RoutesPathsEnum.posts, () => {
   });
 
   it('shoul`nt update post with incorrect auth header', async () => {
-    const updatedPost = PostDataManager.createPostFullOfIncorrectData();
+    const updatedPost = PostDataManager.createPostFullOfIncorrectDataWithId();
     const postResult = await request(app)
       .put(`${RoutesPathsEnum.posts}/'1233123-53453512-3445`)
       .send(updatedPost)

@@ -1,16 +1,19 @@
 import { ObjectId } from 'mongodb';
 import { PostMapper } from '../../types/post/mapper';
 import { postCollection } from '../../db/db';
-import { CreatePostInputModel, UpdatePostInputModel } from '../../types/post/input';
+import { CreatePostRepositoryInputModel, UpdatePostInputModel } from '../../types/post/input';
 import { QueryPostOutputModel } from '../../types/post/output';
 
 export class PostRepository {
-  static async create(data: CreatePostInputModel): Promise<QueryPostOutputModel | null> {
+  static async create(data: CreatePostRepositoryInputModel): Promise<QueryPostOutputModel | null> {
     try {
       const result = await postCollection.insertOne({
-        ...data,
         createdAt: new Date().toISOString(),
-        blogName: 'Blog name',
+        blogId: data.blogId,
+        blogName: data.blogName,
+        content: data.content,
+        shortDescription: data.shortDescription,
+        title: data.title,
       });
 
       if (result.acknowledged) {
@@ -35,7 +38,14 @@ export class PostRepository {
     try {
       const result = await postCollection.updateOne(
         { _id: new ObjectId(id) },
-        { $set: { ...data } }
+        {
+          $set: {
+            blogId: data.blogId,
+            content: data.content,
+            title: data.title,
+            shortDescription: data.shortDescription,
+          },
+        }
       );
 
       return !!result.modifiedCount;

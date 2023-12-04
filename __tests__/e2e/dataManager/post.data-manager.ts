@@ -8,7 +8,7 @@ export class PostDataManager {
     };
   }
 
-  static createCorrectPost(blogId: string) {
+  static createCorrectPostWithBlogId(blogId: string) {
     return {
       title: 'Correct post title',
       content: 'Correct posts content',
@@ -17,7 +17,15 @@ export class PostDataManager {
     };
   }
 
-  static createPostFullOfIncorrectData() {
+  static createCorrectPost() {
+    return {
+      title: 'Correct post title',
+      content: 'Correct posts content',
+      shortDescription: 'Correct post short description',
+    }
+  }
+
+  static createPostFullOfIncorrectDataWithId() {
     return {
       title: null,
       content: 123,
@@ -25,8 +33,16 @@ export class PostDataManager {
       shortDescription: [],
     };
   }
+  
+  static createPostFullOfIncorrectData() {
+    return {
+      title: null,
+      content: 123,
+      shortDescription: [],
+    };
+  }
 
-  static getResponseFullOfErrors() {
+  static getResponseFullOfErrorsWithBlogId() {
     return [
       { message: 'Invalid value', field: 'title' },
       { message: 'Invalid value', field: 'shortDescription' },
@@ -34,9 +50,16 @@ export class PostDataManager {
       { message: 'Invalid value', field: 'blogId' },
     ];
   }
+  static getResponseFullOfErrors() {
+    return [
+      { message: 'Invalid value', field: 'title' },
+      { message: 'Invalid value', field: 'shortDescription' },
+      { message: 'Invalid value', field: 'content' },
+    ];
+  }
 
   static createUpdatedCorrectPost(blogId: string) {
-    const blog = this.createCorrectPost(blogId);
+    const blog = this.createCorrectPostWithBlogId(blogId);
 
     blog.title = 'Updated title for correct post';
     blog.content = 'Updated content for correct post';
