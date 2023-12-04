@@ -59,7 +59,7 @@ export class PostQueryRepository {
       .limit(limit)
       .toArray();
 
-    const totalCount = await postCollection.countDocuments({});
+    const totalCount = await postCollection.countDocuments({ blogId });
     const pagesCount = Math.ceil(totalCount / limit);
 
     return {
