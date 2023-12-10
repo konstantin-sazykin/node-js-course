@@ -10,7 +10,7 @@ export class AuthDataManger {
     return {
       errorsMessages: [
         { message: 'Invalid value', field: 'loginOrEmail' },
-        { message: 'password is required', field: 'password' },
+        { message: 'Invalid value', field: 'password' },
       ],
     };
   }

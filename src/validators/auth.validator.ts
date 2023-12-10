@@ -2,10 +2,14 @@ import { body } from 'express-validator';
 import { inputModelValidation } from '../exeptions/validation.error';
 
 const loginOrEmailValidation = body('loginOrEmail')
-  .exists()
   .isString()
+  .trim()
+  .isLength({ min: 3, max: 30 });
 
-const passwordValidation = body('password').exists().isString().withMessage('password is required');
+const passwordValidation = body('password')
+  .isString()
+  .trim()
+  .isLength({ min: 3, max: 50 })
 
 export const authPostValidation = () => [
   loginOrEmailValidation,
