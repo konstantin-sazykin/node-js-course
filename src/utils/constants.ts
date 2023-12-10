@@ -13,5 +13,6 @@ export enum RoutesPathsEnum {
   videos = '/videos',
   blogs = '/blogs',
   posts = '/posts',
+  auth = '/auth',
   testingAllData = '/testing/all-data',
 }
