@@ -1,4 +1,4 @@
-import { blogCollection, postCollection } from "../db/db";
+import { blogCollection, postCollection, userCollection } from "../db/db";
 import { videoDb } from "../routers/videos.router";
 
 export class TestingRepository {
@@ -6,14 +6,9 @@ export class TestingRepository {
     try {
       videoDb.videos = [];
       
-      // if (blogCollection) {
-        await blogCollection.deleteMany({});
-      // }
-
-      // if (postCollection) {
-        await postCollection.deleteMany({});
-      // }
-      
+      await blogCollection.deleteMany({});
+      await postCollection.deleteMany({});
+      await userCollection.deleteMany({});
       return true;
     } catch (error) {
       console.log(error);

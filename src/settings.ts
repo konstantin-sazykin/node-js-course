@@ -5,6 +5,8 @@ import { blogsRouter } from './routers/blogs.router';
 import { testingRouter } from './routers/testing.router';
 import { postsRouter } from './routers/posts.router';
 import { errorMiddleware } from './middlewares/error/error.middleware';
+import { authRouter } from './routers/auth.router';
+import { userRouter } from './routers/user.router';
 
 export const app = express();
 
@@ -14,4 +16,7 @@ app.use(RoutesPathsEnum.videos, videosRouter);
 app.use(RoutesPathsEnum.blogs, blogsRouter);
 app.use(RoutesPathsEnum.posts, postsRouter);
 app.use(RoutesPathsEnum.testingAllData, testingRouter);
+app.use(RoutesPathsEnum.auth, authRouter);
+app.use(RoutesPathsEnum.user, userRouter);
+
 app.use(errorMiddleware);

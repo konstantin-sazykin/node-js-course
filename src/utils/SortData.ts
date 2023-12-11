@@ -1,6 +1,8 @@
+import { UserQuerySortDataType } from "../types/user/input";
+
 abstract class SortData {
   sortBy: string;
-  sortDirection: 'desc' | 'asc';
+  sortDirection: 1 | -1;
   pageSize: number;
   pageNumber: number;
   skip: number;
@@ -13,12 +15,12 @@ abstract class SortData {
     pageSize,
   }: {
     sortBy?: string;
-    sortDirection?: 'desc' | 'asc';
+    sortDirection?: 'asc' | 'desc';
     pageNumber?: string;
     pageSize?: string;
   }) {
     this.sortBy = sortBy || 'createdAt';
-    this.sortDirection = sortDirection || 'desc';
+    this.sortDirection = sortDirection ? (sortDirection === 'asc' ? 1 : -1) : 1;
     this.pageSize = pageSize ? +pageSize : 10;
     this.pageNumber = pageNumber ? +pageNumber : 1;
 
@@ -39,7 +41,7 @@ export class BlogSortData extends SortData {
   }: {
     searchNameTerm?: string;
     sortBy?: string;
-    sortDirection?: 'desc' | 'asc';
+    sortDirection?: 'asc' | 'desc';
     pageNumber?: string;
     pageSize?: string;
   }) {
@@ -52,10 +54,25 @@ export class BlogSortData extends SortData {
 export class PostSortData extends SortData {
   constructor(filters: {
     sortBy?: string;
-    sortDirection?: 'desc' | 'asc';
+    sortDirection?: 'asc' | 'desc';
     pageNumber?: string;
     pageSize?: string;
   }) {
     super(filters);
+  }
+}
+
+
+export class UserSortData extends SortData {
+  searchEmailTerm: string | null;
+  searchLoginTerm: string | null;
+
+  constructor(filters: UserQuerySortDataType) {
+    super(filters);
+
+    const { searchEmailTerm, searchLoginTerm } = filters;
+
+    this.searchEmailTerm = searchEmailTerm || null;
+    this.searchLoginTerm = searchLoginTerm || null;
   }
 }
