@@ -1,3 +1,4 @@
+import { QuerySortDataType } from './../common';
 export interface CreateUserServiceModel {
   email: string;
   login: string;
@@ -18,3 +19,8 @@ export interface QueryUserOutputModel {
   email: string;
   createdAt: string;
 }
+
+export type UserQuerySortDataType = QuerySortDataType & {
+  searchLoginTerm: string;
+  searchEmailTerm: string;
+};

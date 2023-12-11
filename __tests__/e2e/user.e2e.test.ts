@@ -51,6 +51,70 @@ describe('/user', () => {
     newUser = { ...result.body };
   });
 
+  it('should not return users list with newUser', async () => {
+    const result = await request(app).get(RoutesPathsEnum.user);
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
+  });
+
+  it('should return users list with newUser', async () => {
+    const result = await request(app)
+      .get(RoutesPathsEnum.user)
+      .set('Authorization', authHeaderString);
+
+    expect(result.body.items[0]).toEqual(newUser);
+  });
+
+  it('should return users list with new users from search terms', async () => {
+    const userA = await request(app)
+      .post(RoutesPathsEnum.user)
+      .send(UserDataManager.usersForTestingSearch.userA)
+      .set('Authorization', authHeaderString);
+
+    const userB = await request(app)
+      .post(RoutesPathsEnum.user)
+      .send(UserDataManager.usersForTestingSearch.userB)
+      .set('Authorization', authHeaderString);
+
+    const result = await request(app)
+      .get(RoutesPathsEnum.user)
+      .query({
+        searchEmailTerm: 'director',
+        searchLoginTerm: 'secret',
+        sortBy: 'email',
+        sortDirection: 'desc',
+      })
+      .set('Authorization', authHeaderString);
+
+    expect(result.body.items[0]).toEqual(userB.body);
+    expect(result.body.items[1]).toEqual(userA.body);
+  });
+
+  it('should return emty items list with too big page number', async () => {
+    const result = await request(app)
+      .get(RoutesPathsEnum.user)
+      .query({
+        pageNumber: 5,
+        pageSize: 10,
+      })
+      .set('Authorization', authHeaderString);
+
+    expect(result.body.items).toEqual([]);
+  });
+
+  it('should return userB with sort by email, page number 3 and page size 1', async () => {
+    const result = await request(app)
+      .get(RoutesPathsEnum.user)
+      .query({
+        sortBy: 'email',
+        pageNumber: 3,
+        pageSize: 1,
+      })
+      .set('Authorization', authHeaderString);
+
+    expect(result.body.items[0].email).toBe(UserDataManager.usersForTestingSearch.userB.email);
+  });
+
   it('should not delete user without auth header', async () => {
     const result = await request(app).delete(UserPaths.userById(newUser?.id));
 

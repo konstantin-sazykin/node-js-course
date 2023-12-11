@@ -8,7 +8,7 @@ export class TestingRepository {
       
       await blogCollection.deleteMany({});
       await postCollection.deleteMany({});
-      await userCollection.deleteMany({});      
+      await userCollection.deleteMany({});
       return true;
     } catch (error) {
       console.log(error);

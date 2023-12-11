@@ -1,3 +1,5 @@
+import { UserQuerySortDataType } from "../types/user/input";
+
 abstract class SortData {
   sortBy: string;
   sortDirection: 1 | -1;
@@ -57,5 +59,20 @@ export class PostSortData extends SortData {
     pageSize?: string;
   }) {
     super(filters);
+  }
+}
+
+
+export class UserSortData extends SortData {
+  searchEmailTerm: string | null;
+  searchLoginTerm: string | null;
+
+  constructor(filters: UserQuerySortDataType) {
+    super(filters);
+
+    const { searchEmailTerm, searchLoginTerm } = filters;
+
+    this.searchEmailTerm = searchEmailTerm || null;
+    this.searchLoginTerm = searchLoginTerm || null;
   }
 }

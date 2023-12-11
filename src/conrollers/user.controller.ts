@@ -1,8 +1,10 @@
 import { NextFunction, Response } from 'express';
-import { RequestType } from '../types/common';
-import { CreateUserControllerType } from '../types/user/input';
+import { QueryRequestType, RequestType } from '../types/common';
+import { CreateUserControllerType, UserQuerySortDataType } from '../types/user/input';
 import { UserService } from '../domain/user.service';
 import { ResponseStatusCodesEnum } from '../utils/constants';
+import { UserSortData } from '../utils/SortData';
+import { UserQueryRepository } from '../repositories/user/user.query-repository';
 
 export class UserController {
   static async post(
@@ -44,6 +46,22 @@ export class UserController {
       } else {
         response.sendStatus(ResponseStatusCodesEnum.NotFound);
       }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getAll(
+    request: QueryRequestType<{}, UserQuerySortDataType>,
+    response: Response,
+    next: NextFunction
+  ) {
+    try {
+      const sortData = new UserSortData(request.query);
+
+      const result = await UserQueryRepository.findAll(sortData);
+
+      response.send(result);
     } catch (error) {
       next(error);
     }

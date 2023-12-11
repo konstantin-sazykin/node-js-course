@@ -22,4 +22,23 @@ export class UserDataManager {
       { message: 'Invalid value', field: 'email' }
     ]
   }
+
+  static get usersForTestingSearch() {
+    const userA = {
+      email: 'director1983@yandex.com',
+      login: 'userA',
+      password: 't3425trpe',
+    }
+
+    const userB = {
+      email: 'userB@email.com',
+      login: '_secretary',
+      password: 'Passv0rd4545',
+    }
+
+    return {
+      userA,
+      userB,
+    }
+  }
 }
