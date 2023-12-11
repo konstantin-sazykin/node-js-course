@@ -1,4 +1,3 @@
-import { QueryUserOutputType } from './../../src/types/user/output';
 import request from 'supertest';
 
 import { closeDbConnection, launchDb } from '../../src/db/db';
@@ -8,9 +7,9 @@ import { AuthPaths } from './Routes/auth.paths';
 import { AuthDataManger } from './dataManager/auth.data-manager';
 import { ResponseStatusCodesEnum } from '../../src/utils/constants';
 import { UserService } from '../../src/domain/user.service';
+import { UserDataManager } from './dataManager/user.data-manager';
 
 describe('/auth', () => {
-  let newUser: QueryUserOutputType | null = null
   beforeAll(async () => {
     await launchDb();
 
@@ -46,20 +45,14 @@ describe('/auth', () => {
   });
 
   it('should return status 204 for correct user', async () => {
-    const correctRegUserData = {
-      login: 'testUser',
-      email: 'test@test.com',
-      password: 'test1234',
-    }
-
-    const userResult = await UserService.createUser(correctRegUserData.login, correctRegUserData.email, correctRegUserData.password);
+    const correctRegUserData = UserDataManager.correctUser;
+  
+    await UserService.createUser(correctRegUserData.login, correctRegUserData.email, correctRegUserData.password);
 
     const authResult = await request(app)
       .post(AuthPaths.index)
       .send({ loginOrEmail: correctRegUserData.email, password: correctRegUserData.password });
 
-    console.log(authResult.body);
-    console.log(authResult.statusCode);
-    
+    expect(authResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
   })
 });

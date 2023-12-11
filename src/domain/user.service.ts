@@ -38,4 +38,10 @@ export class UserService {
 
     return hash;
   }
+
+  static async delete(id: string): Promise<boolean> {
+    const isDeleted = await UserRepository.deleteUser(id);
+    
+    return isDeleted;
+  } 
 }

@@ -2,6 +2,7 @@ import { UserMapper } from './../../types/user/mapper';
 import { userCollection } from '../../db/db';
 import { CreateUserServiceModel, QueryUserOutputModel } from '../../types/user/input';
 import { UserDataBaseType } from '../../types/user/output';
+import { ObjectId } from 'mongodb';
 
 export class UserRepository {
   static async createUser(user: CreateUserServiceModel): Promise<QueryUserOutputModel | null> {
@@ -41,6 +42,18 @@ export class UserRepository {
       console.error(error);
       
       return null;
+    }
+  }
+
+  static async deleteUser(id: string): Promise<boolean> {
+    try {
+      const result = await userCollection.deleteOne({ _id: new ObjectId(id) });
+      
+      return !!result.deletedCount;
+    } catch (error) {
+      console.error(error);
+      
+      return false;
     }
   }
 }
