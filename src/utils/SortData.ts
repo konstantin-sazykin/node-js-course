@@ -20,7 +20,7 @@ abstract class SortData {
     pageSize?: string;
   }) {
     this.sortBy = sortBy || 'createdAt';
-    this.sortDirection = sortDirection ? (sortDirection === 'asc' ? 1 : -1) : 1;
+    this.sortDirection = sortDirection ? (sortDirection === 'asc' ? 1 : -1) : -1;
     this.pageSize = pageSize ? +pageSize : 10;
     this.pageNumber = pageNumber ? +pageNumber : 1;
 
