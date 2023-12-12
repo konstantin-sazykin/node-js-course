@@ -24,4 +24,12 @@ export class AuthController {
       next(error);
     }
   }
+
+  static async get(request: RequestType<{}, {}>, response: Response, next: NextFunction) {
+    try {
+      
+    } catch (error) {
+      next(error);
+    }
+  }
 }

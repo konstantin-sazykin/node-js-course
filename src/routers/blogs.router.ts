@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { adminMiddleware } from '../middlewares/auth/admin.middleware';
+import { adminMiddleware } from '../middlewares/admin/admin.middleware';
 import { blogParamValidation, blogPostValidation } from '../validators/blog.validator';
 import { paramValidation } from '../validators/common';
 import { postCreateValidation } from '../validators/post.validator';
