@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { authMiddleware } from '../middlewares/auth/auth.middleware';
+import { adminMiddleware } from '../middlewares/auth/admin.middleware';
 import { postWithBlogIdCreateValidation } from '../validators/post.validator';
 import { paramValidation } from '../validators/common';
 import { PostController } from '../conrollers/post.controller';
@@ -9,12 +9,12 @@ export const postsRouter = Router();
 
 postsRouter.get('/', PostController.getAll);
 postsRouter.get('/:id', paramValidation(), PostController.getById);
-postsRouter.post('/', authMiddleware, postWithBlogIdCreateValidation(), PostController.post);
+postsRouter.post('/', adminMiddleware, postWithBlogIdCreateValidation(), PostController.post);
 postsRouter.put(
   '/:id',
-  authMiddleware,
+  adminMiddleware,
   paramValidation(),
   postWithBlogIdCreateValidation(),
   PostController.put
 );
-postsRouter.delete('/:id', authMiddleware, paramValidation(), PostController.delete);
+postsRouter.delete('/:id', adminMiddleware, paramValidation(), PostController.delete);

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { authMiddleware } from '../middlewares/auth/auth.middleware';
+import { adminMiddleware } from '../middlewares/auth/admin.middleware';
 import { blogParamValidation, blogPostValidation } from '../validators/blog.validator';
 import { paramValidation } from '../validators/common';
 import { postCreateValidation } from '../validators/post.validator';
@@ -10,18 +10,18 @@ export const blogsRouter = Router();
 
 blogsRouter.get('/', BlogController.getAll);
 blogsRouter.get('/:id', paramValidation(), BlogController.getById);
-blogsRouter.post('/', authMiddleware, blogPostValidation(), BlogController.post);
+blogsRouter.post('/', adminMiddleware, blogPostValidation(), BlogController.post);
 blogsRouter.put(
   '/:id',
-  authMiddleware,
+  adminMiddleware,
   paramValidation(),
   blogPostValidation(),
   BlogController.put
 );
-blogsRouter.delete('/:id', authMiddleware, paramValidation(), BlogController.delete);
+blogsRouter.delete('/:id', adminMiddleware, paramValidation(), BlogController.delete);
 blogsRouter.post(
   '/:id/posts',
-  authMiddleware,
+  adminMiddleware,
   blogParamValidation(),
   postCreateValidation(),
   BlogController.postForId

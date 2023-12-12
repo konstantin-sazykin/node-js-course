@@ -8,7 +8,7 @@ const db = {
   }
 }
 
-export const authMiddleware = (request: Request, response: Response, next: NextFunction) => {
+export const adminMiddleware = (request: Request, response: Response, next: NextFunction) => {
   const authHeader = request.headers.authorization;
 
   if (!authHeader) {
