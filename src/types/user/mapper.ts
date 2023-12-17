@@ -14,3 +14,15 @@ export class UserMapper {
     this.createdAt = createdAt.toISOString();
   }
 }
+
+export class UserShortInfoMapper {
+  userId: string;
+  login: string;
+  email: string;
+
+  constructor({ _id, login, email }: UserDataBaseType) {
+    this.userId = _id.toString();
+    this.login = login;
+    this.email = email;
+  }
+}

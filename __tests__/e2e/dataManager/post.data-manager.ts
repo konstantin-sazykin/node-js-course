@@ -22,7 +22,7 @@ export class PostDataManager {
       title: 'Correct post title',
       content: 'Correct posts content',
       shortDescription: 'Correct post short description',
-    }
+    };
   }
 
   static createPostFullOfIncorrectDataWithId() {
@@ -33,7 +33,7 @@ export class PostDataManager {
       shortDescription: [],
     };
   }
-  
+
   static createPostFullOfIncorrectData() {
     return {
       title: null,
@@ -66,5 +66,9 @@ export class PostDataManager {
     blog.shortDescription = 'Updated short description for correct post';
 
     return blog;
+  }
+
+  static get incorrectPostId() {
+    return '657eea0fabd1374357352beb';
   }
 }

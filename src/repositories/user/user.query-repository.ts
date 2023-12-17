@@ -1,8 +1,10 @@
+import { QueryUserShortInfoOutputModel } from './../../types/user/output';
 import { userCollection } from '../../db/db';
 import { WithPaginationDataType } from '../../types/common';
-import { UserMapper } from '../../types/user/mapper';
+import { UserMapper, UserShortInfoMapper } from '../../types/user/mapper';
 import { QueryUserOutputType } from '../../types/user/output';
 import { UserSortData } from '../../utils/SortData';
+import { ObjectId } from 'mongodb';
 
 export class UserQueryRepository {
   static async findAll(
@@ -54,7 +56,7 @@ export class UserQueryRepository {
 
     const totalCount = await userCollection.countDocuments(filter);
     const pagesCount = Math.ceil(totalCount / limit);
-    const items = users.map(user => ({ ... new UserMapper(user) }));
+    const items = users.map((user) => ({ ...new UserMapper(user) }));
 
     return {
       pagesCount,
@@ -62,6 +64,22 @@ export class UserQueryRepository {
       page: pageNumber,
       pageSize: limit,
       items,
+    };
+  }
+
+  static async findUserById(id: string): Promise<QueryUserShortInfoOutputModel | null> {
+    try {
+      const userResult = await userCollection.findOne({ _id: new ObjectId(id) });
+
+      if (!userResult) {
+        return null;
+      }
+
+      return { ...new UserShortInfoMapper(userResult) };
+    } catch (error) {
+      console.error(error);
+
+      return null;
     }
   }
 }

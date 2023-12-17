@@ -1,6 +1,8 @@
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import { inputModelValidation } from '../exeptions/validation.error';
 import { BlogQueryRepository } from '../repositories/blog/blog.query.repository';
+import { PostQueryRepository } from '../repositories/post/post.query.repository';
+import { requestParamsValidation } from './common';
 
 const titleValidation = body('title')
   .isString()
@@ -33,6 +35,14 @@ const blogIdValidation = body('blogId')
   })
   .withMessage('Invalid blogId field');
 
+const postIdValidation = param('id').custom(async (postId) => {
+  const isPostDefined = await PostQueryRepository.getById(postId);
+
+  if (!isPostDefined) {
+    throw new Error(`Пост с id ${postId} не найден`);
+  }
+});
+
 export const postWithBlogIdCreateValidation = () => [
   titleValidation,
   shortDescriptionValidation,
@@ -46,4 +56,6 @@ export const postCreateValidation = () => [
   shortDescriptionValidation,
   contentValidation,
   inputModelValidation,
-]
+];
+
+export const postGetParamValidation = () => [postIdValidation, requestParamsValidation];

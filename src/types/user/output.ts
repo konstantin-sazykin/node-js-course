@@ -25,6 +25,12 @@ export interface QueryUserOutputType {
   createdAt: string;
 }
 
+export interface QueryUserShortInfoOutputModel {
+  userId: string;
+  email: string;
+  login: string;
+}
+
 export interface UserAuthQueryType {
   loginOrEmail: string;
   password: string;

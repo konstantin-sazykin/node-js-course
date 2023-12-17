@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { BlogType } from '../types/blog/output';
 import { PostType } from '../types/post/output';
 import { UserType } from '../types/user/output';
+import { CommentType } from '../types/comment/output';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ const db = client.db('node-js-backend-course');
 export const blogCollection = db.collection<BlogType>('blog');
 export const postCollection = db.collection<PostType>('post');
 export const userCollection = db.collection<UserType>('user');
+export const commentCollection = db.collection<CommentType>('comment');
 
 
 export const launchDb = async () => {

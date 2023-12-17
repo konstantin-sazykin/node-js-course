@@ -10,6 +10,8 @@ import { UserService } from '../../src/domain/user.service';
 import { UserDataManager } from './dataManager/user.data-manager';
 
 describe('/auth', () => {
+  let JWTToken: string | null = null;
+
   beforeAll(async () => {
     await launchDb();
 
@@ -44,15 +46,41 @@ describe('/auth', () => {
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
   });
 
-  it('should return status 204 for correct user', async () => {
+  it('should return status 200 for correct user', async () => {
     const correctRegUserData = UserDataManager.correctUser;
-  
-    await UserService.createUser(correctRegUserData.login, correctRegUserData.email, correctRegUserData.password);
+
+    await UserService.createUser(
+      correctRegUserData.login,
+      correctRegUserData.email,
+      correctRegUserData.password
+    );
 
     const authResult = await request(app)
       .post(AuthPaths.index)
       .send({ loginOrEmail: correctRegUserData.email, password: correctRegUserData.password });
 
-    expect(authResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
+    JWTToken = authResult.body.accessToken;
+
+    expect(authResult.statusCode).toBe(ResponseStatusCodesEnum.Ok);
+  });
+
+  it('should not return user data with incorrect JWT token', async () => {
+    const wrongHeader = UserDataManager.wrongAuthHeader;
+
+    const result = await request(app).get(AuthPaths.me).set('Authorization', wrongHeader);
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
+  });
+
+  it('should return user data with correct JWT token', async () => {
+    const authHeader = UserDataManager.getCorrectAuthHeader(JWTToken!);
+    const result = await request(app)
+      .get(AuthPaths.me)
+      .set('Authorization', authHeader)
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.Ok);
+    expect(result.body.email).toEqual(UserDataManager.correctUser.email);
+    expect(result.body.login).toEqual(UserDataManager.correctUser.login);
+    expect(result.body.userId).toEqual(expect.any(String));
   })
 });

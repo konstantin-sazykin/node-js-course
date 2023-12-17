@@ -1,12 +1,7 @@
-import { type NextFunction, type Request, type Response } from 'express';
-import { ApiError } from '../../exeptions/api.error';
+import { NextFunction, Request, Response } from 'express';
 
-const db = {
-  defaultUser: {
-    login: 'admin',
-    password: 'qwerty'
-  }
-}
+import { ApiError } from '../../exeptions/api.error';
+import { JWTService } from '../../application/jwt.service';
 
 export const authMiddleware = (request: Request, response: Response, next: NextFunction) => {
   const authHeader = request.headers.authorization;
@@ -19,17 +14,18 @@ export const authMiddleware = (request: Request, response: Response, next: NextF
   try {
     const [tokenType, token] = authHeader.split(' ');
 
-    if (tokenType !== 'Basic') {
+    if (tokenType !== 'Bearer') {
       next(ApiError.UnauthorizedError());
       return;
     }
 
-    const [decodedLogin, decodedPassword] = atob(token).split(':');
+    const result = JWTService.validateToken(token);
 
-    if (decodedLogin !== db.defaultUser.login || decodedPassword !== db.defaultUser.password) {
-      next(ApiError.UnauthorizedError());
-      return;
+    if (!result || typeof result === 'string' || !result.id) {
+      return next(ApiError.UnauthorizedError());
     }
+
+    request.userId = result.id;
 
     next();
   } catch (error) {

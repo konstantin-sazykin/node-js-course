@@ -21,16 +21,20 @@ export class UserService {
     return result;
   }
 
-  static async checkCredentials(loginOrEmail: string, password: string): Promise<boolean> {
+  static async checkCredentials(loginOrEmail: string, password: string): Promise<string | null> {
     const user = await UserRepository.checkUserBuLoginOrEmail(loginOrEmail);
 
     if (!user) {
-      return false;
+      return null;
     }
 
     const passwordHash = await this.createHash(password, user.passwordSalt);
 
-    return passwordHash === user.passwordHash;
+    if (passwordHash === user.passwordHash) {
+      return user._id.toString();
+    } else {
+      return null;
+    }
   }
 
   private static async createHash(password: string, salt: string) {
