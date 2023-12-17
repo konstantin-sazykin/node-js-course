@@ -45,8 +45,7 @@ export class AuthController {
       if (!user) {
         return next(ApiError.UnauthorizedError());
       }
-      console.log({ user });
-      
+
       response.send(user);
 
     } catch (error) {
