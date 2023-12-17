@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import { commentCollection } from '../../db/db';
 import { CommentDbMapper, CommentMapper } from '../../types/comment/mapper';
 import { CommentRepositoryType } from '../../types/comment/output';
@@ -30,5 +31,14 @@ export class CommentQueryRepository {
       pageSize: limit,
       items,
     };
+  }
+
+  static async find(id: string): Promise<CommentRepositoryType | null> {
+    const result = await commentCollection.findOne({ _id: new ObjectId(id) });
+
+    if (!result) {
+      return null;
+    }
+    return { ...new CommentDbMapper(result) };
   }
 }

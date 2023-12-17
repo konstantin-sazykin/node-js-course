@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import { commentCollection } from '../../db/db';
 import { CommentDbMapper } from '../../types/comment/mapper';
 import { CommentRepositoryType } from '../../types/comment/output';
@@ -27,6 +28,29 @@ export class CommentRepository {
       console.error(error);
 
       return null;
+    }
+  }
+
+  static async update(id: string, content: string): Promise<boolean> {
+    try {
+      const result = await commentCollection.updateOne({ _id: new ObjectId(id) }, { $set: { content } });
+      
+      return !!result.modifiedCount;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
+  static async delete(id: string): Promise<boolean> {
+    try {
+      const result = await commentCollection.deleteOne({ _id: new ObjectId(id) });
+
+      return !!result.deletedCount;
+    } catch (error) {
+      console.error(error);
+      
+      return false;
     }
   }
 }

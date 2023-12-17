@@ -7,6 +7,22 @@ import { WithPaginationDataType } from '../types/common';
 import { CommentSortData } from '../utils/SortData';
 
 export class CommentService {
+  static async getComment(id: string): Promise<CommentOutputType | null> {
+    const comment = await CommentQueryRepository.find(id);
+
+    if (!comment) {
+      return null;
+    }
+    const user = await UserQueryRepository.findUserById(comment.commentatorId);
+
+    return {
+      ...new CommentMapper({
+        ...comment,
+        userId: user?.userId || 'Unknown user',
+        userLogin: user?.login || 'Unknown user',
+      }),
+    };
+  }
   static async createComment(
     postId: string,
     userId: string,
@@ -32,6 +48,7 @@ export class CommentService {
 
     const promises = result.items.map(async (comm) => {
       const user = await UserQueryRepository.findUserById(comm.commentatorId);
+
       if (!user) {
         throw Error(`Не найден юзер с id ${comm.commentatorId}`);
       }
@@ -50,5 +67,17 @@ export class CommentService {
       totalCount: result.totalCount,
       items: items,
     };
+  }
+
+  static async update(id: string, content: string): Promise<boolean> {
+    const result = await CommentRepository.update(id, content);
+
+    return result;
+  }
+
+  static async delete(id: string): Promise<boolean> {
+    const result = await CommentRepository.delete(id);
+
+    return result;
   }
 }

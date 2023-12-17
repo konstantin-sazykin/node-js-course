@@ -28,7 +28,7 @@ export class PostRepository {
 
       return null;
     } catch (error) {
-      console.log(error);
+      console.error(error);
 
       return null;
     }
@@ -50,7 +50,7 @@ export class PostRepository {
 
       return !!result.modifiedCount;
     } catch (error) {
-      console.log(error);
+      console.error(error);
 
       return false;
     }
@@ -62,7 +62,7 @@ export class PostRepository {
 
       return !!result.deletedCount;
     } catch (error) {
-      console.log(error);
+      console.error(error);
 
       return false;
     }

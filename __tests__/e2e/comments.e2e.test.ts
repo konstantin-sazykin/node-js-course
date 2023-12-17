@@ -1,4 +1,4 @@
-import { AuthDataManger } from './dataManager/auth.data-manager';
+import { CommentPaths } from './Routes/comment.paths';
 import { AuthPaths } from './Routes/auth.paths';
 import request from 'supertest';
 import { closeDbConnection, launchDb } from '../../src/db/db';
@@ -23,12 +23,18 @@ describe('/comments', () => {
   let newBlog: QueryBlogOutputModel;
   let newComment: CommentOutputType;
 
-  const newUser = {
+  const UserA = {
     login: '',
     password: '',
   };
 
-  let accessToken: string;
+  const UserB = {
+    login: '',
+    password: '',
+  };
+
+  let accessUserAToken: string;
+  let accessUserBToken: string;
 
   const simpleAuthHeaderString = `Basic ${btoa('admin:qwerty')}`;
 
@@ -62,26 +68,42 @@ describe('/comments', () => {
       throw new Error('Can`t create new Post for testing comments');
     }
 
-    const userData = UserDataManager.correctUser;
-    const userResult = await UserService.createUser(
-      userData.login,
-      userData.email,
-      userData.password
+    const userAData = UserDataManager.usersForTestingSearch.userA;
+    const userBData = UserDataManager.usersForTestingSearch.userB;
+
+    const userAResult = await UserService.createUser(
+      userAData.login,
+      userAData.email,
+      userAData.password
     );
 
-    if (userResult) {
-      newUser.login = userData.login;
-      newUser.password = userData.password;
+    const userBResult = await UserService.createUser(
+      userBData.login,
+      userBData.email,
+      userBData.password
+    );
+
+    if (userAResult && userBResult) {
+      UserA.login = userAData.login;
+      UserA.password = userAData.password;
+
+      UserB.login = userBData.login;
+      UserB.password = userBData.password;
     } else {
-      throw new Error('Can`t create new Blog for testing comments');
+      throw new Error('Can`t create users for testing comments');
     }
 
-    const authResult = await request(app)
+    const authUserAResult = await request(app)
       .post(AuthPaths.index)
-      .send({ loginOrEmail: newUser.login, password: newUser.password });
+      .send({ loginOrEmail: UserA.login, password: UserA.password });
 
-    if (authResult) {
-      accessToken = authResult.body.accessToken;
+    const authUserBResult = await request(app)
+      .post(AuthPaths.index)
+      .send({ loginOrEmail: UserB.login, password: UserB.password });
+
+    if (authUserAResult && authUserBResult) {
+      accessUserAToken = authUserAResult.body.accessToken;
+      accessUserBToken = authUserBResult.body.accessToken;
     } else {
       throw new Error('Can`t create new Blog for testing comments');
     }
@@ -122,7 +144,7 @@ describe('/comments', () => {
     const result = await request(app)
       .post(PostRoutes.commentsForPost(PostDataManager.incorrectPostId))
       .send(CommentDataManager.correctCommentData)
-      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessToken));
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
 
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
   });
@@ -134,7 +156,7 @@ describe('/comments', () => {
     const result = await request(app)
       .post(PostRoutes.commentsForPost(newPost.id))
       .send(CommentDataManager.incorrectCommentData)
-      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessToken));
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
 
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
   });
@@ -146,20 +168,94 @@ describe('/comments', () => {
     const result = await request(app)
       .post(PostRoutes.commentsForPost(newPost.id))
       .send(CommentDataManager.correctCommentData)
-      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessToken));
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
 
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.Created);
 
     newComment = { ...result.body };
   });
-  it('should return array with new comment', async () => {
-    if (!newPost?.id) {
-      throw Error('Can not test comment without post');
-    }
 
-    const result = await request(app).get(PostRoutes.commentsForPost(newPost.id));
+  it('should not update comment with incorrect id', async () => {
+    const result = await request(app)
+      .put(CommentPaths.commentById(CommentDataManager.incorrectId))
+      .send(CommentDataManager.correctCommentData)
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
 
-    expect(result.body.items[0]).toEqual(newComment);
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
   });
-  // it('should return empty array')
+
+  it('should not update comment with incorrect content', async () => {
+    const result = await request(app)
+      .put(CommentPaths.commentById(newComment.id))
+      .send(CommentDataManager.incorrectCommentData)
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+  });
+
+  it('should not update someone`s else comment', async () => {
+    const result = await request(app)
+      .put(CommentPaths.commentById(newComment.id))
+      .send(CommentDataManager.updatedCommentData)
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserBToken));
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.Forbidden);
+  });
+
+  it('should update comment', async () => {
+    const result = await request(app)
+      .put(CommentPaths.commentById(newComment.id))
+      .send(CommentDataManager.updatedCommentData)
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
+
+    newComment.content = CommentDataManager.updatedCommentData.content;
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
+  });
+
+  it('should not return comment witn incorrect id', async () => {
+    const result = await request(app)
+      .get(CommentPaths.commentById(CommentDataManager.incorrectId))
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
+  });
+
+  it('should return new comment', async () => {
+    const result = await request(app)
+      .get(CommentPaths.commentById(newComment.id))
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
+
+    expect(result.body).toEqual(newComment);
+  });
+
+  it('should not delete comment with incorrect id', async () => {
+    const result = await request(app)
+      .delete(CommentPaths.commentById(CommentDataManager.incorrectId))
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
+  });
+
+  it('should not delete comment without auth header', async () => {
+    const result = await request(app).delete(CommentPaths.commentById(newComment.id));
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
+  });
+
+  it('should not delete someone`s else comment ', async () => {
+    const result = await request(app)
+      .delete(CommentPaths.commentById(newComment.id))
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserBToken));
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.Forbidden);
+  });
+
+  it('should delete new comment ', async () => {
+    const result = await request(app)
+      .delete(CommentPaths.commentById(newComment.id))
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
+  });
 });
