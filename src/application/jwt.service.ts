@@ -1,20 +1,20 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const secret = process.env.JWT_SECRET || '';
+const secret = process.env.JWT_SECRET || 'testSecret';
 
 export class JWTService {
-  generateToken(payload: string) {
-    const token = jwt.sign(payload, secret, {
-      expiresIn: '5m',
+  static generateToken(payload: string) {
+    const token = jwt.sign({ id: payload }, secret, {
+      expiresIn: '300000s'
     });
 
     return token;
   }
 
-  validateToken(token: string) {
+  static validateToken(token: string): string | JwtPayload | null {
     try {
       return jwt.verify(token, secret);
     } catch (e) {

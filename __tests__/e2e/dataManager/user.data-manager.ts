@@ -12,15 +12,15 @@ export class UserDataManager {
       login: 'ab',
       email: 'email',
       passord: 123456,
-    }
+    };
   }
 
   static get responseFullOfErrors() {
     return [
       { message: 'Invalid value', field: 'login' },
       { message: 'Invalid value', field: 'password' },
-      { message: 'Invalid value', field: 'email' }
-    ]
+      { message: 'Invalid value', field: 'email' },
+    ];
   }
 
   static get usersForTestingSearch() {
@@ -28,17 +28,25 @@ export class UserDataManager {
       email: 'director1983@yandex.com',
       login: 'userA',
       password: 't3425trpe',
-    }
+    };
 
     const userB = {
       email: 'userB@email.com',
       login: '_secretary',
       password: 'Passv0rd4545',
-    }
+    };
 
     return {
       userA,
       userB,
-    }
+    };
+  }
+
+  static get wrongAuthHeader() {
+    return 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1N2VjMjUwODU1YzYyNjllNzk5YmMwOCIsImlhdCI6MTcwMjgwNjEwMSwiZXhwIjoxNzAzMTA2MTAxfQ.z3FUx7T8aJ3GrbQKnt-WtBVEzy0zybYNYUbQSq3ortY';
+  }
+
+  static getCorrectAuthHeader(token: string) {
+    return `Bearer ${token}`;
   }
 }
