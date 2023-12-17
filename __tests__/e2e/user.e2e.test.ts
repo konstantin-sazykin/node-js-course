@@ -112,7 +112,7 @@ describe('/user', () => {
       })
       .set('Authorization', authHeaderString);
 
-    expect(result.body.items[0].email).toBe(UserDataManager.usersForTestingSearch.userB.email);
+    expect(result.body.items[0].email).toBe(UserDataManager.usersForTestingSearch.userA.email);
   });
 
   it('should not delete user without auth header', async () => {
