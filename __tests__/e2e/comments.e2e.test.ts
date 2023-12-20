@@ -14,7 +14,6 @@ import { QueryBlogOutputModel } from '../../src/types/blog/output';
 import { PostDataManager } from './dataManager/post.data-manager';
 import { CreatePostWithBlogIdInputModel } from '../../src/types/post/input';
 import { CommentDataManager } from './dataManager/comment.data-manager';
-import { UserService } from '../../src/domain/user.service';
 import { UserDataManager } from './dataManager/user.data-manager';
 import { CommentOutputType } from '../../src/types/comment/output';
 
@@ -71,17 +70,15 @@ describe('/comments', () => {
     const userAData = UserDataManager.usersForTestingSearch.userA;
     const userBData = UserDataManager.usersForTestingSearch.userB;
 
-    const userAResult = await UserService.createUser(
-      userAData.login,
-      userAData.email,
-      userAData.password
-    );
+    const userAResult = await request(app)
+      .post(RoutesPathsEnum.user)
+      .send(UserDataManager.usersForTestingSearch.userA)
+      .set(...UserDataManager.adminHeader);
 
-    const userBResult = await UserService.createUser(
-      userBData.login,
-      userBData.email,
-      userBData.password
-    );
+    const userBResult = await request(app)
+      .post(RoutesPathsEnum.user)
+      .send(UserDataManager.usersForTestingSearch.userB)
+      .set(...UserDataManager.adminHeader);
 
     if (userAResult && userBResult) {
       UserA.login = userAData.login;

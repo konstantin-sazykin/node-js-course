@@ -8,6 +8,7 @@ import { errorMiddleware } from './middlewares/error/error.middleware';
 import { authRouter } from './routers/auth.router';
 import { userRouter } from './routers/user.router';
 import { commentRouter } from './routers/comment.router';
+import { emailRouter } from './routers/email.router';
 
 export const app = express();
 
@@ -20,5 +21,7 @@ app.use(RoutesPathsEnum.testingAllData, testingRouter);
 app.use(RoutesPathsEnum.auth, authRouter);
 app.use(RoutesPathsEnum.user, userRouter);
 app.use(RoutesPathsEnum.comments, commentRouter);
+
+app.use('/email', emailRouter);
 
 app.use(errorMiddleware);

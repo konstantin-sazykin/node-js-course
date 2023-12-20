@@ -16,7 +16,8 @@ export class UserController {
       const result = await UserService.createUser(
         request.body.login,
         request.body.email,
-        request.body.password
+        request.body.password,
+        true,
       );
 
       if (!result) {

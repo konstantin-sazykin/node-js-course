@@ -15,6 +15,22 @@ export class UserDataManager {
     };
   }
 
+  static get incorrectEmail() {
+    return 'test12345.com'
+  }
+
+  static get incorrectLogin() {
+    return 'login login';
+  }
+
+  static get realEmail() {
+    return 'kvsazykin@gmail.com';
+  }
+
+  static get realLogin() {
+    return 'kvsazykin';
+  }
+
   static get responseFullOfErrors() {
     return [
       { message: 'Invalid value', field: 'login' },
@@ -48,5 +64,9 @@ export class UserDataManager {
 
   static getCorrectAuthHeader(token: string) {
     return `Bearer ${token}`;
+  }
+
+  static get adminHeader() {
+    return ['Authorization', `Basic ${btoa('admin:qwerty')}`] as const;
   }
 }

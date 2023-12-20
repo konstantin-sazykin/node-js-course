@@ -8,4 +8,8 @@ export class AuthPaths {
   static get me() {
     return `${RoutesPathsEnum.auth}/me`;
   }
+
+  static get registration() {
+    return `${RoutesPathsEnum.auth}/registration`;
+  }
 }

@@ -12,7 +12,6 @@ import { TestingRepository } from '../../src/repositories/testing.repository';
 import { PostDataManager } from './dataManager/post.data-manager';
 import { BlogDataManager } from './dataManager/blog.data-manager';
 
-
 describe(RoutesPathsEnum.posts, () => {
   const authHeaderString = `Basic ${btoa('admin:qwerty')}`;
   let newPost: QueryPostOutputModel | null = null;

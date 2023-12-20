@@ -13,6 +13,7 @@ export class UserRepository {
         passwordSalt: user.passwordSalt,
         passwordHash: user.passwordHash,
         createdAt: user.createdAt,
+        isConfirmed: user.isConfirmed,
       });
 
       const createdUser = await userCollection.findOne({ _id: result.insertedId });

@@ -6,6 +6,7 @@ export interface UserType {
   passwordHash: string;
   passwordSalt: string;
   createdAt: Date;
+  isConfirmed: boolean;
 }
 
 

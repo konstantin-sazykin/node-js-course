@@ -6,9 +6,10 @@ import { ResponseStatusCodesEnum } from '../utils/constants';
 import { JWTService } from '../application/jwt.service';
 import { UserQueryRepository } from '../repositories/user/user.query-repository';
 import { ApiError } from '../exeptions/api.error';
+import { AuthCreateUserInputType } from '../types/auth/input';
 
 export class AuthController {
-  static async post(
+  static async postLogin(
     request: RequestType<{}, UserAuthQueryType>,
     response: Response,
     next: NextFunction
@@ -19,7 +20,7 @@ export class AuthController {
       const userId = await UserService.checkCredentials(loginOrEmail, password);
 
       if (userId) {
-        const accessToken = JWTService.generateToken(userId)
+        const accessToken = JWTService.generateToken(userId);
 
         response.send({ accessToken });
       } else {
@@ -27,7 +28,7 @@ export class AuthController {
       }
     } catch (error) {
       console.log({ error });
-      
+
       next(error);
     }
   }
@@ -47,8 +48,29 @@ export class AuthController {
       }
 
       response.send(user);
-
     } catch (error) {
+      next(error);
+    }
+  }
+
+  static async postRegistration(
+    request: RequestType<{}, AuthCreateUserInputType>,
+    response: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { email, login, password } = request.body;
+
+      const result = await UserService.createUser(login, email, password, false);
+
+      if (!result) {
+        return next(ApiError.BadRequest(null));
+      }
+
+      response.sendStatus(ResponseStatusCodesEnum.NoContent);
+    } catch (error) {
+      console.error(error);
+
       next(error);
     }
   }

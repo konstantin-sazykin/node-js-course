@@ -5,6 +5,7 @@ export interface CreateUserServiceModel {
   passwordHash: string;
   passwordSalt: string;
   createdAt: Date;
+  isConfirmed: boolean;
 }
 
 export interface CreateUserControllerType {
