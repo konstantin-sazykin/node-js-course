@@ -34,6 +34,12 @@ const newRegistrationLoginFormatValidation = body('login')
   .isLength({ min: 3, max: 10 })
   .withMessage('Invalid value');
 
+const newRegistrationPasswordFormatValidation = body('password')
+  .isString()
+  .trim()
+  .isLength({ min: 6, max: 20 })
+  .withMessage('Invalid value');
+
 const newRegistrationLoginExistValidation = body('login').custom(async (email) => {
   const isEmailAlreadyInUse = await UserRepository.checkUserBuLoginOrEmail(email);
 
@@ -47,6 +53,7 @@ export const authRegistrationDataValidation = () => [
   newRegistrationEmailExistValidation,
   newRegistrationLoginFormatValidation,
   newRegistrationLoginExistValidation,
+  newRegistrationPasswordFormatValidation,
   inputModelValidation,
 ];
 
