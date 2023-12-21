@@ -3,3 +3,8 @@ export type AuthCreateUserInputType = {
   password: string;
   email: string;
 };
+
+
+export type AuthConfirmEmailInputType = {
+  code: string;
+}

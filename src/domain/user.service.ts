@@ -63,6 +63,12 @@ export class UserService {
     }
   }
 
+  static async confirmEmail(email: string): Promise<boolean> {
+    const isConfirmed = await UserRepository.confirmEmail(email);
+
+    return isConfirmed;
+  }
+
   private static async createHash(password: string, salt: string) {
     const hash = await bcrypt.hash(password, salt);
 

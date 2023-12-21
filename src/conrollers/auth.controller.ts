@@ -6,7 +6,7 @@ import { ResponseStatusCodesEnum } from '../utils/constants';
 import { JWTService } from '../application/jwt.service';
 import { UserQueryRepository } from '../repositories/user/user.query-repository';
 import { ApiError } from '../exeptions/api.error';
-import { AuthCreateUserInputType } from '../types/auth/input';
+import { AuthConfirmEmailInputType, AuthCreateUserInputType } from '../types/auth/input';
 
 export class AuthController {
   static async postLogin(
@@ -71,6 +71,23 @@ export class AuthController {
     } catch (error) {
       console.error(error);
 
+      next(error);
+    }
+  }
+
+  static async confirmRegistration(
+    request: RequestType<{}, AuthConfirmEmailInputType>,
+    response: Response,
+    next: NextFunction
+  ) {
+    try {
+      const result = await UserService.confirmEmail(request.body.code);
+      if (result) {
+        response.sendStatus(ResponseStatusCodesEnum.NoContent);
+      } else {
+        throw new ApiError(ResponseStatusCodesEnum.InternalError, 'Внутренняя ошибка в процессе подвтерждения email')
+      }
+    } catch (error) {
       next(error);
     }
   }

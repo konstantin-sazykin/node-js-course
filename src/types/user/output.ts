@@ -17,6 +17,7 @@ export interface UserDataBaseType {
   createdAt: Date;
   passwordHash: string;
   passwordSalt: string;
+  isConfirmed: boolean;
 }
 
 export interface QueryUserOutputType {

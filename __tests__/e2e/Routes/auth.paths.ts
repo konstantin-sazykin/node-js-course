@@ -12,4 +12,8 @@ export class AuthPaths {
   static get registration() {
     return `${RoutesPathsEnum.auth}/registration`;
   }
+
+  static get confirmRegistration() {
+    return `${RoutesPathsEnum.auth}/registration-confirmation`;
+  }
 }
