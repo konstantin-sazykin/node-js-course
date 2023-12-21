@@ -140,8 +140,14 @@ describe('/auth', () => {
       password: UserDataManager.correctUser.password,
     });
 
-    createdBySelfUser = { email: UserDataManager.realEmail, login: UserDataManager.realLogin, id: '', createdAt: '' };
-
+    if (result.body) {
+      createdBySelfUser = {
+        email: UserDataManager.realEmail,
+        login: UserDataManager.realLogin,
+        id: '',
+        createdAt: '',
+      };
+    }
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
   });
 
@@ -173,6 +179,38 @@ describe('/auth', () => {
     expect(result.body.email).toEqual(UserDataManager.correctUser.email);
     expect(result.body.login).toEqual(UserDataManager.correctUser.login);
     expect(result.body.userId).toEqual(expect.any(String));
+  });
+
+  it('should return status 400 with incorrect email', async () => {
+    const email = UserDataManager.incorrectEmail;
+
+    const result = await request(app).post(AuthPaths.resendEmail).send({ email: email });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+  });
+
+  it('should return status 400 with already confirmed email', async () => {
+    if (!createdByAdminUser) {
+      throw new Error('Can not testing confirmation without new user');
+    }
+
+    const email = createdByAdminUser.email;
+
+    const result = await request(app).post(AuthPaths.resendEmail).send({ email: email });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+  });
+
+  it('should return status 204 with non confirmed email', async () => {
+    if (!createdBySelfUser) {
+      throw new Error('Can not testing confirmation without new user');
+    }
+
+    const email = createdBySelfUser.email;
+
+    const result = await request(app).post(AuthPaths.resendEmail).send({ email: email });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
   });
 
   it('should not confirm email with incorrect form code', async () => {
@@ -221,6 +259,4 @@ describe('/auth', () => {
 
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
   });
-
-
 });

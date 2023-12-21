@@ -16,4 +16,8 @@ export class AuthPaths {
   static get confirmRegistration() {
     return `${RoutesPathsEnum.auth}/registration-confirmation`;
   }
+
+  static get resendEmail() {
+    return `${RoutesPathsEnum.auth}/registration-email-resending`;
+  }
 }

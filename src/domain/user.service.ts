@@ -63,10 +63,29 @@ export class UserService {
     }
   }
 
-  static async confirmEmail(email: string): Promise<boolean> {
+  static async confirmEmail(code: string): Promise<boolean> {
+    const validationResult = JWTService.validateToken(code);
+    if (!validationResult) {
+      return false;
+    }
+    const email = typeof validationResult === 'string' ? validationResult : validationResult.id;
     const isConfirmed = await UserRepository.confirmEmail(email);
 
     return isConfirmed;
+  }
+
+  static async resendEmail(email: string): Promise<boolean> {
+    const token = JWTService.generateToken(email, '24h');
+
+    const { subject, template } = EmailViewCreator.confirmation(token);
+
+    const isEmailSended = await EmailAdapter.sendEmail(email, subject, template);
+    
+    if (!isEmailSended) {
+      throw new Error('Подтверждение не отправлено');
+    }
+
+    return isEmailSended;
   }
 
   private static async createHash(password: string, salt: string) {

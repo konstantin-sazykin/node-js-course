@@ -8,3 +8,7 @@ export type AuthCreateUserInputType = {
 export type AuthConfirmEmailInputType = {
   code: string;
 }
+
+export type AuthResendEmailInputType = {
+  email: string;
+}

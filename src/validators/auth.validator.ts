@@ -50,27 +50,49 @@ export const authRegistrationDataValidation = () => [
   inputModelValidation,
 ];
 
-const confirmationCodeValidation = body('code').isString().trim().isJWT().custom(async (code: string) => {
-  const info = JWTService.validateToken(code);
-  
-  if (!info) {
-    throw new Error('Невалидный код, или срок его действия истек');
-  }
+const confirmationCodeValidation = body('code')
+  .isString()
+  .trim()
+  .isJWT()
+  .custom(async (code: string) => {
+    const info = JWTService.validateToken(code);
 
-  const email = typeof info === 'string' ? info : info.id;
+    if (!info) {
+      throw new Error('Невалидный код, или срок его действия истек');
+    }
 
-  const user = await UserRepository.checkUserBuLoginOrEmail(email);
+    const email = typeof info === 'string' ? info : info.id;
 
-  if (!user) {
-    throw new Error('Не найден пользователь');
-  }
+    const user = await UserRepository.checkUserBuLoginOrEmail(email);
 
-  if (user.isConfirmed) {
-    throw new Error('Адрес электронной почты уже подтвержден');
-  }
-});
+    if (!user) {
+      throw new Error('Не найден пользователь');
+    }
+
+    if (user.isConfirmed) {
+      throw new Error('Адрес электронной почты уже подтвержден');
+    }
+  });
 
 export const authConfirmationCodeValidation = () => [
   confirmationCodeValidation,
   inputModelValidation,
 ];
+
+const emailValidation = body('email')
+  .isString()
+  .trim()
+  .isEmail()
+  .custom(async (email: string) => {
+    const user = await UserRepository.checkUserBuLoginOrEmail(email);
+
+    if (!user) {
+      throw new Error('Не найден пользователь');
+    }
+
+    if (user.isConfirmed) {
+      throw new Error('Адрес электронной почты уже подтвержден');
+    }
+  });
+
+export const authResendEmailConfirmationValidation = () => [emailValidation, inputModelValidation];
