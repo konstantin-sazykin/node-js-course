@@ -125,9 +125,19 @@ describe('/auth', () => {
     }
 
     const result = await request(app).post(AuthPaths.registration).send({
-      email: UserDataManager.usersForTestingSearch.userA.email,
+      email: UserDataManager.usersForTestingSearch.userB.email,
       login: createdByAdminUser.login,
       password: UserDataManager.correctUser.password,
+    });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+  });
+
+  it('should not try to create new user with incorrect password', async () => {
+    const result = await request(app).post(AuthPaths.registration).send({
+      email: UserDataManager.usersForTestingSearch.userA.email,
+      login: UserDataManager.usersForTestingSearch.userA.email,
+      password: UserDataManager.tooLongPassword,
     });
 
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);

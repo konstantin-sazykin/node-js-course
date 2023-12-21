@@ -69,4 +69,8 @@ export class UserDataManager {
   static get adminHeader() {
     return ['Authorization', `Basic ${btoa('admin:qwerty')}`] as const;
   }
+
+  static get tooLongPassword() {
+    return 'groep49wiu2305gtropgnr';
+  }
 }
