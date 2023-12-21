@@ -6,7 +6,11 @@ import { ResponseStatusCodesEnum } from '../utils/constants';
 import { JWTService } from '../application/jwt.service';
 import { UserQueryRepository } from '../repositories/user/user.query-repository';
 import { ApiError } from '../exeptions/api.error';
-import { AuthCreateUserInputType } from '../types/auth/input';
+import {
+  AuthConfirmEmailInputType,
+  AuthCreateUserInputType,
+  AuthResendEmailInputType,
+} from '../types/auth/input';
 
 export class AuthController {
   static async postLogin(
@@ -68,6 +72,51 @@ export class AuthController {
       }
 
       response.sendStatus(ResponseStatusCodesEnum.NoContent);
+    } catch (error) {
+      console.error(error);
+
+      next(error);
+    }
+  }
+
+  static async confirmRegistration(
+    request: RequestType<{}, AuthConfirmEmailInputType>,
+    response: Response,
+    next: NextFunction
+  ) {
+    try {
+      const result = await UserService.confirmEmail(request.body.code);
+      if (result) {
+        response.sendStatus(ResponseStatusCodesEnum.NoContent);
+      } else {
+        throw new ApiError(
+          ResponseStatusCodesEnum.InternalError,
+          'Внутренняя ошибка в процессе подвтерждения email'
+        );
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async resendEmail(
+    request: RequestType<{}, AuthResendEmailInputType>,
+    response: Response,
+    next: NextFunction
+  ) {
+    try {
+      const email = request.body.email;
+
+      const result = await UserService.resendEmail(email);
+
+      if (result) {
+        response.sendStatus(ResponseStatusCodesEnum.NoContent);
+      } else {
+        throw new ApiError(
+          ResponseStatusCodesEnum.InternalError,
+          'Не удалось поторно отправить письмо'
+        );
+      }
     } catch (error) {
       console.error(error);
 

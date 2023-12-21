@@ -57,4 +57,16 @@ export class UserRepository {
       return false;
     }
   }
+
+  static async confirmEmail(email: string): Promise<boolean> {
+    try {
+      const result = await userCollection.updateOne({ email: email }, { $set: { isConfirmed: true } });
+
+      return !!result.modifiedCount;
+    } catch (error) {
+      console.error(error);
+      
+      return false;
+    }
+  }
 }

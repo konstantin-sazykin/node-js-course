@@ -8,22 +8,24 @@ import { AuthDataManger } from './dataManager/auth.data-manager';
 import { ResponseStatusCodesEnum, RoutesPathsEnum } from '../../src/utils/constants';
 import { UserDataManager } from './dataManager/user.data-manager';
 import { QueryUserOutputType } from '../../src/types/user/output';
+import { JWTService } from '../../src/application/jwt.service';
 
 const sendMailMock = jest.fn(() => ({ accepted: [UserDataManager.realEmail] }));
 
 jest.mock('nodemailer');
 
-const nodemailer = require("nodemailer");
+const nodemailer = require('nodemailer');
 
-nodemailer.createTransport.mockReturnValue({ 'sendMail': sendMailMock });
-
+nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock });
 
 describe('/auth', () => {
   let JWTToken: string | null = null;
 
   const authHeaderString = `Basic ${btoa('admin:qwerty')}`;
 
-  let newUser: QueryUserOutputType | null = null;
+  let createdByAdminUser: QueryUserOutputType | null = null;
+
+  let createdBySelfUser: QueryUserOutputType | null = null;
 
   beforeAll(async () => {
     await launchDb();
@@ -35,7 +37,7 @@ describe('/auth', () => {
       .send(UserDataManager.correctUser)
       .set('Authorization', authHeaderString);
 
-    newUser = { ...userData.body };
+    createdByAdminUser = { ...userData.body };
   });
 
   beforeEach(() => {
@@ -104,12 +106,12 @@ describe('/auth', () => {
   });
 
   it('should not try to create new user with existing email', async () => {
-    if (!newUser) {
+    if (!createdByAdminUser) {
       throw new Error('Can not testing registration without new user data');
     }
 
     const result = await request(app).post(AuthPaths.registration).send({
-      email: newUser.email,
+      email: createdByAdminUser.email,
       login: UserDataManager.usersForTestingSearch.userB.login,
       password: UserDataManager.correctUser.password,
     });
@@ -118,13 +120,13 @@ describe('/auth', () => {
   });
 
   it('should not try to create new user with existing login', async () => {
-    if (!newUser) {
+    if (!createdByAdminUser) {
       throw new Error('Can not testing registration without new user data');
     }
 
     const result = await request(app).post(AuthPaths.registration).send({
       email: UserDataManager.usersForTestingSearch.userA.email,
-      login: newUser.login,
+      login: createdByAdminUser.login,
       password: UserDataManager.correctUser.password,
     });
 
@@ -138,6 +140,14 @@ describe('/auth', () => {
       password: UserDataManager.correctUser.password,
     });
 
+    if (result.body) {
+      createdBySelfUser = {
+        email: UserDataManager.realEmail,
+        login: UserDataManager.realLogin,
+        id: '',
+        createdAt: '',
+      };
+    }
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
   });
 
@@ -169,5 +179,84 @@ describe('/auth', () => {
     expect(result.body.email).toEqual(UserDataManager.correctUser.email);
     expect(result.body.login).toEqual(UserDataManager.correctUser.login);
     expect(result.body.userId).toEqual(expect.any(String));
+  });
+
+  it('should return status 400 with incorrect email', async () => {
+    const email = UserDataManager.incorrectEmail;
+
+    const result = await request(app).post(AuthPaths.resendEmail).send({ email: email });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+  });
+
+  it('should return status 400 with already confirmed email', async () => {
+    if (!createdByAdminUser) {
+      throw new Error('Can not testing confirmation without new user');
+    }
+
+    const email = createdByAdminUser.email;
+
+    const result = await request(app).post(AuthPaths.resendEmail).send({ email: email });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+  });
+
+  it('should return status 204 with non confirmed email', async () => {
+    if (!createdBySelfUser) {
+      throw new Error('Can not testing confirmation without new user');
+    }
+
+    const email = createdBySelfUser.email;
+
+    const result = await request(app).post(AuthPaths.resendEmail).send({ email: email });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
+  });
+
+  it('should not confirm email with incorrect form code', async () => {
+    const token: [] = [];
+
+    const result = await request(app).post(AuthPaths.confirmRegistration).send({ code: token });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+  });
+
+  it('should not confirm email with incorrect form code', async () => {
+    const token: string = AuthDataManger.incorrectConfirmCode;
+
+    const result = await request(app).post(AuthPaths.confirmRegistration).send({ code: token });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+  });
+
+  it('should not confirm email with expired code', async () => {
+    const token = AuthDataManger.correctLikeConfirmCode;
+
+    const result = await request(app).post(AuthPaths.confirmRegistration).send({ code: token });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+  });
+
+  it('should  not confirm email with correct code but for confirmed user email', async () => {
+    if (!createdByAdminUser) {
+      throw new Error('Can not testing confirmation without new user');
+    }
+    const token = JWTService.generateToken(createdByAdminUser.email);
+
+    const result = await request(app).post(AuthPaths.confirmRegistration).send({ code: token });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+  });
+
+  it('should confirm email with correct code for new user', async () => {
+    if (!createdBySelfUser) {
+      throw new Error('Can not testing confirmation without new user');
+    }
+
+    const token = JWTService.generateToken(createdBySelfUser.email);
+
+    const result = await request(app).post(AuthPaths.confirmRegistration).send({ code: token });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
   });
 });
