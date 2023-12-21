@@ -3,7 +3,8 @@ import bcrypt from 'bcrypt';
 import { CreateUserServiceModel, QueryUserOutputModel } from '../types/user/input';
 import { UserRepository } from '../repositories/user/user.repository';
 import { EmailAdapter } from '../adapters/email.adapter';
-import { emails } from '../utils/email';
+import { EmailViewCreator } from '../utils/emailViewCreator';
+import { JWTService } from '../application/jwt.service';
 export class UserService {
   static async createUser(
     login: string,
@@ -16,10 +17,11 @@ export class UserService {
       const passwordHash = await this.createHash(password, passwordSalt);
 
       if (!createdBySuperAdmin) {
-        const subject = emails.emailConfirmation.subject;
-        const message = emails.emailConfirmation.template;
+        const token = JWTService.generateToken(email, '24h');
 
-        const isEmailSended = await EmailAdapter.sendEmail(email, subject, message);
+        const { subject, template } = EmailViewCreator.confirmation(token);
+
+        const isEmailSended = await EmailAdapter.sendEmail(email, subject, template);
         
         if (!isEmailSended) {
           throw new Error('Подтверждение не отправлено');

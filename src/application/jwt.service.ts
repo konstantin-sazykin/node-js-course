@@ -6,10 +6,8 @@ dotenv.config();
 const secret = process.env.JWT_SECRET || 'testSecret';
 
 export class JWTService {
-  static generateToken(payload: string) {
-    const token = jwt.sign({ id: payload }, secret, {
-      expiresIn: '300000s'
-    });
+  static generateToken(payload: string, expiresIn = '300000s') {
+    const token = jwt.sign({ id: payload }, secret, { expiresIn });
 
     return token;
   }
