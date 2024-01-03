@@ -282,9 +282,13 @@ describe('/auth', () => {
     }
 
     const result = await request(app).post(AuthPaths.refreshToken).set('Cookie', [`refreshToken=${refreshToken}`]);
+    
+    const cookies = cookieParse(result.get('Set-Cookie'));
+    
+    refreshToken = cookies.refreshToken;
 
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.Ok);
-    expect(result.body.accessToken).toBeDefined()
+    expect(result.body.accessToken).toBeDefined();
   });
 
   it('should return 204 status code after logout', async () => {
@@ -292,9 +296,18 @@ describe('/auth', () => {
       throw Error('Can not test logout without refresh token')
     }
 
+    const result = await request(app).post(AuthPaths.logout).set('Cookie', [`refreshToken=${refreshToken}`]);
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
+  });
+
+  it('should return 401 status code for refresh request after logout', async () => {
+    if (!refreshToken) {
+      throw Error('Can not test logout without refresh token')
+    }
+
     const result = await request(app).post(AuthPaths.refreshToken).set('Cookie', [`refreshToken=${refreshToken}`]);
 
-    expect(result.statusCode).toBe(ResponseStatusCodesEnum.Ok);
-    expect(result.body.accessToken).toBeDefined()
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
   });
 });

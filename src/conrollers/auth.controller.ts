@@ -33,7 +33,6 @@ export class AuthController {
           secure: true,
           httpOnly: true,
         });
-        console.log({ accessToken, refreshToken });
         
         response.send({ accessToken });
       } else {
@@ -141,7 +140,7 @@ export class AuthController {
         throw ApiError.UnauthorizedError();
       }
 
-      const userData = JWTService.validateToken(oldRefreshToken);
+      const userData =  await JWTService.validateRefreshToken(oldRefreshToken);
 
       if (typeof userData === 'string' || !userData) {
         throw ApiError.UnauthorizedError();
