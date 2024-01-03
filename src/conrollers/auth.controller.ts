@@ -23,10 +23,19 @@ export class AuthController {
 
       const userId = await UserService.checkCredentials(loginOrEmail, password);
 
+      
       if (userId) {
-        const accessToken = JWTService.generateToken(userId);
+        const oldRefreshToken = request.cookies.refreshToken;
+        const accessToken = JWTService.generateToken(userId, '10s');
+        const refreshToken = await JWTService.generateRefreshToken(userId, oldRefreshToken);
+        
+        response.cookie('refreshToken', refreshToken, {
+          secure: true,
+          httpOnly: true,
+          maxAge: 20 * 1000,
+        });
 
-        response.send({ accessToken });
+        response.send({ access: accessToken });
       } else {
         response.sendStatus(ResponseStatusCodesEnum.Unathorized);
       }
@@ -120,6 +129,65 @@ export class AuthController {
     } catch (error) {
       console.error(error);
 
+      next(error);
+    }
+  }
+
+  static async refresh(request: RequestType<{}, {}>, response: Response, next: NextFunction) {
+    try {
+      const oldRefreshToken = request.cookies.refreshToken;
+
+      if (!oldRefreshToken) {
+        throw ApiError.UnauthorizedError();
+      }
+
+      const userData = JWTService.validateToken(oldRefreshToken);
+
+      if (typeof userData === 'string' || !userData) {
+        throw ApiError.UnauthorizedError();
+      }
+
+      const userId = userData.id;
+
+      const newRefreshToken = await JWTService.generateRefreshToken(userId, oldRefreshToken);
+      const accessToken = JWTService.generateToken(userId, '10s');
+
+      response.cookie('refreshToken', newRefreshToken, {
+        secure: true,
+        httpOnly: true,
+        maxAge: 20 * 1000,
+      });
+
+      response.send({ accessToken });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async logout(request: RequestType<{}, {}>, response: Response, next: NextFunction) {
+    try {
+      const refreshToken = request.cookies.refreshToken;
+
+      if (!refreshToken) {
+        throw ApiError.UnauthorizedError();
+      }
+
+      const userData = JWTService.validateToken(refreshToken);
+
+      if (!userData || typeof userData === 'string') {
+        throw ApiError.UnauthorizedError();
+      }
+
+      const userId = userData.id;
+
+      const result = await UserService.logout(refreshToken, userId);
+
+      if (result) {
+        response.send(ResponseStatusCodesEnum.NoContent);
+      } else {
+        response.send(ResponseStatusCodesEnum.Unathorized);
+      }
+    } catch (error) {
       next(error);
     }
   }

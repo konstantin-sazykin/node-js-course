@@ -5,6 +5,7 @@ import { UserRepository } from '../repositories/user/user.repository';
 import { EmailAdapter } from '../adapters/email.adapter';
 import { EmailViewCreator } from '../utils/emailViewCreator';
 import { JWTService } from '../application/jwt.service';
+import { RefreshBlackListRepository } from '../repositories/refreshBlackList/refreshBlackList.repository';
 export class UserService {
   static async createUser(
     login: string,
@@ -98,5 +99,11 @@ export class UserService {
     const isDeleted = await UserRepository.deleteUser(id);
 
     return isDeleted;
+  }
+
+  static async logout(refresh: string, userId: string) {
+    const logoutResult = await RefreshBlackListRepository.create(refresh, userId);
+
+    return logoutResult;
   }
 }

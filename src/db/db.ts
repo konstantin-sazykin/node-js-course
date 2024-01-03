@@ -6,6 +6,7 @@ import { BlogType } from '../types/blog/output';
 import { PostType } from '../types/post/output';
 import { UserType } from '../types/user/output';
 import { CommentType } from '../types/comment/output';
+import { RefreshBlackListType } from '../types/refresh/output';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ export const blogCollection = db.collection<BlogType>('blog');
 export const postCollection = db.collection<PostType>('post');
 export const userCollection = db.collection<UserType>('user');
 export const commentCollection = db.collection<CommentType>('comment');
+export const refreshBlackListCollection = db.collection<RefreshBlackListType>('refreshBlackList');
 
 
 export const launchDb = async () => {

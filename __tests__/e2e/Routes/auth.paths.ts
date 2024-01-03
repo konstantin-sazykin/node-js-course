@@ -20,4 +20,8 @@ export class AuthPaths {
   static get resendEmail() {
     return `${RoutesPathsEnum.auth}/registration-email-resending`;
   }
+
+  static get refreshToken() {
+    return `${RoutesPathsEnum.auth}/refresh-token`;
+  }
 }

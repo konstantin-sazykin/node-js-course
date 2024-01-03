@@ -1,5 +1,6 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { RefreshBlackListRepository } from '../repositories/refreshBlackList/refreshBlackList.repository';
 
 dotenv.config();
 
@@ -20,5 +21,19 @@ export class JWTService {
 
       return null;
     }
+  }
+
+  static async generateRefreshToken(userId: string, oldToken: string) {
+    if (!userId) {
+      return null;
+    }
+
+    if (oldToken) {
+      await RefreshBlackListRepository.create(oldToken, userId);
+    }
+
+    const refresh = this.generateToken(userId, '20s');
+
+    return refresh;
   }
 }
