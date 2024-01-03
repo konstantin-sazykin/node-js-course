@@ -73,4 +73,8 @@ export class UserDataManager {
   static get tooLongPassword() {
     return 'groep49wiu2305gtropgnr';
   }
+
+  static getUserAuthHeader(token: string) {
+    return ['Authorization', `Bearer ${token}`] as const;
+  }
 }

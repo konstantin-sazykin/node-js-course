@@ -8,9 +8,11 @@ import { errorMiddleware } from './middlewares/error/error.middleware';
 import { authRouter } from './routers/auth.router';
 import { userRouter } from './routers/user.router';
 import { commentRouter } from './routers/comment.router';
+import cookieParser from 'cookie-parser';
 
 export const app = express();
 
+app.use(cookieParser());
 app.use(express.json());
 
 app.use(RoutesPathsEnum.videos, videosRouter);

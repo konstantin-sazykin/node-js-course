@@ -8,6 +8,7 @@ import { AuthDataManger } from './dataManager/auth.data-manager';
 import { ResponseStatusCodesEnum, RoutesPathsEnum } from '../../src/utils/constants';
 import { UserDataManager } from './dataManager/user.data-manager';
 import { QueryUserOutputType } from '../../src/types/user/output';
+import { cookieParse } from './../../src/utils/cookie-parse';
 import { JWTService } from '../../src/application/jwt.service';
 
 const sendMailMock = jest.fn(() => ({ accepted: [UserDataManager.realEmail] }));
@@ -19,7 +20,8 @@ const nodemailer = require('nodemailer');
 nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock });
 
 describe('/auth', () => {
-  let JWTToken: string | null = null;
+  let accessToken: string | null = null;
+  let refreshToken: string | null = null;
 
   const authHeaderString = `Basic ${btoa('admin:qwerty')}`;
 
@@ -168,9 +170,13 @@ describe('/auth', () => {
       .post(AuthPaths.index)
       .send({ loginOrEmail: correctRegUserData.email, password: correctRegUserData.password });
 
-    JWTToken = authResult.body.accessToken;
+    accessToken = authResult.body.accessToken;
 
-    expect(authResult.statusCode).toBe(ResponseStatusCodesEnum.Ok);
+    const cookies = cookieParse(authResult.get('Set-Cookie'));
+    
+    refreshToken = cookies.refreshToken;
+
+    expect(refreshToken).toBeDefined();
   });
 
   it('should not return user data with incorrect JWT token', async () => {
@@ -182,7 +188,7 @@ describe('/auth', () => {
   });
 
   it('should return user data with correct JWT token', async () => {
-    const authHeader = UserDataManager.getCorrectAuthHeader(JWTToken!);
+    const authHeader = UserDataManager.getCorrectAuthHeader(accessToken!);
     const result = await request(app).get(AuthPaths.me).set('Authorization', authHeader);
 
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.Ok);
@@ -268,5 +274,27 @@ describe('/auth', () => {
     const result = await request(app).post(AuthPaths.confirmRegistration).send({ code: token });
 
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
+  });
+
+  it('should return valid refresh token in cookies', async () => {
+    if (!accessToken) {
+      throw Error('Can not test refresh token without JWT token')
+    }
+
+    const result = await request(app).post(AuthPaths.refreshToken).set('Cookie', [`refreshToken=${refreshToken}`]);
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.Ok);
+    expect(result.body.accessToken).toBeDefined()
+  });
+
+  it('should return 204 status code after logout', async () => {
+    if (!refreshToken) {
+      throw Error('Can not test logout without refresh token')
+    }
+
+    const result = await request(app).post(AuthPaths.refreshToken).set('Cookie', [`refreshToken=${refreshToken}`]);
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.Ok);
+    expect(result.body.accessToken).toBeDefined()
   });
 });
