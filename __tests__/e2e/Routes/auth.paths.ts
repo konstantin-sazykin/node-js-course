@@ -24,4 +24,8 @@ export class AuthPaths {
   static get refreshToken() {
     return `${RoutesPathsEnum.auth}/refresh-token`;
   }
+
+  static get logout() {
+    return `${RoutesPathsEnum.auth}/logout`;
+  }
 }

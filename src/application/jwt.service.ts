@@ -29,12 +29,12 @@ export class JWTService {
       return null;
     }
 
-    if (oldToken) {
-      await RefreshBlackListRepository.create(oldToken, userId);
-    }
-
     const refresh = this.generateToken(userId, '20s');
 
+    if (oldToken !== refresh) {
+      await RefreshBlackListRepository.create(oldToken, userId);
+    }
+  
     return refresh;
   }
 
