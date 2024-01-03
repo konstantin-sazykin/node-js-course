@@ -171,9 +171,9 @@ export class AuthController {
         throw ApiError.UnauthorizedError();
       }
 
-      const userData = JWTService.validateToken(refreshToken);
+      const userData = await JWTService.validateRefreshToken(refreshToken);
 
-      if (!userData || typeof userData === 'string') {
+      if (!userData || !userData.id) {
         throw ApiError.UnauthorizedError();
       }
 
