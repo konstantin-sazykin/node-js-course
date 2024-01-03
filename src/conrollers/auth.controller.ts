@@ -32,10 +32,10 @@ export class AuthController {
         response.cookie('refreshToken', refreshToken, {
           secure: true,
           httpOnly: true,
-          maxAge: 20 * 1000,
         });
-
-        response.send({ access: accessToken });
+        console.log({ accessToken, refreshToken });
+        
+        response.send({ accessToken });
       } else {
         response.sendStatus(ResponseStatusCodesEnum.Unathorized);
       }
@@ -155,7 +155,6 @@ export class AuthController {
       response.cookie('refreshToken', newRefreshToken, {
         secure: true,
         httpOnly: true,
-        maxAge: 20 * 1000,
       });
 
       response.send({ accessToken });
