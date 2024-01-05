@@ -21,11 +21,11 @@ export const authMiddleware = (request: Request, response: Response, next: NextF
 
     const result = JWTService.validateToken(token);
 
-    if (!result || typeof result === 'string' || !result.id) {
+    if (!result || typeof result === 'string' || !result.userId) {
       return next(ApiError.UnauthorizedError());
     }
 
-    request.userId = result.id;
+    request.userId = result.userId;
 
     next();
   } catch (error) {
