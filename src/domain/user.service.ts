@@ -5,7 +5,6 @@ import { UserRepository } from '../repositories/user/user.repository';
 import { EmailAdapter } from '../adapters/email.adapter';
 import { EmailViewCreator } from '../utils/emailViewCreator';
 import { JWTService } from '../application/jwt.service';
-import { RefreshBlackListRepository } from '../repositories/refreshBlackList/refreshBlackList.repository';
 export class UserService {
   static async createUser(
     login: string,
@@ -18,7 +17,7 @@ export class UserService {
       const passwordHash = await this.createHash(password, passwordSalt);
 
       if (!createdBySuperAdmin) {
-        const token = JWTService.generateToken(email, '24h');
+        const token = JWTService.generateToken({ email }, '24h');
 
         const { subject, template } = EmailViewCreator.confirmation(token);
 
@@ -76,7 +75,7 @@ export class UserService {
   }
 
   static async resendEmail(email: string): Promise<boolean> {
-    const token = JWTService.generateToken(email, '24h');
+    const token = JWTService.generateToken({ email }, '24h');
 
     const { subject, template } = EmailViewCreator.confirmation(token);
 
@@ -99,11 +98,5 @@ export class UserService {
     const isDeleted = await UserRepository.deleteUser(id);
 
     return isDeleted;
-  }
-
-  static async logout(refresh: string, userId: string) {
-    const logoutResult = await RefreshBlackListRepository.create(refresh, userId);
-
-    return logoutResult;
   }
 }
