@@ -154,6 +154,11 @@ export class AuthController {
       
       const { userId, sessionId } = sessionData;
       const newRefreshToken = await SessionService.updateSession(sessionId);
+
+      if (!newRefreshToken) {
+        throw ApiError.UnauthorizedError();
+      }
+
       const accessToken = JWTService.generateToken({ userId }, '10s');
 
       response.cookie('refreshToken', newRefreshToken, {
@@ -163,7 +168,7 @@ export class AuthController {
 
       response.send({ accessToken });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       
       next(error);
     }
@@ -188,9 +193,9 @@ export class AuthController {
       const result = await SessionService.deleteSession(sessionId);
 
       if (result) {
-        response.send(ResponseStatusCodesEnum.NoContent);
+        response.sendStatus(ResponseStatusCodesEnum.NoContent);
       } else {
-        response.send(ResponseStatusCodesEnum.Unathorized);
+        response.sendStatus(ResponseStatusCodesEnum.Unathorized);
       }
     } catch (error) {
       next(error);

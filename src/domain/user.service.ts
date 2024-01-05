@@ -65,10 +65,11 @@ export class UserService {
 
   static async confirmEmail(code: string): Promise<boolean> {
     const validationResult = JWTService.validateToken(code);
-    if (!validationResult) {
+
+    if (!validationResult || typeof validationResult === 'string') {
       return false;
     }
-    const email = typeof validationResult === 'string' ? validationResult : validationResult.id;
+    const email = validationResult.email;
     const isConfirmed = await UserRepository.confirmEmail(email);
 
     return isConfirmed;

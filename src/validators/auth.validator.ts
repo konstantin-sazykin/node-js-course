@@ -62,13 +62,13 @@ const confirmationCodeValidation = body('code')
   .trim()
   .isJWT()
   .custom(async (code: string) => {
-    const info = JWTService.validateToken(code);
+    const tokenInfo = JWTService.validateToken(code);
 
-    if (!info) {
+    if (!tokenInfo) {
       throw new Error('Невалидный код, или срок его действия истек');
     }
 
-    const email = typeof info === 'string' ? info : info.id;
+    const email = typeof tokenInfo === 'string' ? tokenInfo : tokenInfo.email;
 
     const user = await UserRepository.checkUserBuLoginOrEmail(email);
 
