@@ -257,7 +257,7 @@ describe('/auth', () => {
     if (!createdByAdminUser) {
       throw new Error('Can not testing confirmation without new user');
     }
-    const token = JWTService.generateToken(createdByAdminUser.email);
+    const token = JWTService.generateToken({ email: createdByAdminUser.email});
 
     const result = await request(app).post(AuthPaths.confirmRegistration).send({ code: token });
 
@@ -269,7 +269,7 @@ describe('/auth', () => {
       throw new Error('Can not testing confirmation without new user');
     }
 
-    const token = JWTService.generateToken(createdBySelfUser.email);
+    const token = JWTService.generateToken({ email: createdBySelfUser.email });
 
     const result = await request(app).post(AuthPaths.confirmRegistration).send({ code: token });
 

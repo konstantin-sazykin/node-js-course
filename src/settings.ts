@@ -1,4 +1,5 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import { RoutesPathsEnum } from './utils/constants';
 import { videosRouter } from './routers/videos.router';
 import { blogsRouter } from './routers/blogs.router';
@@ -8,7 +9,6 @@ import { errorMiddleware } from './middlewares/error/error.middleware';
 import { authRouter } from './routers/auth.router';
 import { userRouter } from './routers/user.router';
 import { commentRouter } from './routers/comment.router';
-import cookieParser from 'cookie-parser';
 
 export const app = express();
 

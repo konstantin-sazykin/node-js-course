@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import uaParser from 'ua-parser-js';
 import { RequestType } from '../types/common';
 import { UserAuthQueryType } from '../types/user/output';
 import { UserService } from '../domain/user.service';
@@ -11,6 +12,7 @@ import {
   AuthCreateUserInputType,
   AuthResendEmailInputType,
 } from '../types/auth/input';
+import { SessionService } from '../domain/session.service';
 
 export class AuthController {
   static async postLogin(
@@ -20,15 +22,19 @@ export class AuthController {
   ) {
     try {
       const { loginOrEmail, password } = request.body;
-
+      const IP = request.header('x-forwarded-for');
+      const userAgent = uaParser(request.headers['user-agent']);
+      const { browser: { name: browserName, major: browserVersion }, os: { name: osName, version: osVersion } } = userAgent;
       const userId = await UserService.checkCredentials(loginOrEmail, password);
 
-      
       if (userId) {
-        const oldRefreshToken = request.cookies.refreshToken;
-        const accessToken = JWTService.generateToken(userId, '10s');
-        const refreshToken = await JWTService.generateRefreshToken(userId, oldRefreshToken);
+        const accessToken = JWTService.generateToken({ userId }, '10s');
+        const refreshToken = await SessionService.createSession({ userId, browserName, browserVersion, IP, osName, osVersion })
         
+        if (!accessToken || !refreshToken) {
+          throw new ApiError(ResponseStatusCodesEnum.InternalError, 'Не создан accessToken или refreshToken');
+        }
+
         response.cookie('refreshToken', refreshToken, {
           secure: true,
           httpOnly: true,
@@ -140,16 +146,15 @@ export class AuthController {
         throw ApiError.UnauthorizedError();
       }
 
-      const userData =  await JWTService.validateRefreshToken(oldRefreshToken);
+      const sessionData =  JWTService.validateToken(oldRefreshToken);
 
-      if (typeof userData === 'string' || !userData) {
+      if (typeof sessionData === 'string' || !sessionData) {
         throw ApiError.UnauthorizedError();
       }
-
-      const userId = userData.id;
-
-      const newRefreshToken = await JWTService.generateRefreshToken(userId, oldRefreshToken);
-      const accessToken = JWTService.generateToken(userId, '10s');
+      
+      const { userId, sessionId } = sessionData;
+      const newRefreshToken = await SessionService.updateSession(sessionId);
+      const accessToken = JWTService.generateToken({ userId }, '10s');
 
       response.cookie('refreshToken', newRefreshToken, {
         secure: true,
@@ -158,6 +163,8 @@ export class AuthController {
 
       response.send({ accessToken });
     } catch (error) {
+      console.log(error);
+      
       next(error);
     }
   }
@@ -170,15 +177,15 @@ export class AuthController {
         throw ApiError.UnauthorizedError();
       }
 
-      const userData = await JWTService.validateRefreshToken(refreshToken);
+      const sessionData = JWTService.validateToken(refreshToken);
 
-      if (!userData || !userData.id) {
+      if (typeof sessionData === 'string' || !sessionData) {
         throw ApiError.UnauthorizedError();
       }
 
-      const userId = userData.id;
+      const { sessionId } = sessionData;
 
-      const result = await UserService.logout(refreshToken, userId);
+      const result = await SessionService.deleteSession(sessionId);
 
       if (result) {
         response.send(ResponseStatusCodesEnum.NoContent);
