@@ -16,6 +16,7 @@ import { CreatePostWithBlogIdInputModel } from '../../src/types/post/input';
 import { CommentDataManager } from './dataManager/comment.data-manager';
 import { UserDataManager } from './dataManager/user.data-manager';
 import { CommentOutputType } from '../../src/types/comment/output';
+import { PostRepository } from '../../src/repositories/post/post.repository';
 
 describe('/comments', () => {
   let newPost: QueryPostOutputModel | null = null;
@@ -56,17 +57,6 @@ describe('/comments', () => {
       newBlog.id
     );
 
-    const postResult = await request(app)
-      .post(RoutesPathsEnum.posts)
-      .send(createdPost)
-      .set('Authorization', simpleAuthHeaderString);
-
-    if (postResult) {
-      newPost = { ...postResult.body };
-    } else {
-      throw new Error('Can`t create new Post for testing comments');
-    }
-
     const userAData = UserDataManager.usersForTestingSearch.userA;
     const userBData = UserDataManager.usersForTestingSearch.userB;
 
@@ -104,6 +94,8 @@ describe('/comments', () => {
     } else {
       throw new Error('Can`t create new Blog for testing comments');
     }
+    
+    newPost = await PostRepository.create({ ...createdPost, blogName: newBlog.name  });
   });
 
   afterAll(async () => {
