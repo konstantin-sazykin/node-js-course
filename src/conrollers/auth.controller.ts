@@ -1,16 +1,18 @@
-import { NextFunction, Request, Response } from 'express';
 import uaParser from 'ua-parser-js';
-import { RequestType } from '../types/common';
-import { UserAuthQueryType } from '../types/user/output';
+import { type NextFunction, type Response } from 'express';
+import { type JwtPayload } from 'jsonwebtoken';
+
+import { ApiError } from '../exeptions/api.error';
+import { type RequestType } from '../types/common';
+import { type UserAuthQueryType } from '../types/user/output';
 import { UserService } from '../domain/user.service';
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { JWTService } from '../application/jwt.service';
 import { UserQueryRepository } from '../repositories/user/user.query-repository';
-import { ApiError } from '../exeptions/api.error';
 import {
-  AuthConfirmEmailInputType,
-  AuthCreateUserInputType,
-  AuthResendEmailInputType,
+  type AuthConfirmEmailInputType,
+  type AuthCreateUserInputType,
+  type AuthResendEmailInputType,
 } from '../types/auth/input';
 import { SessionService } from '../domain/session.service';
 
@@ -18,34 +20,47 @@ export class AuthController {
   static async postLogin(
     request: RequestType<{}, UserAuthQueryType>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const { loginOrEmail, password } = request.body;
       const IP = request.header('x-forwarded-for');
       const userAgent = uaParser(request.headers['user-agent']);
-      const { browser: { name: browserName, major: browserVersion }, os: { name: osName, version: osVersion } } = userAgent;
+      const {
+        browser: { name: browserName, major: browserVersion },
+        os: { name: osName, version: osVersion },
+      } = userAgent;
       const userId = await UserService.checkCredentials(loginOrEmail, password);
 
       if (userId) {
         const accessToken = JWTService.generateToken({ userId }, '10s');
-        const refreshToken = await SessionService.createSession({ userId, browserName, browserVersion, IP, osName, osVersion })
-        
+        const refreshToken = await SessionService.createSession({
+          userId,
+          browserName,
+          browserVersion,
+          IP,
+          osName,
+          osVersion,
+        });
+
         if (!accessToken || !refreshToken) {
-          throw new ApiError(ResponseStatusCodesEnum.InternalError, 'Не создан accessToken или refreshToken');
+          throw new ApiError(
+            ResponseStatusCodesEnum.InternalError,
+            'Не создан accessToken или refreshToken',
+          );
         }
 
         response.cookie('refreshToken', refreshToken, {
           secure: true,
           httpOnly: true,
         });
-        
+
         response.send({ accessToken });
       } else {
         response.sendStatus(ResponseStatusCodesEnum.Unathorized);
       }
     } catch (error) {
-      console.log({ error });
+      console.error({ error });
 
       next(error);
     }
@@ -56,13 +71,15 @@ export class AuthController {
       const userId = request.userId;
 
       if (!userId) {
-        return next(ApiError.UnauthorizedError());
+        next(ApiError.UnauthorizedError());
+        return;
       }
 
       const user = await UserQueryRepository.findUserById(userId);
 
       if (!user) {
-        return next(ApiError.UnauthorizedError());
+        next(ApiError.UnauthorizedError());
+        return;
       }
 
       response.send(user);
@@ -74,7 +91,7 @@ export class AuthController {
   static async postRegistration(
     request: RequestType<{}, AuthCreateUserInputType>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const { email, login, password } = request.body;
@@ -82,7 +99,8 @@ export class AuthController {
       const result = await UserService.createUser(login, email, password, false);
 
       if (!result) {
-        return next(ApiError.BadRequest(null));
+        next(ApiError.BadRequest(null));
+        return;
       }
 
       response.sendStatus(ResponseStatusCodesEnum.NoContent);
@@ -96,7 +114,7 @@ export class AuthController {
   static async confirmRegistration(
     request: RequestType<{}, AuthConfirmEmailInputType>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const result = await UserService.confirmEmail(request.body.code);
@@ -105,7 +123,7 @@ export class AuthController {
       } else {
         throw new ApiError(
           ResponseStatusCodesEnum.InternalError,
-          'Внутренняя ошибка в процессе подвтерждения email'
+          'Внутренняя ошибка в процессе подвтерждения email',
         );
       }
     } catch (error) {
@@ -116,7 +134,7 @@ export class AuthController {
   static async resendEmail(
     request: RequestType<{}, AuthResendEmailInputType>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const email = request.body.email;
@@ -128,7 +146,7 @@ export class AuthController {
       } else {
         throw new ApiError(
           ResponseStatusCodesEnum.InternalError,
-          'Не удалось поторно отправить письмо'
+          'Не удалось поторно отправить письмо',
         );
       }
     } catch (error) {
@@ -140,19 +158,22 @@ export class AuthController {
 
   static async refresh(request: RequestType<{}, {}>, response: Response, next: NextFunction) {
     try {
-      const oldRefreshToken = request.cookies.refreshToken;
+      const oldRefreshToken: string = request.cookies.refreshToken;
 
       if (!oldRefreshToken) {
         throw ApiError.UnauthorizedError();
       }
 
-      const sessionData =  JWTService.validateToken(oldRefreshToken);
+      const sessionData = JWTService.validateToken(oldRefreshToken);
 
       if (typeof sessionData === 'string' || !sessionData) {
         throw ApiError.UnauthorizedError();
       }
 
-      const { userId, sessionId, extendedAt } = sessionData;
+      const userId: string = sessionData.userId;
+      const sessionId: string = sessionData.sessionId;
+      const extendedAt: string = sessionData.extendedAt;
+
       const newRefreshToken = await SessionService.updateSession(sessionId, extendedAt);
 
       if (!newRefreshToken) {
@@ -169,26 +190,25 @@ export class AuthController {
       response.send({ accessToken });
     } catch (error) {
       console.error(error);
-      
+
       next(error);
     }
   }
 
   static async logout(request: RequestType<{}, {}>, response: Response, next: NextFunction) {
     try {
-      const refreshToken = request.cookies.refreshToken;
+      const refreshToken: string = request.cookies.refreshToken;
 
       if (!refreshToken) {
         throw ApiError.UnauthorizedError();
       }
 
-      const sessionData = JWTService.validateToken(refreshToken);
+      const jwtPayload: JwtPayload | string | null = JWTService.validateToken(refreshToken);
 
-      if (typeof sessionData === 'string' || !sessionData) {
+      if (typeof jwtPayload === 'string' || !jwtPayload) {
         throw ApiError.UnauthorizedError();
       }
-
-      const { sessionId } = sessionData;
+      const sessionId: string = jwtPayload.sessionId;
 
       const result = await SessionService.deleteSession(sessionId);
 

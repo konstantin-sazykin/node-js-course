@@ -1,7 +1,8 @@
-import { SessionRepository } from './../repositories/session/session.repository';
-import { CreateSessionInputType, UpdateSessionInputType } from '../types/session/input';
+import { type CreateSessionInputType } from '../types/session/input';
 import { JWTService } from '../application/jwt.service';
 import { SessionQueryRepository } from '../repositories/session/session.query-repository';
+
+import { SessionRepository } from './../repositories/session/session.repository';
 
 export class SessionService {
   static async createSession(sessionData: CreateSessionInputType): Promise<string | null> {
@@ -19,8 +20,6 @@ export class SessionService {
 
     const session = await SessionRepository.create({ userId, IP, os, browser });
 
-    console.log({ session });
-    
     if (!session) {
       return null;
     }
@@ -30,7 +29,7 @@ export class SessionService {
     return refreshToken;
   }
 
-  static async updateSession(sessionId: string, tokenExtendedAt: string) {
+  static async updateSession(sessionId: string, tokenExtendedAt: string): Promise<string | null> {
     const session = await SessionQueryRepository.find(sessionId);
 
     if (!session) {
@@ -42,7 +41,7 @@ export class SessionService {
     if (lastExtended && lastExtended !== tokenExtendedAt) {
       return null;
     }
-    
+
     const result = await SessionRepository.update(sessionId);
 
     if (!result) {
@@ -54,8 +53,8 @@ export class SessionService {
     return refreshToken;
   }
 
-  static async deleteSession(sessionId: string) {
-    const isDeleted = await SessionRepository.delete(sessionId);
+  static async deleteSession(sessionId: string): Promise<boolean> {
+    const isDeleted = await SessionRepository.remove(sessionId);
 
     return isDeleted;
   }

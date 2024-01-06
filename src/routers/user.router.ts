@@ -1,4 +1,6 @@
+// @ts-nocheck
 import { Router } from 'express';
+
 import { UserController } from '../conrollers/user.controller';
 import { adminMiddleware } from '../middlewares/admin/admin.middleware';
 import { userDataValidation } from '../validators/user.validator';

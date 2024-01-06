@@ -1,16 +1,17 @@
 import bcrypt from 'bcrypt';
 
-import { CreateUserServiceModel, QueryUserOutputModel } from '../types/user/input';
+import { type CreateUserServiceModel, type QueryUserOutputModel } from '../types/user/input';
 import { UserRepository } from '../repositories/user/user.repository';
 import { EmailAdapter } from '../adapters/email.adapter';
 import { EmailViewCreator } from '../utils/emailViewCreator';
 import { JWTService } from '../application/jwt.service';
+
 export class UserService {
   static async createUser(
     login: string,
     email: string,
     password: string,
-    createdBySuperAdmin: boolean = false
+    createdBySuperAdmin: boolean = false,
   ): Promise<QueryUserOutputModel | null> {
     try {
       const passwordSalt = await bcrypt.genSalt(10);
@@ -22,7 +23,7 @@ export class UserService {
         const { subject, template } = EmailViewCreator.confirmation(token);
 
         const isEmailSended = await EmailAdapter.sendEmail(email, subject, template);
-        
+
         if (!isEmailSended) {
           throw new Error('Подтверждение не отправлено');
         }
@@ -58,9 +59,8 @@ export class UserService {
 
     if (passwordHash === user.passwordHash) {
       return user._id.toString();
-    } else {
-      return null;
     }
+    return null;
   }
 
   static async confirmEmail(code: string): Promise<boolean> {
@@ -69,7 +69,7 @@ export class UserService {
     if (!validationResult || typeof validationResult === 'string') {
       return false;
     }
-    const email = validationResult.email;
+    const email: string = validationResult.email;
     const isConfirmed = await UserRepository.confirmEmail(email);
 
     return isConfirmed;
@@ -81,7 +81,7 @@ export class UserService {
     const { subject, template } = EmailViewCreator.confirmation(token);
 
     const isEmailSended = await EmailAdapter.sendEmail(email, subject, template);
-    
+
     if (!isEmailSended) {
       throw new Error('Подтверждение не отправлено');
     }
@@ -89,13 +89,13 @@ export class UserService {
     return isEmailSended;
   }
 
-  private static async createHash(password: string, salt: string) {
+  private static async createHash(password: string, salt: string): Promise<string> {
     const hash = await bcrypt.hash(password, salt);
 
     return hash;
   }
 
-  static async delete(id: string): Promise<boolean> {
+  static async remove(id: string): Promise<boolean> {
     const isDeleted = await UserRepository.deleteUser(id);
 
     return isDeleted;

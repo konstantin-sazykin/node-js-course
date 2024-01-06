@@ -1,6 +1,7 @@
-import { NextFunction, Response } from 'express';
-import { QueryRequestType, RequestType } from '../types/common';
-import { CreateUserControllerType, UserQuerySortDataType } from '../types/user/input';
+import { type NextFunction, type Response } from 'express';
+
+import { type QueryRequestType, type RequestType } from '../types/common';
+import { type CreateUserControllerType, type UserQuerySortDataType } from '../types/user/input';
 import { UserService } from '../domain/user.service';
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { UserSortData } from '../utils/SortData';
@@ -10,7 +11,7 @@ export class UserController {
   static async post(
     request: RequestType<{}, CreateUserControllerType>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const result = await UserService.createUser(
@@ -33,14 +34,14 @@ export class UserController {
   }
 
   static async delete(
-    request: RequestType<{ id: string }, {}>,
+    request: RequestType<{ id: string; }, {}>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const id = request.params.id;
 
-      const result = await UserService.delete(id);
+      const result = await UserService.remove(id);
 
       if (result) {
         response.sendStatus(ResponseStatusCodesEnum.NoContent);
@@ -55,7 +56,7 @@ export class UserController {
   static async getAll(
     request: QueryRequestType<{}, UserQuerySortDataType>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const sortData = new UserSortData(request.query);

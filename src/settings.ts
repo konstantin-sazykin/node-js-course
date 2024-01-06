@@ -1,5 +1,6 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
+
 import { RoutesPathsEnum } from './utils/constants';
 import { videosRouter } from './routers/videos.router';
 import { blogsRouter } from './routers/blogs.router';

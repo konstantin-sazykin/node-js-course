@@ -1,5 +1,6 @@
-import { WithId } from 'mongodb';
-import { SessionType } from './output';
+import { type WithId } from 'mongodb';
+
+import { type SessionType } from './output';
 
 export class SessionMapper {
   userId: string;

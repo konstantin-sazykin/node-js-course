@@ -1,21 +1,27 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { type JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const secret = process.env.JWT_SECRET || 'testSecret';
+const secret = process.env.JWT_SECRET ?? 'testSecret';
 
 export class JWTService {
-  // todo переделать в дженерик
-  static generateToken(payload: object , expiresIn = '300000s') {
+  // Todo переделать в дженерик
+  static generateToken(payload: object, expiresIn = '300000s'): string {
     const token = jwt.sign(payload, secret, { expiresIn });
 
     return token;
   }
 
-  static validateToken(token: string): string | JwtPayload | null {
+  static validateToken(token: string): JwtPayload | null {
     try {
-      return jwt.verify(token, secret);
+      const jwtPayload = jwt.verify(token, secret);
+
+      if (typeof jwtPayload === 'string') {
+        return null;
+      }
+
+      return { ...jwtPayload, iss: undefined };
     } catch (e) {
       console.error(e);
 

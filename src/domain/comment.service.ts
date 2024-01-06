@@ -2,9 +2,9 @@ import { CommentQueryRepository } from '../repositories/comment/comment.query-re
 import { CommentRepository } from '../repositories/comment/comment.repository';
 import { UserQueryRepository } from '../repositories/user/user.query-repository';
 import { CommentMapper } from '../types/comment/mapper';
-import { CommentOutputType } from '../types/comment/output';
-import { WithPaginationDataType } from '../types/common';
-import { CommentSortData } from '../utils/SortData';
+import { type CommentOutputType } from '../types/comment/output';
+import { type WithPaginationDataType } from '../types/common';
+import { type CommentSortData } from '../utils/SortData';
 
 export class CommentService {
   static async getComment(id: string): Promise<CommentOutputType | null> {
@@ -18,15 +18,16 @@ export class CommentService {
     return {
       ...new CommentMapper({
         ...comment,
-        userId: user?.userId || 'Unknown user',
-        userLogin: user?.login || 'Unknown user',
+        userId: user?.userId ?? 'Unknown user',
+        userLogin: user?.login ?? 'Unknown user',
       }),
     };
   }
+
   static async createComment(
     postId: string,
     userId: string,
-    content: string
+    content: string,
   ): Promise<CommentOutputType | null> {
     const createdComment = await CommentRepository.create(postId, userId, content);
     const user = await UserQueryRepository.findUserById(userId);
@@ -42,7 +43,7 @@ export class CommentService {
 
   static async findCommentsForPost(
     postId: string,
-    sortData: CommentSortData
+    sortData: CommentSortData,
   ): Promise<WithPaginationDataType<CommentOutputType>> {
     const result = await CommentQueryRepository.getAllByPostId(postId, sortData);
 
@@ -65,7 +66,7 @@ export class CommentService {
       page: result.page,
       pageSize: result.pageSize,
       totalCount: result.totalCount,
-      items: items,
+      items,
     };
   }
 
@@ -76,7 +77,7 @@ export class CommentService {
   }
 
   static async delete(id: string): Promise<boolean> {
-    const result = await CommentRepository.delete(id);
+    const result = await CommentRepository.remove(id);
 
     return result;
   }

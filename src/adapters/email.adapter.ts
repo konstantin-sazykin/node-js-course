@@ -7,7 +7,7 @@ const ADDRESS = process.env.EMAIL_ADDRESS;
 const PASSWORD = process.env.EMAIL_PASSWORD;
 
 export class EmailAdapter {
-  static async sendEmail(email: string, subject: string, message: string) {
+  static async sendEmail(email: string, subject: string, message: string): Promise<boolean> {
     try {
       if (!ADDRESS || !PASSWORD) {
         throw new Error('The username or password is not available');
@@ -24,12 +24,12 @@ export class EmailAdapter {
       const info = await transport.sendMail({
         from: `Konstantin <${ADDRESS}>`,
         to: email,
-        subject: subject,
+        subject,
         html: message,
       });
 
       const isAccepted = info.accepted.includes(email);
-      
+
       return isAccepted;
     } catch (error) {
       console.error(error);

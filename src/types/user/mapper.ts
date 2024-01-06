@@ -1,5 +1,4 @@
-import { QueryUserOutputModel } from './input';
-import { UserDataBaseType } from './output';
+import { type UserDataBaseType } from './output';
 
 export class UserMapper {
   id: string;

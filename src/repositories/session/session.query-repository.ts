@@ -1,7 +1,9 @@
-import { SessionMapper } from './../../types/session/mapper';
 import { ObjectId } from 'mongodb';
+
 import { sessionCollection } from '../../db/db';
-import { SessionRepositoryOutputType } from '../../types/session/output';
+import { type SessionRepositoryOutputType } from '../../types/session/output';
+
+import { SessionMapper } from './../../types/session/mapper';
 
 export class SessionQueryRepository {
   static async find(sessionId: string): Promise<SessionRepositoryOutputType | null> {

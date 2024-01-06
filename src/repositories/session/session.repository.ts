@@ -1,12 +1,13 @@
 import { ObjectId } from 'mongodb';
+
 import { sessionCollection } from '../../db/db';
-import { CreateSessionRepositoryType } from '../../types/session/input';
+import { type CreateSessionRepositoryType } from '../../types/session/input';
 import { SessionMapper } from '../../types/session/mapper';
-import { SessionRepositoryOutputType } from '../../types/session/output';
+import { type SessionRepositoryOutputType } from '../../types/session/output';
 
 export class SessionRepository {
   static async create(
-    data: CreateSessionRepositoryType
+    data: CreateSessionRepositoryType,
   ): Promise<SessionRepositoryOutputType | null> {
     try {
       const result = await sessionCollection.insertOne({
@@ -22,9 +23,8 @@ export class SessionRepository {
 
       if (createdSession) {
         return { ...new SessionMapper(createdSession) };
-      } else {
-        return null;
       }
+      return null;
     } catch (error) {
       console.error(error);
 
@@ -37,7 +37,7 @@ export class SessionRepository {
       const id = new ObjectId(sessionId);
       const result = await sessionCollection.updateOne(
         { _id: id },
-        { $set: { extendedAt: new Date().toISOString() } }
+        { $set: { extendedAt: new Date().toISOString() } },
       );
 
       if (result.modifiedCount) {
@@ -48,9 +48,8 @@ export class SessionRepository {
         }
 
         return { ...new SessionMapper(updatedSession) };
-      } else {
-        return null;
       }
+      return null;
     } catch (error) {
       console.error(error);
 
@@ -58,7 +57,7 @@ export class SessionRepository {
     }
   }
 
-  static async delete(sessionId: string): Promise<boolean> {
+  static async remove(sessionId: string): Promise<boolean> {
     try {
       const result = await sessionCollection.deleteOne({ _id: new ObjectId(sessionId) });
 

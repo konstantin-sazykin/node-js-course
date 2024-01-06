@@ -1,29 +1,29 @@
-export type UserAgentDataType = {
+export interface UserAgentDataType {
   IP: string;
   browserName?: string;
   browserVersion?: string;
   osName?: string;
   osVersion?: string;
-};
+}
 
-export type CreateSessionInputType = {
+export interface CreateSessionInputType {
   userId: string;
   IP?: string;
   browserName?: string;
   browserVersion?: string;
   osName?: string;
   osVersion?: string;
-};
+}
 
-export type CreateSessionRepositoryType = {
+export interface CreateSessionRepositoryType {
   userId: string;
   IP: string;
   browser: string;
   os: string;
-};
+}
 
-export type UpdateSessionInputType = {
+export interface UpdateSessionInputType {
   userId: string;
   sessionId: string;
   createdAt: string;
-};
+}

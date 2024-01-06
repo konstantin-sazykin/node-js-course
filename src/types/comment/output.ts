@@ -1,13 +1,13 @@
-import { ObjectId } from 'mongodb';
+import { type ObjectId } from 'mongodb';
 
-export type CommentType = {
+export interface CommentType {
   content: string;
   postId: string;
   commentatorId: string;
   createdAt: Date;
-};
+}
 
-export type CommentOutputType = {
+export interface CommentOutputType {
   id: string;
   content: string;
   commentatorInfo: {
@@ -15,24 +15,24 @@ export type CommentOutputType = {
     userLogin: string;
   };
   createdAt: string;
-};
+}
 
-export type CommentMapModelType = {
+export interface CommentMapModelType {
   id: string;
   content: string;
   userId: string;
   userLogin: string;
   createdAt: Date;
-};
+}
 
-export type CommentReadDbType = {
+export interface CommentReadDbType {
   _id: ObjectId;
   content: string;
   commentatorId: string;
   createdAt: Date;
-}
+};
 
-export type CommentRepositoryType = {
+export interface CommentRepositoryType {
   id: string;
   content: string;
   commentatorId: string;
