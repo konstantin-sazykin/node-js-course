@@ -7,8 +7,9 @@ export type SessionType = {
   os: string;
 };
 
-export type CreateSessionRepositoryOutputType = {
+export type SessionRepositoryOutputType = {
   userId: string;
   sessionId: string;
   createdAt: string;
+  extendedAt: string;
 };

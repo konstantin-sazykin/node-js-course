@@ -2,12 +2,12 @@ import { ObjectId } from 'mongodb';
 import { sessionCollection } from '../../db/db';
 import { CreateSessionRepositoryType } from '../../types/session/input';
 import { SessionMapper } from '../../types/session/mapper';
-import { CreateSessionRepositoryOutputType } from '../../types/session/output';
+import { SessionRepositoryOutputType } from '../../types/session/output';
 
 export class SessionRepository {
   static async create(
     data: CreateSessionRepositoryType
-  ): Promise<CreateSessionRepositoryOutputType | null> {
+  ): Promise<SessionRepositoryOutputType | null> {
     try {
       const result = await sessionCollection.insertOne({
         userId: data.userId,
@@ -32,7 +32,7 @@ export class SessionRepository {
     }
   }
 
-  static async update(sessionId: string): Promise<CreateSessionRepositoryOutputType | null> {
+  static async update(sessionId: string): Promise<SessionRepositoryOutputType | null> {
     try {
       const id = new ObjectId(sessionId);
       const result = await sessionCollection.updateOne(

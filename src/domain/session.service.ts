@@ -1,9 +1,10 @@
 import { SessionRepository } from './../repositories/session/session.repository';
 import { CreateSessionInputType, UpdateSessionInputType } from '../types/session/input';
 import { JWTService } from '../application/jwt.service';
+import { SessionQueryRepository } from '../repositories/session/session.query-repository';
 
 export class SessionService {
-  static async createSession(sessionData: CreateSessionInputType) {
+  static async createSession(sessionData: CreateSessionInputType): Promise<string | null> {
     const {
       userId,
       IP = 'Unknown IP',
@@ -18,6 +19,8 @@ export class SessionService {
 
     const session = await SessionRepository.create({ userId, IP, os, browser });
 
+    console.log({ session });
+    
     if (!session) {
       return null;
     }
@@ -27,7 +30,19 @@ export class SessionService {
     return refreshToken;
   }
 
-  static async updateSession(sessionId: string) {
+  static async updateSession(sessionId: string, tokenExtendedAt: string) {
+    const session = await SessionQueryRepository.find(sessionId);
+
+    if (!session) {
+      return null;
+    }
+
+    const lastExtended = session.extendedAt;
+
+    if (lastExtended && lastExtended !== tokenExtendedAt) {
+      return null;
+    }
+    
     const result = await SessionRepository.update(sessionId);
 
     if (!result) {

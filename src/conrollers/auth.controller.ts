@@ -151,9 +151,9 @@ export class AuthController {
       if (typeof sessionData === 'string' || !sessionData) {
         throw ApiError.UnauthorizedError();
       }
-      
-      const { userId, sessionId } = sessionData;
-      const newRefreshToken = await SessionService.updateSession(sessionId);
+
+      const { userId, sessionId, extendedAt } = sessionData;
+      const newRefreshToken = await SessionService.updateSession(sessionId, extendedAt);
 
       if (!newRefreshToken) {
         throw ApiError.UnauthorizedError();
