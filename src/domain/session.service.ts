@@ -58,4 +58,10 @@ export class SessionService {
 
     return isDeleted;
   }
+
+  static async deleteAllSessions(userId: string): Promise<boolean> {
+    const hasDeleted = await SessionRepository.removaAll(userId);
+
+    return hasDeleted;
+  }
 }

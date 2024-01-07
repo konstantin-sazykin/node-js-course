@@ -1,9 +1,9 @@
 import { ObjectId } from 'mongodb';
 
 import { sessionCollection } from '../../db/db';
-import { type SessionRepositoryOutputType } from '../../types/session/output';
+import { type SessionReadRepositoryOutputType, type SessionRepositoryOutputType } from '../../types/session/output';
 
-import { SessionMapper } from './../../types/session/mapper';
+import { SessionMapper, SessionOutputMapper } from './../../types/session/mapper';
 
 export class SessionQueryRepository {
   static async find(sessionId: string): Promise<SessionRepositoryOutputType | null> {
@@ -13,5 +13,11 @@ export class SessionQueryRepository {
       return null;
     }
     return { ...new SessionMapper(result) };
+  }
+
+  static async findAll(userId: string): Promise<SessionReadRepositoryOutputType[] | null> {
+    const result = await sessionCollection.find({ userId }).toArray();
+
+    return result.map(session => ({ ...new SessionOutputMapper(session) }));
   }
 }

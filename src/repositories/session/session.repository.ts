@@ -68,4 +68,16 @@ export class SessionRepository {
       return false;
     }
   }
+
+  static async removaAll(userId: string): Promise<boolean> {
+    try {
+      const result = await sessionCollection.deleteMany({ userId });
+
+      return !!result.deletedCount;
+    } catch (error) {
+      console.error(error);
+
+      return false;
+    }
+  }
 }
