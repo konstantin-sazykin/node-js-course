@@ -14,6 +14,13 @@ export class UserService {
     createdBySuperAdmin: boolean = false,
   ): Promise<QueryUserOutputModel | null> {
     try {
+      const isLoginAlreadyExists = await UserRepository.checkUserByLoginOrEmail(login);
+      const isEmailAlreadyExists = await UserRepository.checkUserByLoginOrEmail(email);
+
+      if (isEmailAlreadyExists || isLoginAlreadyExists) {
+        return null;
+      }
+
       const passwordSalt = await bcrypt.genSalt(10);
       const passwordHash = await this.createHash(password, passwordSalt);
 
@@ -49,7 +56,7 @@ export class UserService {
   }
 
   static async checkCredentials(loginOrEmail: string, password: string): Promise<string | null> {
-    const user = await UserRepository.checkUserBuLoginOrEmail(loginOrEmail);
+    const user = await UserRepository.checkUserByLoginOrEmail(loginOrEmail);
 
     if (!user) {
       return null;

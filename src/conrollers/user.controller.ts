@@ -6,6 +6,7 @@ import { UserService } from '../domain/user.service';
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { UserSortData } from '../utils/SortData';
 import { UserQueryRepository } from '../repositories/user/user.query-repository';
+import { ApiError } from '../exeptions/api.error';
 
 export class UserController {
   static async post(
@@ -22,7 +23,7 @@ export class UserController {
       );
 
       if (!result) {
-        response.send(ResponseStatusCodesEnum.BadRequest);
+        throw ApiError.BadRequest(null, 'Email or login are already exists');
       }
 
       response.status(ResponseStatusCodesEnum.Created).send(result);
