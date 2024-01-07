@@ -15,3 +15,17 @@ export class SessionMapper {
     this.extendedAt = extendedAt;
   }
 }
+
+export class SessionOutputMapper {
+  ip: string;
+  title: string;
+  lastActiveDate: string;
+  deviceId: string;
+
+  constructor({ _id, extendedAt, browser, IP }: WithId<SessionType>) {
+    this.ip = IP;
+    this.deviceId = _id.toString();
+    this.lastActiveDate = extendedAt;
+    this.title = browser;
+  }
+}
