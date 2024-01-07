@@ -27,3 +27,7 @@ export interface UpdateSessionInputType {
   sessionId: string;
   createdAt: string;
 }
+
+export interface QuerySessionIdType {
+  id: string;
+};

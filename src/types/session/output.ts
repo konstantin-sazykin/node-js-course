@@ -13,3 +13,10 @@ export interface SessionRepositoryOutputType {
   createdAt: string;
   extendedAt: string;
 }
+
+export interface SessionReadRepositoryOutputType {
+  ip: string;
+  title: string;
+  lastActiveDate: string;
+  deviceId: string;
+}
