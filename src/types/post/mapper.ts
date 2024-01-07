@@ -1,5 +1,6 @@
-import { WithId } from 'mongodb';
-import { PostType, QueryPostOutputModel } from "./output";
+import { type WithId } from 'mongodb';
+
+import { type PostType, type QueryPostOutputModel } from './output';
 
 export class PostMapper implements QueryPostOutputModel {
   public id: string;

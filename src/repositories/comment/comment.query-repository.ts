@@ -1,14 +1,15 @@
 import { ObjectId } from 'mongodb';
+
 import { commentCollection } from '../../db/db';
-import { CommentDbMapper, CommentMapper } from '../../types/comment/mapper';
-import { CommentRepositoryType } from '../../types/comment/output';
-import { WithPaginationDataType } from '../../types/common';
-import { CommentSortData } from '../../utils/SortData';
+import { CommentDbMapper } from '../../types/comment/mapper';
+import { type CommentRepositoryType } from '../../types/comment/output';
+import { type WithPaginationDataType } from '../../types/common';
+import { type CommentSortData } from '../../utils/SortData';
 
 export class CommentQueryRepository {
   static async getAllByPostId(
     postId: string,
-    sortData: CommentSortData
+    sortData: CommentSortData,
   ): Promise<WithPaginationDataType<CommentRepositoryType>> {
     const { sortBy, sortDirection, skip, limit, pageNumber } = sortData;
 

@@ -5,5 +5,5 @@ export const emails = {
       <a href='https://somesite.com/confirm-email?code={{confirmationCode}}'>complete registration</a>
     </p>`,
     subject: 'Konstantin <lebowskibar24@gmail.com>',
-  }
+  },
 };

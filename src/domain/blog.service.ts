@@ -1,8 +1,9 @@
 import { BlogRepository } from '../repositories/blog/blog.repository';
-import { CreateBlogInputModel, UpdateBlogInputModel } from '../types/blog/input';
+import { type CreateBlogInputModel, type UpdateBlogInputModel } from '../types/blog/input';
+import { type QueryBlogOutputModel } from '../types/blog/output';
 
 export class BlogService {
-  static async createBlog(data: CreateBlogInputModel) {
+  static async createBlog(data: CreateBlogInputModel): Promise<QueryBlogOutputModel | null> {
     const createdBlog = await BlogRepository.createBlog(data);
 
     if (!createdBlog) {

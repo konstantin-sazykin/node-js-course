@@ -1,8 +1,11 @@
-import { UserMapper } from './../../types/user/mapper';
-import { userCollection } from '../../db/db';
-import { CreateUserServiceModel, QueryUserOutputModel } from '../../types/user/input';
-import { UserDataBaseType } from '../../types/user/output';
 import { ObjectId } from 'mongodb';
+
+import { userCollection } from '../../db/db';
+
+import { type CreateUserServiceModel, type QueryUserOutputModel } from '../../types/user/input';
+import { type UserDataBaseType } from '../../types/user/output';
+
+import { UserMapper } from './../../types/user/mapper';
 
 export class UserRepository {
   static async createUser(user: CreateUserServiceModel): Promise<QueryUserOutputModel | null> {
@@ -22,7 +25,7 @@ export class UserRepository {
         return null;
       }
 
-      return { ... new UserMapper(createdUser) }
+      return { ...new UserMapper(createdUser) };
     } catch (error) {
       console.error(error);
 
@@ -30,9 +33,9 @@ export class UserRepository {
     }
   }
 
-  static async checkUserBuLoginOrEmail(loginOrEmail: string): Promise<UserDataBaseType | null> {
+  static async checkUserByLoginOrEmail(loginOrEmail: string): Promise<UserDataBaseType | null> {
     try {
-      const user = await userCollection.findOne({ $or: [ { login: loginOrEmail }, { email: loginOrEmail } ] });
+      const user = await userCollection.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] });
 
       if (!user) {
         return null;
@@ -41,7 +44,7 @@ export class UserRepository {
       return user;
     } catch (error) {
       console.error(error);
-      
+
       return null;
     }
   }
@@ -49,23 +52,23 @@ export class UserRepository {
   static async deleteUser(id: string): Promise<boolean> {
     try {
       const result = await userCollection.deleteOne({ _id: new ObjectId(id) });
-      
+
       return !!result.deletedCount;
     } catch (error) {
       console.error(error);
-      
+
       return false;
     }
   }
 
   static async confirmEmail(email: string): Promise<boolean> {
     try {
-      const result = await userCollection.updateOne({ email: email }, { $set: { isConfirmed: true } });
+      const result = await userCollection.updateOne({ email }, { $set: { isConfirmed: true } });
 
       return !!result.modifiedCount;
     } catch (error) {
       console.error(error);
-      
+
       return false;
     }
   }

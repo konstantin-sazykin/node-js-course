@@ -1,13 +1,14 @@
 import { ObjectId } from 'mongodb';
+
 import { blogCollection } from '../../db/db';
 import { BlogMapper } from '../../types/blog/mapper';
-import { QueryBlogOutputModel } from '../../types/blog/output';
-import { WithPaginationDataType } from '../../types/common';
-import { BlogSortData } from '../../utils/SortData';
+import { type QueryBlogOutputModel } from '../../types/blog/output';
+import { type WithPaginationDataType } from '../../types/common';
+import { type BlogSortData } from '../../utils/SortData';
 
 export class BlogQueryRepository {
   static async getAllBlogs(
-    sortData: BlogSortData
+    sortData: BlogSortData,
   ): Promise<WithPaginationDataType<QueryBlogOutputModel>> {
     const { searchNameTerm, sortDirection, sortBy, skip, limit, pageNumber } = sortData;
     let filter = {};
@@ -40,7 +41,7 @@ export class BlogQueryRepository {
     };
   }
 
-  static async getBlogById(id: string) {
+  static async getBlogById(id: string): Promise<null | BlogMapper> {
     const blog = await blogCollection.findOne({ _id: new ObjectId(id) });
 
     if (!blog) {

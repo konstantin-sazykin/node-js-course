@@ -1,12 +1,12 @@
-import { NextFunction, Response } from 'express';
+import { type NextFunction, type Response } from 'express';
 
-import { QueryRequestType, RequestType, ResponseWithPagination } from '../types/common';
+import { type QueryRequestType, type RequestType, type ResponseWithPagination } from '../types/common';
 import {
-  CreatePostWithBlogIdInputModel,
-  PostParams,
-  QuerySortedPostsType,
+  type CreatePostWithBlogIdInputModel,
+  type PostParams,
+  type QuerySortedPostsType,
 } from '../types/post/input';
-import { QueryPostOutputModel } from '../types/post/output';
+import { type QueryPostOutputModel } from '../types/post/output';
 import { PostSortData } from '../utils/SortData';
 import { PostQueryRepository } from '../repositories/post/post.query.repository';
 import { ApiError } from '../exeptions/api.error';
@@ -17,7 +17,7 @@ export class PostController {
   static async getAll(
     request: QueryRequestType<{}, QuerySortedPostsType>,
     response: ResponseWithPagination<QueryPostOutputModel>,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const sortData = new PostSortData(request.query);
@@ -33,7 +33,7 @@ export class PostController {
   static async getById(
     request: RequestType<PostParams, {}>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const findedPost = await PostQueryRepository.getById(request.params.id);
@@ -51,13 +51,13 @@ export class PostController {
   static async post(
     request: RequestType<{}, CreatePostWithBlogIdInputModel>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const createdPost = await PostService.createPost(request.body);
 
       if (!createdPost) {
-        throw new ApiError(ResponseStatusCodesEnum.BadRequest, `Не удалось создать пост`);
+        throw new ApiError(ResponseStatusCodesEnum.BadRequest, 'Не удалось создать пост');
       }
 
       response.status(ResponseStatusCodesEnum.Created).send(createdPost);
@@ -69,13 +69,13 @@ export class PostController {
   static async put(
     request: RequestType<PostParams, CreatePostWithBlogIdInputModel>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const isPostUpdated = await PostService.updatePost(request.params.id, request.body);
 
       if (!isPostUpdated) {
-        throw new ApiError(ResponseStatusCodesEnum.NotFound, `Некорректный id блога или id поста`);
+        throw new ApiError(ResponseStatusCodesEnum.NotFound, 'Некорректный id блога или id поста');
       }
 
       response.sendStatus(ResponseStatusCodesEnum.NoContent);
@@ -87,7 +87,7 @@ export class PostController {
   static async delete(
     request: RequestType<PostParams, CreatePostWithBlogIdInputModel>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const isPostDeleted = await PostService.deletePostById(request.params.id);
@@ -95,7 +95,7 @@ export class PostController {
       if (!isPostDeleted) {
         throw new ApiError(
           ResponseStatusCodesEnum.NotFound,
-          `Пост с id = ${request.params.id} не найден`
+          `Пост с id = ${request.params.id} не найден`,
         );
       }
 

@@ -1,14 +1,13 @@
-export type AuthCreateUserInputType = {
+export interface AuthCreateUserInputType {
   login: string;
   password: string;
   email: string;
-};
-
-
-export type AuthConfirmEmailInputType = {
-  code: string;
 }
 
-export type AuthResendEmailInputType = {
+export interface AuthConfirmEmailInputType {
+  code: string;
+};
+
+export interface AuthResendEmailInputType {
   email: string;
 }

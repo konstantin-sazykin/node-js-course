@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Router } from 'express';
 
 import { adminMiddleware } from '../middlewares/admin/admin.middleware';
@@ -16,7 +17,7 @@ blogsRouter.put(
   adminMiddleware,
   paramValidation(),
   blogPostValidation(),
-  BlogController.put
+  BlogController.put,
 );
 blogsRouter.delete('/:id', adminMiddleware, paramValidation(), BlogController.delete);
 blogsRouter.post(
@@ -24,6 +25,6 @@ blogsRouter.post(
   adminMiddleware,
   blogParamValidation(),
   postCreateValidation(),
-  BlogController.postForId
+  BlogController.postForId,
 );
 blogsRouter.get('/:id/posts', blogParamValidation(), BlogController.getPostsForBlogById);

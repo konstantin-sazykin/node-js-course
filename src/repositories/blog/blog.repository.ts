@@ -1,8 +1,8 @@
 import { ObjectId } from 'mongodb';
 
 import { blogCollection } from '../../db/db';
-import { CreateBlogInputModel, UpdateBlogInputModel } from '../../types/blog/input';
-import { QueryBlogOutputModel } from '../../types/blog/output';
+import { type CreateBlogInputModel, type UpdateBlogInputModel } from '../../types/blog/input';
+import { type QueryBlogOutputModel } from '../../types/blog/output';
 import { BlogMapper } from '../../types/blog/mapper';
 
 export class BlogRepository {
@@ -19,9 +19,8 @@ export class BlogRepository {
 
         if (createdBlog) {
           return { ...new BlogMapper(createdBlog) };
-        } else {
-          return null;
         }
+        return null;
       }
 
       return null;
@@ -34,7 +33,7 @@ export class BlogRepository {
     try {
       const result = await blogCollection.updateOne(
         { _id: new ObjectId(id) },
-        { $set: { ...data } }
+        { $set: { ...data } },
       );
 
       return !!result.modifiedCount;

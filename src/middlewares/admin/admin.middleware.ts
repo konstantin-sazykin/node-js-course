@@ -1,14 +1,15 @@
 import { type NextFunction, type Request, type Response } from 'express';
+
 import { ApiError } from '../../exeptions/api.error';
 
 const db = {
   defaultUser: {
     login: 'admin',
-    password: 'qwerty'
-  }
-}
+    password: 'qwerty',
+  },
+};
 
-export const adminMiddleware = (request: Request, response: Response, next: NextFunction) => {
+export const adminMiddleware = (request: Request, response: Response, next: NextFunction): void => {
   const authHeader = request.headers.authorization;
 
   if (!authHeader) {

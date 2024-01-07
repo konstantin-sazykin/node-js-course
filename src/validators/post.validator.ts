@@ -1,7 +1,11 @@
-import { body, param } from 'express-validator';
+import { type ValidationChain, body, param } from 'express-validator';
+
+import { type NextFunction, type Request, type Response } from 'express';
+
 import { inputModelValidation } from '../exeptions/validation.error';
 import { BlogQueryRepository } from '../repositories/blog/blog.query.repository';
 import { PostQueryRepository } from '../repositories/post/post.query.repository';
+
 import { requestParamsValidation } from './common';
 
 const titleValidation = body('title')
@@ -26,7 +30,7 @@ const blogIdValidation = body('blogId')
   .isString()
   .trim()
   .isMongoId()
-  .custom(async (blogId) => {
+  .custom(async (blogId: string) => {
     const isBlogDefined = await BlogQueryRepository.getBlogById(blogId);
 
     if (!isBlogDefined) {
@@ -35,7 +39,7 @@ const blogIdValidation = body('blogId')
   })
   .withMessage('Invalid blogId field');
 
-const postIdValidation = param('id').custom(async (postId) => {
+const postIdValidation = param('id').custom(async (postId: string) => {
   const isPostDefined = await PostQueryRepository.getById(postId);
 
   if (!isPostDefined) {
@@ -43,7 +47,13 @@ const postIdValidation = param('id').custom(async (postId) => {
   }
 });
 
-export const postWithBlogIdCreateValidation = () => [
+export const postWithBlogIdCreateValidation = (): [
+  ValidationChain,
+  ValidationChain,
+  ValidationChain,
+  ValidationChain,
+  (request: Request, response: Response, next: NextFunction) => void,
+] => [
   titleValidation,
   shortDescriptionValidation,
   contentValidation,
@@ -51,11 +61,14 @@ export const postWithBlogIdCreateValidation = () => [
   inputModelValidation,
 ];
 
-export const postCreateValidation = () => [
-  titleValidation,
-  shortDescriptionValidation,
-  contentValidation,
-  inputModelValidation,
-];
+export const postCreateValidation = (): [
+  ValidationChain,
+  ValidationChain,
+  ValidationChain,
+  (request: Request, response: Response, next: NextFunction) => void,
+] => [titleValidation, shortDescriptionValidation, contentValidation, inputModelValidation];
 
-export const postGetParamValidation = () => [postIdValidation, requestParamsValidation];
+export const postGetParamValidation = (): [
+  ValidationChain,
+  (request: Request, response: Response, next: NextFunction) => void,
+] => [postIdValidation, requestParamsValidation];

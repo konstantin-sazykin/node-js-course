@@ -1,4 +1,6 @@
+// @ts-nocheck
 import { Router } from 'express';
+
 import { CommentController } from '../conrollers/comment.controller';
 import { commentIdParamValidation, commentUpdateValidation } from '../validators/comment.validator';
 import { authMiddleware } from '../middlewares/auth/auth.middleware';
@@ -14,7 +16,7 @@ commentRouter.put(
   authMiddleware,
   commentAuthorMiddleware,
   commentUpdateValidation(),
-  CommentController.put
+  CommentController.put,
 );
 
 commentRouter.delete(
@@ -22,5 +24,5 @@ commentRouter.delete(
   commentIdParamValidation(),
   authMiddleware,
   commentAuthorMiddleware,
-  CommentController.delete
+  CommentController.delete,
 );

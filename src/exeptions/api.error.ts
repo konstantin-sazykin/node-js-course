@@ -1,5 +1,5 @@
-import { ErrorMessageType } from "../types/common";
-import { ResponseStatusCodesEnum } from "../utils/constants";
+import { type ErrorMessageType } from '../types/common';
+import { ResponseStatusCodesEnum } from '../utils/constants';
 
 export class ApiError {
   status;
@@ -12,14 +12,14 @@ export class ApiError {
     this.message = message;
   }
 
-  static UnauthorizedError() {
+  static UnauthorizedError(): ApiError {
     return new ApiError(ResponseStatusCodesEnum.Unathorized, 'Пользователь неавторизован');
   }
 
   static BadRequest(
     errors: ErrorMessageType[] | null,
-    message: string | null = 'Непредвиденная ошибка'
-  ) {
+    message: string | null = 'Непредвиденная ошибка',
+  ): ApiError {
     if (errors?.length) {
       return new ApiError(ResponseStatusCodesEnum.BadRequest, null, errors);
     }
@@ -27,10 +27,10 @@ export class ApiError {
     return new ApiError(ResponseStatusCodesEnum.BadRequest, message);
   }
 
-  static AccessError() {
+  static AccessError(): ApiError {
     return new ApiError(
       ResponseStatusCodesEnum.Forbidden,
-      'Действие доступно только администраторам'
+      'Действие доступно только администраторам',
     );
   }
 }

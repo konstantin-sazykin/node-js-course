@@ -1,5 +1,5 @@
-export const cookieParse = (cookies: string[]) => {
-  const res: { [key: string]: string } = {};
+export const cookieParse = (cookies: string[]): any => {
+  const res: Record<string, string> = {};
 
   cookies.forEach((str) => {
     const cookie = decodeURIComponent(str.split(';')[0]).split('=');

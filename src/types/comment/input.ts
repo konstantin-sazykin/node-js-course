@@ -1,13 +1,13 @@
-import { QuerySortDataType } from '../common';
+import { type QuerySortDataType } from '../common';
 
-export type CommentsParams = { id: string };
+export interface CommentsParams { id: string; }
 
 export type QuerySortedCommentsType = QuerySortDataType;
 
-export type CreateCommentType = {
+export interface CreateCommentType {
   content: string;
-}
+};
 
-export type UpdateCommentType = {
+export interface UpdateCommentType {
   content: string;
 }

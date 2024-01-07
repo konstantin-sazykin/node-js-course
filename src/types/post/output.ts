@@ -1,13 +1,13 @@
-export type PostType = {
+export interface PostType {
   title: string;
   shortDescription: string;
   content: string;
   blogId: string;
   blogName: string;
   createdAt: string;
-};
+}
 
-export type QueryPostOutputModel = {
+export interface QueryPostOutputModel {
   id: string;
   title: string;
   shortDescription: string;
@@ -15,4 +15,4 @@ export type QueryPostOutputModel = {
   blogId: string;
   blogName: string;
   createdAt: string;
-};
+}

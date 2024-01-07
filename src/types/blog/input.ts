@@ -1,10 +1,10 @@
-import { QuerySortDataType } from "../common";
+import { type QuerySortDataType } from '../common';
 
-export type BlogParams = { id: string };
+export interface BlogParams { id: string; }
 
 export type QuerySortedBlogsType = QuerySortDataType & {
   searchNameTerm?: string;
-}
+};
 
 export interface CreateBlogInputModel {
   name: string;

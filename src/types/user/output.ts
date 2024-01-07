@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { type ObjectId } from 'mongodb';
 
 export interface UserType {
   email: string;
@@ -8,7 +8,6 @@ export interface UserType {
   createdAt: Date;
   isConfirmed: boolean;
 }
-
 
 export interface UserDataBaseType {
   _id: ObjectId;

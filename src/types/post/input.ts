@@ -1,30 +1,30 @@
-import { QuerySortDataType } from "../common";
+import { type QuerySortDataType } from '../common';
 
-export type PostParams = { id: string };
+export interface PostParams { id: string; }
 
 export type QuerySortedPostsType = QuerySortDataType;
 
-export type CreatePostWithBlogIdInputModel = {
+export interface CreatePostWithBlogIdInputModel {
   title: string;
   shortDescription: string;
   content: string;
   blogId: string;
-}
+};
 
-export type CreatePostInputModel = {
+export interface CreatePostInputModel {
   title: string;
   shortDescription: string;
   content: string;
-}
+};
 
-export type UpdatePostInputModel = {
+export interface UpdatePostInputModel {
   title: string;
   shortDescription: string;
   content: string;
   blogId: string;
-}
+};
 
-export type CreatePostRepositoryInputModel = {
+export interface CreatePostRepositoryInputModel {
   title: string;
   shortDescription: string;
   content: string;

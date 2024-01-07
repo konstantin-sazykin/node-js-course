@@ -1,8 +1,9 @@
 import { ObjectId } from 'mongodb';
+
 import { PostMapper } from '../../types/post/mapper';
 import { postCollection } from '../../db/db';
-import { CreatePostRepositoryInputModel, UpdatePostInputModel } from '../../types/post/input';
-import { QueryPostOutputModel } from '../../types/post/output';
+import { type CreatePostRepositoryInputModel, type UpdatePostInputModel } from '../../types/post/input';
+import { type QueryPostOutputModel } from '../../types/post/output';
 
 export class PostRepository {
   static async create(data: CreatePostRepositoryInputModel): Promise<QueryPostOutputModel | null> {
@@ -21,9 +22,8 @@ export class PostRepository {
 
         if (createdPost) {
           return { ...new PostMapper(createdPost) };
-        } else {
-          return null;
         }
+        return null;
       }
 
       return null;
@@ -45,7 +45,7 @@ export class PostRepository {
             title: data.title,
             shortDescription: data.shortDescription,
           },
-        }
+        },
       );
 
       return !!result.modifiedCount;
@@ -56,7 +56,7 @@ export class PostRepository {
     }
   }
 
-  static async delete(id: string): Promise<boolean> {
+  static async remove(id: string): Promise<boolean> {
     try {
       const result = await postCollection.deleteOne({ _id: new ObjectId(id) });
 

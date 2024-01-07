@@ -1,4 +1,4 @@
-import { CommentMapModelType, CommentReadDbType, CommentType } from './output';
+import { type CommentMapModelType, type CommentReadDbType } from './output';
 
 export class CommentMapper {
   id: string;
@@ -7,6 +7,7 @@ export class CommentMapper {
     userId: string;
     userLogin: string;
   };
+
   createdAt: string;
 
   constructor({ id, content, userId, userLogin, createdAt }: CommentMapModelType) {

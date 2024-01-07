@@ -6,11 +6,11 @@ export interface BlogType {
   isMembership: boolean;
 }
 
-export type QueryBlogOutputModel = {
+export interface QueryBlogOutputModel {
   id: string;
   name: string;
   description: string;
   websiteUrl: string;
   createdAt: string;
   isMembership: boolean;
-};
+}

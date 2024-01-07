@@ -1,14 +1,17 @@
-import { QueryUserShortInfoOutputModel } from './../../types/user/output';
-import { userCollection } from '../../db/db';
-import { WithPaginationDataType } from '../../types/common';
-import { UserMapper, UserShortInfoMapper } from '../../types/user/mapper';
-import { QueryUserOutputType } from '../../types/user/output';
-import { UserSortData } from '../../utils/SortData';
 import { ObjectId } from 'mongodb';
+
+import { userCollection } from '../../db/db';
+
+import { type WithPaginationDataType } from '../../types/common';
+import { UserMapper, UserShortInfoMapper } from '../../types/user/mapper';
+import { type QueryUserOutputType } from '../../types/user/output';
+import { type UserSortData } from '../../utils/SortData';
+
+import { type QueryUserShortInfoOutputModel } from './../../types/user/output';
 
 export class UserQueryRepository {
   static async findAll(
-    sortData: UserSortData
+    sortData: UserSortData,
   ): Promise<WithPaginationDataType<QueryUserOutputType>> {
     const { searchEmailTerm, searchLoginTerm, sortBy, sortDirection, skip, limit, pageNumber } =
       sortData;

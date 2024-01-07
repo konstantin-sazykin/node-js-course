@@ -17,4 +17,5 @@ export enum RoutesPathsEnum {
   user = '/users',
   testingAllData = '/testing/all-data',
   comments = '/comments',
+  devices = '/security/devices',
 }
