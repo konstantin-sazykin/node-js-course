@@ -1,4 +1,4 @@
-import { blogCollection, commentCollection, postCollection, userCollection } from '../db/db';
+import { blogCollection, commentCollection, postCollection, sessionCollection, userCollection } from '../db/db';
 import { videoDb } from '../routers/videos.router';
 
 export class TestingRepository {
@@ -10,6 +10,8 @@ export class TestingRepository {
       await postCollection.deleteMany({});
       await userCollection.deleteMany({});
       await commentCollection.deleteMany({});
+      await sessionCollection.deleteMany({});
+
       return true;
     } catch (error) {
       console.error(error);
