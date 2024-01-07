@@ -33,7 +33,7 @@ export class UserRepository {
     }
   }
 
-  static async checkUserBuLoginOrEmail(loginOrEmail: string): Promise<UserDataBaseType | null> {
+  static async checkUserByLoginOrEmail(loginOrEmail: string): Promise<UserDataBaseType | null> {
     try {
       const user = await userCollection.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] });
 
