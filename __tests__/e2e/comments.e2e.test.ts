@@ -36,8 +36,6 @@ describe('/comments', () => {
   let accessUserAToken: string;
   let accessUserBToken: string;
 
-  const simpleAuthHeaderString = `Basic ${btoa('admin:qwerty')}`;
-
   beforeAll(async () => {
     await launchDb();
 
