@@ -7,6 +7,7 @@ import { type PostType } from '../types/post/output';
 import { type UserType } from '../types/user/output';
 import { type CommentType } from '../types/comment/output';
 import { type SessionType } from '../types/session/output';
+import { type AttemptType } from '../types/attempt/output';
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ export const postCollection = db.collection<PostType>('post');
 export const userCollection = db.collection<UserType>('user');
 export const commentCollection = db.collection<CommentType>('comment');
 export const sessionCollection = db.collection<SessionType>('session');
+export const attemptCollection = db.collection<AttemptType>('attempts');
 
 export const launchDb = async (): Promise<void> => {
   try {
