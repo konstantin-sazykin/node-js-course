@@ -1,6 +1,9 @@
-import { body, param } from 'express-validator';
+import { type NextFunction, type Request, type Response } from 'express';
+import { type ValidationChain, body, param } from 'express-validator';
+
 import { inputModelValidation } from '../exeptions/validation.error';
 import { BlogQueryRepository } from '../repositories/blog/blog.query.repository';
+
 import { requestParamsValidation } from './common';
 
 const nameValidation = body('name')
@@ -31,10 +34,15 @@ const websiteUrlValidation = body('websiteUrl')
   .matches('^https://([a-zA-Z0-9_-]+.)+[a-zA-Z0-9_-]+(/[a-zA-Z0-9_-]+)*/?$')
   .withMessage('Invalid websiteUrl field');
 
-// реализация не через regex а через встроеную проверку на URL
-// const websiteUrlValidation = body('name').isString().trim().isLength({ min: 1, max: 100 }).isURL().withMessage('Invalid websiteUrl field');
+/* Реализация не через regex а через встроеную проверку на URL
+   const websiteUrlValidation = body('name').isString().trim().isLength({ min: 1, max: 100 }).isURL().withMessage('Invalid websiteUrl field'); */
 
-export const blogPostValidation = () => [
+export const blogPostValidation = (): [
+  ValidationChain,
+  ValidationChain,
+  ValidationChain,
+  (request: Request, response: Response, next: NextFunction) => void,
+] => [
   nameValidation,
   descriptionValidation,
   websiteUrlValidation,
@@ -45,7 +53,7 @@ const blogIdValidation = param('id')
   .isString()
   .trim()
   .isMongoId()
-  .custom(async (blogId) => {
+  .custom(async (blogId: string) => {
     const isBlogDefined = await BlogQueryRepository.getBlogById(blogId);
 
     if (!isBlogDefined) {
@@ -53,7 +61,7 @@ const blogIdValidation = param('id')
     }
   });
 
-export const blogParamValidation = () => [
-  blogIdValidation,
-  requestParamsValidation,
-]
+export const blogParamValidation = (): [
+  ValidationChain,
+  (request: Request, response: Response, next: NextFunction) => void,
+] => [blogIdValidation, requestParamsValidation];

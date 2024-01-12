@@ -1,11 +1,12 @@
-import { NextFunction, Response } from 'express';
+import { type NextFunction, type Response } from 'express';
+
 import {
-  CommentsParams,
-  CreateCommentType,
-  QuerySortedCommentsType,
-  UpdateCommentType,
+  type CommentsParams,
+  type CreateCommentType,
+  type QuerySortedCommentsType,
+  type UpdateCommentType,
 } from '../types/comment/input';
-import { QueryRequestType, RequestType } from '../types/common';
+import { type QueryRequestType, type RequestType } from '../types/common';
 import { CommentSortData } from '../utils/SortData';
 import { CommentService } from '../domain/comment.service';
 import { ApiError } from '../exeptions/api.error';
@@ -15,7 +16,7 @@ export class CommentController {
   static async getCommentsByPostId(
     request: QueryRequestType<CommentsParams, QuerySortedCommentsType>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const postId = request.params.id;
@@ -32,7 +33,7 @@ export class CommentController {
   static async postCommentByPostId(
     request: RequestType<CommentsParams, CreateCommentType>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const postId = request.params.id;
@@ -40,7 +41,7 @@ export class CommentController {
       const content = request.body.content;
 
       if (!userId) {
-        return next(ApiError.BadRequest(null, `Can not create comment with user id ${userId}`));
+        next(ApiError.BadRequest(null, `Can not create comment with user id ${userId}`)); return;
       }
 
       const result = await CommentService.createComment(postId, userId, content);
@@ -54,7 +55,7 @@ export class CommentController {
   static async getById(
     request: RequestType<CommentsParams, {}>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const commentId = request.params.id;
@@ -73,7 +74,7 @@ export class CommentController {
   static async put(
     request: RequestType<CommentsParams, UpdateCommentType>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const commentId = request.params.id;
@@ -85,7 +86,7 @@ export class CommentController {
         response.sendStatus(ResponseStatusCodesEnum.NoContent);
       } else {
         next(
-          new ApiError(ResponseStatusCodesEnum.InternalError, 'Не удалось обновить комментарий')
+          new ApiError(ResponseStatusCodesEnum.InternalError, 'Не удалось обновить комментарий'),
         );
       }
     } catch (error) {
@@ -96,7 +97,7 @@ export class CommentController {
   static async delete(
     request: RequestType<CommentsParams, {}>,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const commentId = request.params.id;

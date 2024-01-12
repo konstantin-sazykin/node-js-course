@@ -1,4 +1,5 @@
-import { QuerySortDataType } from './../common';
+import { type QuerySortDataType } from './../common';
+
 export interface CreateUserServiceModel {
   email: string;
   login: string;

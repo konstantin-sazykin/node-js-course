@@ -1,14 +1,24 @@
-import { body, param, validationResult } from 'express-validator';
+import { type ValidationChain, body, param } from 'express-validator';
+
+import { type NextFunction, type Request, type Response } from 'express';
+
 import { inputModelValidation } from '../exeptions/validation.error';
 import { CommentQueryRepository } from '../repositories/comment/comment.query-repository';
+
 import { requestParamsValidation } from './common';
 
 const commentContentValidation = body('content').isString().trim().isLength({ min: 20, max: 300 });
 
-export const commentCreateValidation = () => [commentContentValidation, inputModelValidation];
-export const commentUpdateValidation = () => [commentContentValidation, inputModelValidation];
+export const commentCreateValidation = (): [
+  ValidationChain,
+  (request: Request, response: Response, next: NextFunction) => void,
+] => [commentContentValidation, inputModelValidation];
+export const commentUpdateValidation = (): [
+  ValidationChain,
+  (request: Request, response: Response, next: NextFunction) => void,
+] => [commentContentValidation, inputModelValidation];
 
-const idValidation = param('id').custom(async (id) => {
+const idValidation = param('id').custom(async (id: string) => {
   const isCommentDefined = await CommentQueryRepository.find(id);
 
   if (!isCommentDefined) {
@@ -16,4 +26,7 @@ const idValidation = param('id').custom(async (id) => {
   }
 });
 
-export const commentIdParamValidation = () => [idValidation, requestParamsValidation];
+export const commentIdParamValidation = (): [
+  ValidationChain,
+  (request: Request, response: Response, next: NextFunction) => void,
+] => [idValidation, requestParamsValidation];

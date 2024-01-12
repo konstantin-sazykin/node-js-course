@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Router } from 'express';
 
 import { adminMiddleware } from '../middlewares/admin/admin.middleware';
@@ -21,7 +22,7 @@ postsRouter.put(
   adminMiddleware,
   paramValidation(),
   postWithBlogIdCreateValidation(),
-  PostController.put
+  PostController.put,
 );
 postsRouter.delete('/:id', adminMiddleware, paramValidation(), PostController.delete);
 postsRouter.get('/:id/comments', postGetParamValidation(), CommentController.getCommentsByPostId);
@@ -30,5 +31,5 @@ postsRouter.post(
   authMiddleware,
   postGetParamValidation(),
   commentCreateValidation(),
-  CommentController.postCommentByPostId
+  CommentController.postCommentByPostId,
 );

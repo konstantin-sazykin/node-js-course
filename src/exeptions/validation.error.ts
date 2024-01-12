@@ -3,7 +3,7 @@ import { validationResult } from 'express-validator';
 
 import { ApiError } from './api.error';
 
-export const inputModelValidation = (request: Request, response: Response, next: NextFunction) => {
+export const inputModelValidation = (request: Request, response: Response, next: NextFunction): void => {
   const errors = validationResult(request).formatWith((error) => {
     switch (error.type) {
       case 'field':

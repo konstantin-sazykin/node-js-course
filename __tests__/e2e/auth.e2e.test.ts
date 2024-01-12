@@ -1,4 +1,4 @@
-import request from 'supertest';
+import request, { Test } from 'supertest';
 
 import { closeDbConnection, launchDb } from '../../src/db/db';
 import { TestingRepository } from '../../src/repositories/testing.repository';
@@ -10,6 +10,7 @@ import { UserDataManager } from './dataManager/user.data-manager';
 import { QueryUserOutputType } from '../../src/types/user/output';
 import { cookieParse } from './../../src/utils/cookie-parse';
 import { JWTService } from '../../src/application/jwt.service';
+import { RateLimitService } from '../../src/domain/rateLimit.service';
 
 const sendMailMock = jest.fn(() => ({ accepted: [UserDataManager.realEmail] }));
 
@@ -257,7 +258,7 @@ describe('/auth', () => {
     if (!createdByAdminUser) {
       throw new Error('Can not testing confirmation without new user');
     }
-    const token = JWTService.generateToken(createdByAdminUser.email);
+    const token = JWTService.generateToken({ email: createdByAdminUser.email});
 
     const result = await request(app).post(AuthPaths.confirmRegistration).send({ code: token });
 
@@ -269,7 +270,7 @@ describe('/auth', () => {
       throw new Error('Can not testing confirmation without new user');
     }
 
-    const token = JWTService.generateToken(createdBySelfUser.email);
+    const token = JWTService.generateToken({ email: createdBySelfUser.email });
 
     const result = await request(app).post(AuthPaths.confirmRegistration).send({ code: token });
 
@@ -309,5 +310,22 @@ describe('/auth', () => {
     const result = await request(app).post(AuthPaths.refreshToken).set('Cookie', [`refreshToken=${refreshToken}`]);
 
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
+  });
+
+  it('should return 429 status after 5 attempts during 10 seconds', async () => {
+    // @ts-ignore
+    RateLimitService.checkLimit.mockRestore();
+    const promises: Promise<Test>[] = [];
+
+    new Array(6).fill('').forEach((_, index) => {
+      // @ts-ignore
+      promises.push(request(app).post(AuthPaths.index).send({ loginOrEmail: UserDataManager.correctUser.login, password: UserDataManager.usersForTestingSearch.userA.password }));
+    });
+
+    const results = await Promise.all(promises);
+
+    const lastResult = results[results.length - 1];
+    
+    expect(lastResult.statusCode).toBe(ResponseStatusCodesEnum.TooManyRequests);
   });
 });

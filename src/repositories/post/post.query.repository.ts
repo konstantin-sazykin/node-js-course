@@ -1,13 +1,14 @@
 import { ObjectId } from 'mongodb';
-import { blogCollection, postCollection } from '../../db/db';
+
+import { postCollection } from '../../db/db';
 import { PostMapper } from '../../types/post/mapper';
-import { QueryPostOutputModel } from '../../types/post/output';
-import { WithPaginationDataType } from '../../types/common';
-import { PostSortData } from '../../utils/SortData';
+import { type QueryPostOutputModel } from '../../types/post/output';
+import { type WithPaginationDataType } from '../../types/common';
+import { type PostSortData } from '../../utils/SortData';
 
 export class PostQueryRepository {
   static async getAll(
-    sortData: PostSortData
+    sortData: PostSortData,
   ): Promise<WithPaginationDataType<QueryPostOutputModel>> {
     const { sortBy, sortDirection, skip, limit, pageNumber } = sortData;
     const posts = await postCollection
@@ -41,7 +42,7 @@ export class PostQueryRepository {
         ...new PostMapper(post),
       };
     } catch (error) {
-      console.log(error);
+      console.error(error);
 
       return null;
     }
@@ -49,7 +50,7 @@ export class PostQueryRepository {
 
   static async getAllByBlogId(
     blogId: string,
-    sortData: PostSortData
+    sortData: PostSortData,
   ): Promise<WithPaginationDataType<QueryPostOutputModel>> {
     const { sortBy, sortDirection, skip, limit, pageNumber } = sortData;
     const posts = await postCollection

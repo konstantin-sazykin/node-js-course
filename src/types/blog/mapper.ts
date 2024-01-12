@@ -1,5 +1,6 @@
-import { WithId,  } from 'mongodb';
-import { BlogType, QueryBlogOutputModel } from "./output";
+import { type WithId } from 'mongodb';
+
+import { type BlogType, type QueryBlogOutputModel } from './output';
 
 export class BlogMapper implements QueryBlogOutputModel {
   id: string;

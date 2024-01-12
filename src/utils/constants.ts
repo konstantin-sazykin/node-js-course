@@ -6,6 +6,7 @@ export enum ResponseStatusCodesEnum {
   Unathorized = 401,
   Forbidden = 403,
   NotFound = 404,
+  TooManyRequests = 429,
   InternalError = 500,
 }
 
@@ -17,4 +18,7 @@ export enum RoutesPathsEnum {
   user = '/users',
   testingAllData = '/testing/all-data',
   comments = '/comments',
+  devices = '/security/devices',
 }
+
+export const REFRESH_TOKEN_EXPIRES_IN = '1d';

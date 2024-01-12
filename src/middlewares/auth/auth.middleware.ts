@@ -1,9 +1,9 @@
-import { NextFunction, Request, Response } from 'express';
+import { type NextFunction, type Request, type Response } from 'express';
 
 import { ApiError } from '../../exeptions/api.error';
 import { JWTService } from '../../application/jwt.service';
 
-export const authMiddleware = (request: Request, response: Response, next: NextFunction) => {
+export const authMiddleware = (request: Request, response: Response, next: NextFunction): void => {
   const authHeader = request.headers.authorization;
 
   if (!authHeader) {
@@ -21,11 +21,11 @@ export const authMiddleware = (request: Request, response: Response, next: NextF
 
     const result = JWTService.validateToken(token);
 
-    if (!result || typeof result === 'string' || !result.id) {
-      return next(ApiError.UnauthorizedError());
+    if (!result || typeof result === 'string' || !result.userId) {
+      next(ApiError.UnauthorizedError()); return;
     }
 
-    request.userId = result.id;
+    request.userId = result.userId;
 
     next();
   } catch (error) {

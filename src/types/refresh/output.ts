@@ -1,4 +1,4 @@
-export type RefreshBlackListType = {
+export interface RefreshBlackListType {
   refresh: string;
   userId: string;
 }
