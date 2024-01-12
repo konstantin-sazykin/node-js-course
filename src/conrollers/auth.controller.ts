@@ -24,7 +24,7 @@ export class AuthController {
   ) {
     try {
       const { loginOrEmail, password } = request.body;
-      const IP = request.header('x-forwarded-for');
+      const IP = request.ip;
       const userAgent = uaParser(request.headers['user-agent']);
       const {
         browser: { name: browserName, major: browserVersion },

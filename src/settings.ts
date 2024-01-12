@@ -16,6 +16,7 @@ export const app = express();
 
 app.use(cookieParser());
 app.use(express.json());
+app.set('trust proxy', true);
 
 app.use(RoutesPathsEnum.videos, videosRouter);
 app.use(RoutesPathsEnum.blogs, blogsRouter);
