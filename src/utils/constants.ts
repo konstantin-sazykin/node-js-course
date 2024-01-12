@@ -20,3 +20,5 @@ export enum RoutesPathsEnum {
   comments = '/comments',
   devices = '/security/devices',
 }
+
+export const REFRESH_TOKEN_EXPIRES_IN = '1d';

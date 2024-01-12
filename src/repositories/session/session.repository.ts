@@ -4,6 +4,8 @@ import { sessionCollection } from '../../db/db';
 import { type CreateSessionRepositoryType } from '../../types/session/input';
 import { SessionMapper } from '../../types/session/mapper';
 import { type SessionRepositoryOutputType } from '../../types/session/output';
+import { addTImeToCurrentDate } from '../../utils/addTImeToCurrentDate';
+import { REFRESH_TOKEN_EXPIRES_IN } from '../../utils/constants';
 
 export class SessionRepository {
   static async create(
@@ -14,6 +16,7 @@ export class SessionRepository {
         userId: data.userId,
         createdAt: new Date().toISOString(),
         extendedAt: new Date().toISOString(),
+        expiresAt: addTImeToCurrentDate(REFRESH_TOKEN_EXPIRES_IN),
         os: data.os,
         IP: data.IP,
         browser: data.browser,

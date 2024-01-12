@@ -2,6 +2,7 @@ export interface SessionType {
   userId: string;
   createdAt: string;
   extendedAt: string;
+  expiresAt: string;
   IP: string;
   browser: string;
   os: string;

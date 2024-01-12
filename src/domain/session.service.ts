@@ -2,6 +2,8 @@ import { type CreateSessionInputType } from '../types/session/input';
 import { JWTService } from '../application/jwt.service';
 import { SessionQueryRepository } from '../repositories/session/session.query-repository';
 
+import { REFRESH_TOKEN_EXPIRES_IN } from '../utils/constants';
+
 import { SessionRepository } from './../repositories/session/session.repository';
 
 export class SessionService {
@@ -24,7 +26,7 @@ export class SessionService {
       return null;
     }
 
-    const refreshToken = JWTService.generateToken(session, '20s');
+    const refreshToken = JWTService.generateToken(session, REFRESH_TOKEN_EXPIRES_IN);
 
     return refreshToken;
   }
@@ -48,7 +50,7 @@ export class SessionService {
       return null;
     }
 
-    const refreshToken = JWTService.generateToken(result, '20s');
+    const refreshToken = JWTService.generateToken(result, REFRESH_TOKEN_EXPIRES_IN);
 
     return refreshToken;
   }
