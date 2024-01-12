@@ -6,6 +6,7 @@ export enum ResponseStatusCodesEnum {
   Unathorized = 401,
   Forbidden = 403,
   NotFound = 404,
+  TooManyRequests = 429,
   InternalError = 500,
 }
 
