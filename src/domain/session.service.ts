@@ -1,10 +1,14 @@
+import dotenv from 'dotenv';
+
 import { type CreateSessionInputType } from '../types/session/input';
 import { JWTService } from '../application/jwt.service';
 import { SessionQueryRepository } from '../repositories/session/session.query-repository';
 
-import { REFRESH_TOKEN_EXPIRES_IN } from '../utils/constants';
-
 import { SessionRepository } from './../repositories/session/session.repository';
+
+dotenv.config();
+
+const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN ?? '20s';
 
 export class SessionService {
   static async createSession(sessionData: CreateSessionInputType): Promise<string | null> {
