@@ -1,6 +1,5 @@
 import uaParser from 'ua-parser-js';
 import { type NextFunction, type Response } from 'express';
-import { type JwtPayload } from 'jsonwebtoken';
 
 import { ApiError } from '../exeptions/api.error';
 import { type RequestType } from '../types/common';
@@ -197,18 +196,11 @@ export class AuthController {
 
   static async logout(request: RequestType<{}, {}>, response: Response, next: NextFunction) {
     try {
-      const refreshToken: string = request.cookies.refreshToken;
+      const sessionId: string | null = request.sessionId;
 
-      if (!refreshToken) {
+      if (!sessionId) {
         throw ApiError.UnauthorizedError();
       }
-
-      const jwtPayload: JwtPayload | string | null = JWTService.validateToken(refreshToken);
-
-      if (typeof jwtPayload === 'string' || !jwtPayload) {
-        throw ApiError.UnauthorizedError();
-      }
-      const sessionId: string = jwtPayload.sessionId;
 
       const result = await SessionService.deleteSession(sessionId);
 

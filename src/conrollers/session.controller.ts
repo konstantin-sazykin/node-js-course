@@ -33,12 +33,13 @@ export class SessionController {
   static async removeAllSessions(request: RequestType<{}, {}>, response: Response, next: NextFunction): Promise<void> {
     try {
       const userId: string | null = request.userId;
+      const currentSessionId = request.sessionId;
 
-      if (!userId) {
+      if (!userId || !currentSessionId) {
         throw ApiError.UnauthorizedError();
       }
 
-      const result = await SessionService.deleteAllSessions(userId);
+      const result = await SessionService.deleteManySessions(userId, currentSessionId);
 
       if (result) {
         response.sendStatus(ResponseStatusCodesEnum.NoContent);

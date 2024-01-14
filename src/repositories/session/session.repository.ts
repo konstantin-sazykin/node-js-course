@@ -75,9 +75,9 @@ export class SessionRepository {
     }
   }
 
-  static async removaAll(userId: string): Promise<boolean> {
+  static async removeMany(userId: string, current: string): Promise<boolean> {
     try {
-      const result = await sessionCollection.deleteMany({ userId });
+      const result = await sessionCollection.deleteMany({ userId, _id: { $ne: new ObjectId(current) } });
 
       return !!result.deletedCount;
     } catch (error) {

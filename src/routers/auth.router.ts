@@ -5,6 +5,7 @@ import { AuthController } from '../conrollers/auth.controller';
 import { authConfirmationCodeValidation, authPostValidation, authRegistrationDataValidation, authResendEmailConfirmationValidation } from '../validators/auth.validator';
 import { authMiddleware } from '../middlewares/auth/auth.middleware';
 import { rateLimitMiddleware } from '../middlewares/rateLimit/rateLimit.middleware';
+import { refreshTokenMiddleware } from '../middlewares/refreshToken/refreshToken.middleware';
 
 export const authRouter = Router();
 
@@ -14,4 +15,4 @@ authRouter.post('/registration', rateLimitMiddleware, authRegistrationDataValida
 authRouter.post('/registration-confirmation', rateLimitMiddleware, authConfirmationCodeValidation(), AuthController.confirmRegistration);
 authRouter.post('/registration-email-resending', rateLimitMiddleware, authResendEmailConfirmationValidation(), AuthController.resendEmail);
 authRouter.post('/refresh-token', AuthController.refresh);
-authRouter.post('/logout', AuthController.logout);
+authRouter.post('/logout', refreshTokenMiddleware, AuthController.logout);
