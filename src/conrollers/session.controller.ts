@@ -79,7 +79,7 @@ export class SessionController {
       if (result) {
         response.sendStatus(ResponseStatusCodesEnum.NoContent);
       } else {
-        response.sendStatus(ResponseStatusCodesEnum.BadRequest); // Мб стоит сменить
+        response.sendStatus(ResponseStatusCodesEnum.NotFound); // Мб стоит сменить
       }
     } catch (error) {
       console.error(error);
