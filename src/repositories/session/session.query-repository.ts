@@ -7,12 +7,18 @@ import { SessionMapper, SessionOutputMapper } from './../../types/session/mapper
 
 export class SessionQueryRepository {
   static async find(sessionId: string): Promise<SessionRepositoryOutputType | null> {
-    const result = await sessionCollection.findOne({ _id: new ObjectId(sessionId) });
+    try {
+      const result = await sessionCollection.findOne({ _id: new ObjectId(sessionId) });
 
-    if (!result) {
+      if (!result) {
+        return null;
+      }
+      return { ...new SessionMapper(result) };
+    } catch (error) {
+      console.error(error);
+
       return null;
     }
-    return { ...new SessionMapper(result) };
   }
 
   static async findAll(userId: string): Promise<SessionReadRepositoryOutputType[] | null> {

@@ -9,4 +9,4 @@ export const sessionRouter = Router();
 
 sessionRouter.get('/', refreshTokenMiddleware, SessionController.getAllSessions);
 sessionRouter.delete('/', refreshTokenMiddleware, SessionController.removeAllSessions);
-sessionRouter.delete('/:id', refreshTokenMiddleware, deleteDeviceByIdValidation, SessionController.removeById);
+sessionRouter.delete('/:id', refreshTokenMiddleware, deleteDeviceByIdValidation(), SessionController.removeById);

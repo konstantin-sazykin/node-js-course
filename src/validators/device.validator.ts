@@ -7,14 +7,11 @@ import { SessionQueryRepository } from '../repositories/session/session.query-re
 
 const deviceIdParamValidation = param('id').custom(async (deviceId: string, { req }) => {
   const userId: string = req.userId;
-
   const session = await SessionQueryRepository.find(deviceId);
 
   if (!session) {
     throw new Error(`Device с id ${deviceId} не найден`);
   };
-
-  console.log({ userId, sessUsId: session.userId });
 
   if (session.userId !== userId) {
     throw new Error('Нет прав для удаления');
@@ -23,6 +20,7 @@ const deviceIdParamValidation = param('id').custom(async (deviceId: string, { re
 
 export const requestParamsValidation = (request: Request, response: Response, next: NextFunction): void => {
   const errors = validationResult(request);
+
   if (!errors.isEmpty()) {
     next(new ApiError(ResponseStatusCodesEnum.Forbidden, null)); return;
   }
