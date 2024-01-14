@@ -6,7 +6,7 @@ import { ApiError } from '../../exeptions/api.error';
 import { ResponseStatusCodesEnum } from '../../utils/constants';
 import { RateLimitService } from '../../domain/rateLimit.service';
 
-const RATE_LIMIT_POINTS = 6;
+const RATE_LIMIT_POINTS = 5;
 const RATE_LIMIT_DURATION = 10 * 1000;
 
 export const rateLimitMiddleware = async (
