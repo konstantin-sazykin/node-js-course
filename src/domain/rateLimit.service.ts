@@ -7,7 +7,7 @@ export class RateLimitService {
   static async checkLimit(ip: string, points: number, duration: number): Promise<boolean> {
     const nowDate = (new Date()).getTime() / 1000;
 
-    // Await AttemptRepository.setLimit(ip, nowDate);
+    await AttemptRepository.setLimit(ip, nowDate);
 
     const ipList = await AttemptRepository.getAttempts(ip);
 
@@ -27,8 +27,6 @@ export class RateLimitService {
     if (diff <= duration) {
       return false;
     }
-
-    await AttemptRepository.setLimit(ip, nowDate);
 
     return true;
   }
