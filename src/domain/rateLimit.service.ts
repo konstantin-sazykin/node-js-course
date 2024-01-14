@@ -5,7 +5,7 @@ import { AttemptRepository } from '../repositories/attempt/attempt.repository';
 
 export class RateLimitService {
   static async checkLimit(ip: string, points: number, duration: number): Promise<boolean> {
-    const nowDate = (new Date()).getTime();
+    const nowDate = (new Date()).getTime() / 1000;
 
     await AttemptRepository.setLimit(ip, nowDate);
 

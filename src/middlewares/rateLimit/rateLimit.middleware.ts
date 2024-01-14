@@ -7,7 +7,8 @@ import { ResponseStatusCodesEnum } from '../../utils/constants';
 import { RateLimitService } from '../../domain/rateLimit.service';
 
 const RATE_LIMIT_POINTS = 6;
-const RATE_LIMIT_DURATION = 10 * 1000;
+// Const RATE_LIMIT_DURATION = 10 * 1000;
+const RATE_LIMIT_DURATION = 10;
 
 export const rateLimitMiddleware = async (
   request: RequestType<CommentsParams, UpdateCommentType>,
