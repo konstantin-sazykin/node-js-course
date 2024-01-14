@@ -2,10 +2,10 @@
 import { Router } from 'express';
 
 import { SessionController } from '../conrollers/session.controller';
-import { authMiddleware } from '../middlewares/auth/auth.middleware';
+import { refreshTokenMiddleware } from '../middlewares/refreshToken/refreshToken.middleware';
 
 export const sessionRouter = Router();
 
-sessionRouter.get('/', SessionController.getAllSessions);
-sessionRouter.delete('/', authMiddleware, SessionController.removeAllSessions);
-sessionRouter.delete('/:id', authMiddleware, SessionController.removeById);
+sessionRouter.get('/', refreshTokenMiddleware, SessionController.getAllSessions);
+sessionRouter.delete('/', refreshTokenMiddleware, SessionController.removeAllSessions);
+sessionRouter.delete('/:id', refreshTokenMiddleware, SessionController.removeById);

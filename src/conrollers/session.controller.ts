@@ -3,7 +3,6 @@ import { type NextFunction, type Response } from 'express';
 import { type RequestType } from '../types/common';
 import { ApiError } from '../exeptions/api.error';
 import { type QuerySessionIdType } from '../types/session/input';
-import { JWTService } from '../application/jwt.service';
 import { SessionQueryRepository } from '../repositories/session/session.query-repository';
 import { SessionService } from '../domain/session.service';
 import { ResponseStatusCodesEnum } from '../utils/constants';
@@ -15,19 +14,11 @@ export class SessionController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const refreshToken: string = request.cookies.refreshToken;
+      const userId: string | null = request.userId;
 
-      if (!refreshToken) {
+      if (!userId) {
         throw ApiError.UnauthorizedError();
       }
-
-      const jwtPayload = JWTService.validateToken(refreshToken);
-
-      if (!jwtPayload) {
-        throw ApiError.UnauthorizedError();
-      }
-
-      const userId: string = jwtPayload.userId;
 
       const result = await SessionQueryRepository.findAll(userId);
 
@@ -41,19 +32,11 @@ export class SessionController {
 
   static async removeAllSessions(request: RequestType<{}, {}>, response: Response, next: NextFunction): Promise<void> {
     try {
-      const refreshToken: string = request.cookies.refreshToken;
+      const userId: string | null = request.userId;
 
-      if (!refreshToken) {
+      if (!userId) {
         throw ApiError.UnauthorizedError();
       }
-
-      const jwtPayload = JWTService.validateToken(refreshToken);
-
-      if (!jwtPayload) {
-        throw ApiError.UnauthorizedError();
-      }
-
-      const userId: string = jwtPayload.userId;
 
       const result = await SessionService.deleteAllSessions(userId);
 
@@ -69,7 +52,6 @@ export class SessionController {
     }
   }
 
-  // Вкрутить проверку в МВ если пользователь тот и пробросить сюда ид
   static async removeById(request: RequestType<QuerySessionIdType, {}>, response: Response, next: NextFunction): Promise<void> {
     try {
       const sessionId: string = request.params.id;
@@ -79,7 +61,7 @@ export class SessionController {
       if (result) {
         response.sendStatus(ResponseStatusCodesEnum.NoContent);
       } else {
-        response.sendStatus(ResponseStatusCodesEnum.NotFound); // Мб стоит сменить
+        response.sendStatus(ResponseStatusCodesEnum.NotFound);
       }
     } catch (error) {
       console.error(error);
