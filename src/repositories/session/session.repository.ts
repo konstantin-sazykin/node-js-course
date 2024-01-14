@@ -1,12 +1,15 @@
 import { ObjectId } from 'mongodb';
+import dotenv from 'dotenv';
 
 import { sessionCollection } from '../../db/db';
 import { type CreateSessionRepositoryType } from '../../types/session/input';
 import { SessionMapper } from '../../types/session/mapper';
 import { type SessionRepositoryOutputType } from '../../types/session/output';
 import { addTImeToCurrentDate } from '../../utils/addTImeToCurrentDate';
-import { REFRESH_TOKEN_EXPIRES_IN } from '../../utils/constants';
 
+dotenv.config();
+
+const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN ?? '20s';
 export class SessionRepository {
   static async create(
     data: CreateSessionRepositoryType,
