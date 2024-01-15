@@ -16,12 +16,13 @@ export const rateLimitMiddleware = async (
   next: NextFunction,
 ): Promise<void> => {
   const IP = request.ip;
+  const URL = request.url;
 
   if (!IP) {
     throw ApiError.BadRequest(null, 'Unable to get an IP address from the request');
   }
   try {
-    const res = await RateLimitService.checkLimit(IP, RATE_LIMIT_POINTS, RATE_LIMIT_DURATION);
+    const res = await RateLimitService.checkLimit(IP, URL, RATE_LIMIT_POINTS, RATE_LIMIT_DURATION);
 
     if (!res) {
       throw new ApiError(ResponseStatusCodesEnum.TooManyRequests, 'Too many requests');

@@ -4,12 +4,12 @@ import { attemptCollection } from '../db/db';
 import { AttemptRepository } from '../repositories/attempt/attempt.repository';
 
 export class RateLimitService {
-  static async checkLimit(ip: string, points: number, duration: number): Promise<boolean> {
+  static async checkLimit(ip: string, url: string, points: number, duration: number): Promise<boolean> {
     const nowDate = (new Date()).getTime() / 1000;
 
-    await AttemptRepository.setLimit(ip, nowDate);
+    await AttemptRepository.setLimit(ip, url, nowDate);
 
-    const ipList = await AttemptRepository.getAttempts(ip);
+    const ipList = await AttemptRepository.getAttempts(ip, url);
 
     if (!ipList.length) {
       return true;
