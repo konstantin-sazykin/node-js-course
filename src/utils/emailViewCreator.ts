@@ -14,4 +14,12 @@ export class EmailViewCreator {
 
     return { template: result, subject };
   }
+
+  static recovery(token: string): EmailType {
+    const template = Handlebars.compile(emails.passwordRecovery.template);
+    const subject = emails.passwordRecovery.subject;
+    const result = template({ recoveryCode: token });
+
+    return { template: result, subject };
+  }
 }

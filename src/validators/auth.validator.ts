@@ -115,3 +115,10 @@ export const authResendEmailConfirmationValidation = (): [
   ValidationChain,
   (request: Request, response: Response, next: NextFunction) => void,
 ] => [emailValidation, inputModelValidation];
+
+const emailForPasswordRecovery = body('email').isString().trim().isEmail();
+
+export const emailForPasswordRecoveryValidation = (): [
+  ValidationChain,
+  (request: Request, response: Response, next: NextFunction) => void,
+] => [emailForPasswordRecovery, inputModelValidation];

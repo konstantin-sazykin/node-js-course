@@ -312,6 +312,20 @@ describe('/auth', () => {
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
   });
 
+  it('should return 204 status after trying password recovery', async () => {
+    const result = await request(app).post(AuthPaths.passwordRecovery).send({ email: UserDataManager.realEmail })
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
+    
+  });
+
+  it('should return 400 status after trying password recovery with incorrect email', async () => {
+    const result = await request(app).post(AuthPaths.passwordRecovery).send({ email: UserDataManager.incorrectEmail })
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+    
+  });
+
   it('should return 429 status after 5 attempts during 10 seconds', async () => {
     // @ts-ignore
     RateLimitService.checkLimit.mockRestore();
@@ -320,6 +334,21 @@ describe('/auth', () => {
     new Array(6).fill('').forEach((_, index) => {
       // @ts-ignore
       promises.push(request(app).post(AuthPaths.index).send({ loginOrEmail: UserDataManager.correctUser.login, password: UserDataManager.usersForTestingSearch.userA.password }));
+    });
+
+    const results = await Promise.all(promises);
+
+    const lastResult = results[results.length - 1];
+    
+    expect(lastResult.statusCode).toBe(ResponseStatusCodesEnum.TooManyRequests);
+  });
+
+  it('should return 429 status after 5 attempts to try restore password', async () => {
+    const promises: Promise<Test>[] = [];
+
+    new Array(6).fill('').forEach((_, index) => {
+      // @ts-ignore
+      promises.push(request(app).post(AuthPaths.passwordRecovery).send({ email: UserDataManager.correctUser.email }));
     });
 
     const results = await Promise.all(promises);

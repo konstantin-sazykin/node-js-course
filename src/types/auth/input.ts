@@ -11,3 +11,7 @@ export interface AuthConfirmEmailInputType {
 export interface AuthResendEmailInputType {
   email: string;
 }
+
+export interface AuthRecoveryPasswordByEmailInputType {
+  email: string;
+}

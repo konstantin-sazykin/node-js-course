@@ -28,4 +28,8 @@ export class AuthPaths {
   static get logout() {
     return `${RoutesPathsEnum.auth}/logout`;
   }
+
+  static get passwordRecovery() {
+    return `${RoutesPathsEnum.auth}/password-recovery`;
+  }
 }

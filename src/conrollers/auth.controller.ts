@@ -9,6 +9,7 @@ import { ResponseStatusCodesEnum } from '../utils/constants';
 import { JWTService } from '../application/jwt.service';
 import { UserQueryRepository } from '../repositories/user/user.query-repository';
 import {
+  type AuthRecoveryPasswordByEmailInputType,
   type AuthConfirmEmailInputType,
   type AuthCreateUserInputType,
   type AuthResendEmailInputType,
@@ -210,6 +211,31 @@ export class AuthController {
         response.sendStatus(ResponseStatusCodesEnum.Unathorized);
       }
     } catch (error) {
+      next(error);
+    }
+  }
+
+  static async recoveryPassword(
+    request: RequestType<{}, AuthRecoveryPasswordByEmailInputType>,
+    response: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const email = request.body.email;
+
+      const result = await UserService.recoveryPassword(email);
+
+      if (result) {
+        response.sendStatus(ResponseStatusCodesEnum.NoContent);
+      } else {
+        throw new ApiError(
+          ResponseStatusCodesEnum.InternalError,
+          'Не удалось поторно отправить письмо',
+        );
+      }
+    } catch (error) {
+      console.error(error);
+
       next(error);
     }
   }

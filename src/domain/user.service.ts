@@ -107,4 +107,18 @@ export class UserService {
 
     return isDeleted;
   }
+
+  static async recoveryPassword(email: string): Promise<boolean> {
+    const token = JWTService.generateToken({ email }, '24h');
+
+    const { subject, template } = EmailViewCreator.recovery(token);
+
+    const isEmailSended = await EmailAdapter.sendEmail(email, subject, template);
+
+    if (!isEmailSended) {
+      throw new Error('Сообщение не отправлено');
+    }
+
+    return isEmailSended;
+  }
 }
