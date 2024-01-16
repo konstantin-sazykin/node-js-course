@@ -111,11 +111,31 @@ const emailValidation = body('email')
     }
   });
 
-const newRecoverytionPasswordFormatValidation = body('newPassword')
+const newRecoveryPasswordFormatValidation = body('newPassword')
   .isString()
   .trim()
   .isLength({ min: 6, max: 20 })
   .withMessage('Invalid value');
+
+const recoveryCodeValidation = body('recoveryCode')
+  .isString()
+  .trim()
+  .isJWT()
+  .custom(async (code: string) => {
+    const tokenInfo = JWTService.validateToken(code);
+
+    if (!tokenInfo) {
+      throw new Error('Невалидный код, или срок его действия истек');
+    }
+
+    const email: string = typeof tokenInfo === 'string' ? tokenInfo : tokenInfo.email;
+
+    const user = await UserRepository.checkUserByLoginOrEmail(email);
+
+    if (!user) {
+      throw new Error('Не найден пользователь');
+    }
+  });
 
 export const authResendEmailConfirmationValidation = (): [
   ValidationChain,
@@ -131,5 +151,6 @@ export const emailForPasswordRecoveryValidation = (): [
 
 export const passwordForRecoveryValidation = (): [
   ValidationChain,
+  ValidationChain,
   (request: Request, response: Response, next: NextFunction) => void,
-] => [newRecoverytionPasswordFormatValidation, inputModelValidation];
+] => [newRecoveryPasswordFormatValidation, recoveryCodeValidation, inputModelValidation];
