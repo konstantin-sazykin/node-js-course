@@ -20,3 +20,12 @@ export enum RoutesPathsEnum {
   comments = '/comments',
   devices = '/security/devices',
 }
+
+export enum MongoCollections {
+  blogs = 'blogs',
+  posts = 'posts',
+  users = 'users',
+  comments = 'comments',
+  sessions = 'sessions',
+  attempts = 'attempts',
+};

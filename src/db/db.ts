@@ -1,17 +1,19 @@
 import { MongoClient } from 'mongodb';
 import colors from 'colors';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 
-import { type BlogType } from '../types/blog/output';
 import { type PostType } from '../types/post/output';
 import { type UserType } from '../types/user/output';
 import { type CommentType } from '../types/comment/output';
 import { type SessionType } from '../types/session/output';
 import { type AttemptType } from '../types/attempt/output';
+import { MongoCollections } from '../utils/constants';
 
 dotenv.config();
 
 const mongoUrl = process.env.MONGO_URL;
+const dbName = process.env.DB_NAME ?? 'node-js-backend-course';
 
 if (!mongoUrl) {
   throw new Error('mongoUrl is undefined');
@@ -19,18 +21,18 @@ if (!mongoUrl) {
 
 const client = new MongoClient(mongoUrl);
 
-const db = client.db('node-js-backend-course');
+const db = client.db(dbName);
 
-export const blogCollection = db.collection<BlogType>('blog');
-export const postCollection = db.collection<PostType>('post');
-export const userCollection = db.collection<UserType>('user');
-export const commentCollection = db.collection<CommentType>('comment');
-export const sessionCollection = db.collection<SessionType>('session');
-export const attemptCollection = db.collection<AttemptType>('attempts');
+export const postCollection = db.collection<PostType>(MongoCollections.posts);
+export const userCollection = db.collection<UserType>(MongoCollections.users);
+export const commentCollection = db.collection<CommentType>(MongoCollections.comments);
+export const sessionCollection = db.collection<SessionType>(MongoCollections.sessions);
+export const attemptCollection = db.collection<AttemptType>(MongoCollections.attempts);
 
 export const launchDb = async (): Promise<void> => {
   try {
     await client.connect();
+    await mongoose.connect(mongoUrl, { dbName });
 
     console.log(colors.green(`Client connected to DB with URL ${mongoUrl}`));
   } catch (error) {
@@ -39,9 +41,11 @@ export const launchDb = async (): Promise<void> => {
     }
 
     await client.close();
+    await mongoose.disconnect();
   }
 };
 
 export const closeDbConnection = async (): Promise<void> => {
   await client.close();
+  await mongoose.disconnect();
 };
