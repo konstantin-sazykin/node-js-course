@@ -15,3 +15,8 @@ export interface AuthResendEmailInputType {
 export interface AuthRecoveryPasswordByEmailInputType {
   email: string;
 }
+
+export interface AuthCreateNewPasswordByRecoveryCodeInputType {
+  newPassword: string;
+  recoveryCode: string;
+}

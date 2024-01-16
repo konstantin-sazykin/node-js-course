@@ -312,14 +312,36 @@ describe('/auth', () => {
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
   });
 
-  it('should return 204 status after trying password recovery', async () => {
+  it('should return 204 status after attempting password recovery', async () => {
     const result = await request(app).post(AuthPaths.passwordRecovery).send({ email: UserDataManager.realEmail })
 
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
     
   });
 
-  it('should return 400 status after trying password recovery with incorrect email', async () => {
+  it('should return 400 status after attempting to recover password with an invalid password', async () => {
+    const recoveryCode = JWTService.generateToken({ email: UserDataManager.realEmail }, '24h');
+    const result = await request(app).post(AuthPaths.newPassword).send({ newPassword: UserDataManager.incorrectUser.passord, recoveryCode });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+  });
+
+  it('should return 400 status after attempting to recover password with an invalid recovery code', async () => {
+    const recoveryCode = JWTService.generateToken({ test: 'abc' }, '24h');
+    const result = await request(app).post(AuthPaths.newPassword).send({ newPassword: UserDataManager.correctUser.password, recoveryCode });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+  });
+
+  it('should return 204 status after attempting to recover password with an valid recovery code', async () => {
+    const recoveryCode = JWTService.generateToken({ email: UserDataManager.realEmail }, '24h');
+    const result = await request(app).post(AuthPaths.newPassword).send({ newPassword: UserDataManager.usersForTestingSearch.userA.password, recoveryCode });
+
+    expect(result.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
+  });
+
+
+  it('should return 400 status after attempting password recovery with incorrect email', async () => {
     const result = await request(app).post(AuthPaths.passwordRecovery).send({ email: UserDataManager.incorrectEmail })
 
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);

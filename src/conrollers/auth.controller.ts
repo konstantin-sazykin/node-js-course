@@ -13,6 +13,7 @@ import {
   type AuthConfirmEmailInputType,
   type AuthCreateUserInputType,
   type AuthResendEmailInputType,
+  type AuthCreateNewPasswordByRecoveryCodeInputType,
 } from '../types/auth/input';
 import { SessionService } from '../domain/session.service';
 
@@ -232,6 +233,34 @@ export class AuthController {
           ResponseStatusCodesEnum.InternalError,
           'Не удалось поторно отправить письмо',
         );
+      }
+    } catch (error) {
+      console.error(error);
+
+      next(error);
+    }
+  }
+
+  static async createNewPassword(
+    request: RequestType<{}, AuthCreateNewPasswordByRecoveryCodeInputType>,
+    response: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const { newPassword, recoveryCode } = request.body;
+
+      const jwtPayload = JWTService.validateToken(recoveryCode);
+
+      if (typeof jwtPayload === 'string' || !jwtPayload?.email) {
+        throw ApiError.BadRequest(null, 'Recovery code is wrong');
+      }
+
+      const result = await UserService.createPassword(newPassword, jwtPayload.email as string);
+
+      if (result) {
+        response.send(ResponseStatusCodesEnum.NoContent);
+      } else {
+        response.sendStatus(ResponseStatusCodesEnum.BadRequest);
       }
     } catch (error) {
       console.error(error);

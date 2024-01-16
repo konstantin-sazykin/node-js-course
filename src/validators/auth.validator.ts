@@ -111,6 +111,12 @@ const emailValidation = body('email')
     }
   });
 
+const newRecoverytionPasswordFormatValidation = body('newPassword')
+  .isString()
+  .trim()
+  .isLength({ min: 6, max: 20 })
+  .withMessage('Invalid value');
+
 export const authResendEmailConfirmationValidation = (): [
   ValidationChain,
   (request: Request, response: Response, next: NextFunction) => void,
@@ -122,3 +128,8 @@ export const emailForPasswordRecoveryValidation = (): [
   ValidationChain,
   (request: Request, response: Response, next: NextFunction) => void,
 ] => [emailForPasswordRecovery, inputModelValidation];
+
+export const passwordForRecoveryValidation = (): [
+  ValidationChain,
+  (request: Request, response: Response, next: NextFunction) => void,
+] => [newRecoverytionPasswordFormatValidation, inputModelValidation];

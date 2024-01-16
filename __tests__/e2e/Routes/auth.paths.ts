@@ -32,4 +32,8 @@ export class AuthPaths {
   static get passwordRecovery() {
     return `${RoutesPathsEnum.auth}/password-recovery`;
   }
+
+  static get newPassword() {
+    return `${RoutesPathsEnum.auth}/new-password`;
+  }
 }

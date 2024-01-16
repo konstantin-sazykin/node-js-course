@@ -121,4 +121,19 @@ export class UserService {
 
     return isEmailSended;
   }
+
+  static async createPassword(newPassword: string, email: string): Promise<boolean> {
+    const isUserDefined = await UserRepository.checkUserByLoginOrEmail(email);
+
+    if (!isUserDefined) {
+      return false;
+    }
+
+    const passwordSalt = await bcrypt.genSalt(10);
+    const passwordHash = await this.createHash(newPassword, passwordSalt);
+
+    const isChanged = await UserRepository.changePassword(email, passwordHash, passwordSalt);
+
+    return isChanged;
+  }
 }

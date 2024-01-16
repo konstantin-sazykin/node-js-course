@@ -72,4 +72,16 @@ export class UserRepository {
       return false;
     }
   }
+
+  static async changePassword(email: string, passwordHash: string, passwordSalt: string): Promise<boolean> {
+    try {
+      const result = await userCollection.updateOne({ email }, { $set: { passwordHash, passwordSalt } });
+
+      return !!result.modifiedCount;
+    } catch (error) {
+      console.error(error);
+
+      return false;
+    }
+  }
 }
