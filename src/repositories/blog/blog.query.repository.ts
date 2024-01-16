@@ -1,10 +1,10 @@
 import { ObjectId } from 'mongodb';
 
-import { blogCollection } from '../../db/db';
 import { BlogMapper } from '../../types/blog/mapper';
 import { type QueryBlogOutputModel } from '../../types/blog/output';
 import { type WithPaginationDataType } from '../../types/common';
 import { type BlogSortData } from '../../utils/SortData';
+import { BlogModel } from '../../models/blog.model';
 
 export class BlogQueryRepository {
   static async getAllBlogs(
@@ -22,14 +22,12 @@ export class BlogQueryRepository {
       };
     }
 
-    const blogs = await blogCollection
-      .find(filter)
-      .sort(sortBy, sortDirection)
+    const blogs = await BlogModel.find(filter)
+      .sort({ [sortBy]: sortDirection })
       .skip(skip)
-      .limit(limit)
-      .toArray();
+      .limit(limit);
 
-    const totalCount = await blogCollection.countDocuments(filter);
+    const totalCount = await BlogModel.countDocuments(filter);
     const pagesCount = Math.ceil(totalCount / limit);
 
     return {
@@ -42,7 +40,7 @@ export class BlogQueryRepository {
   }
 
   static async getBlogById(id: string): Promise<null | BlogMapper> {
-    const blog = await blogCollection.findOne({ _id: new ObjectId(id) });
+    const blog = await BlogModel.findOne({ _id: new ObjectId(id) });
 
     if (!blog) {
       return null;

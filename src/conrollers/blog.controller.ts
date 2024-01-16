@@ -29,6 +29,10 @@ export class BlogController {
 
       const blogs = await BlogQueryRepository.getAllBlogs(sortData);
 
+      if (!blogs) {
+        throw new ApiError(ResponseStatusCodesEnum.NotFound, null);
+      }
+
       response.send(blogs);
     } catch (error) {
       next(error);
