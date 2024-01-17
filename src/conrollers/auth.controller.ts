@@ -19,7 +19,7 @@ import { SessionService } from '../domain/session.service';
 import { UserService } from '../domain/user.service';
 
 export class AuthController {
-  constructor(protected userService: UserService, protected userQueryRepository: UserQueryRepository) {}
+  constructor(protected userService: UserService, protected userQueryRepository: UserQueryRepository, protected accessExpiresIn: string) {}
   async postLogin(
     request: RequestType<{}, UserAuthQueryType>,
     response: Response,
@@ -36,7 +36,7 @@ export class AuthController {
       const userId = await this.userService.checkCredentials(loginOrEmail, password);
 
       if (userId) {
-        const accessToken = JWTService.generateToken({ userId }, '10s');
+        const accessToken = JWTService.generateToken({ userId }, this.accessExpiresIn);
         const refreshToken = await SessionService.createSession({
           userId,
           browserName,
@@ -185,7 +185,7 @@ export class AuthController {
         throw ApiError.UnauthorizedError();
       }
 
-      const accessToken = JWTService.generateToken({ userId }, '10s');
+      const accessToken = JWTService.generateToken({ userId }, this.accessExpiresIn);
 
       response.cookie('refreshToken', newRefreshToken, {
         secure: true,

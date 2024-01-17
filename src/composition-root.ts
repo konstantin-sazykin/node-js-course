@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+
 import { AuthController } from './conrollers/auth.controller';
 import { CommentController } from './conrollers/comment.controller';
 import { UserController } from './conrollers/user.controller';
@@ -7,6 +9,10 @@ import { CommentQueryRepository } from './repositories/comment/comment.query-rep
 import { CommentRepository } from './repositories/comment/comment.repository';
 import { UserQueryRepository } from './repositories/user/user.query-repository';
 import { UserRepository } from './repositories/user/user.repository';
+
+dotenv.config();
+
+const ACCESS_TOKEN_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN ?? '10s';
 
 export const userRepository = new UserRepository();
 const userQueryRepository = new UserQueryRepository();
@@ -21,4 +27,4 @@ const commentService = new CommentService(userQueryRepository, commentRepository
 
 export const commentController = new CommentController(commentService);
 
-export const authController = new AuthController(userService, userQueryRepository);
+export const authController = new AuthController(userService, userQueryRepository, ACCESS_TOKEN_EXPIRES_IN);
