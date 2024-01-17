@@ -8,12 +8,13 @@ import {
 } from '../types/comment/input';
 import { type QueryRequestType, type RequestType } from '../types/common';
 import { CommentSortData } from '../utils/SortData';
-import { CommentService } from '../domain/comment.service';
 import { ApiError } from '../exeptions/api.error';
 import { ResponseStatusCodesEnum } from '../utils/constants';
+import { CommentService } from '../domain/comment.service';
 
 export class CommentController {
-  static async getCommentsByPostId(
+  constructor(protected commentService: CommentService) {};
+  async getCommentsByPostId(
     request: QueryRequestType<CommentsParams, QuerySortedCommentsType>,
     response: Response,
     next: NextFunction,
@@ -22,7 +23,7 @@ export class CommentController {
       const postId = request.params.id;
       const sortData = new CommentSortData(request.query);
 
-      const result = await CommentService.findCommentsForPost(postId, sortData);
+      const result = await this.commentService.findCommentsForPost(postId, sortData);
 
       response.send(result);
     } catch (error) {
@@ -30,7 +31,7 @@ export class CommentController {
     }
   }
 
-  static async postCommentByPostId(
+  async postCommentByPostId(
     request: RequestType<CommentsParams, CreateCommentType>,
     response: Response,
     next: NextFunction,
@@ -44,7 +45,7 @@ export class CommentController {
         next(ApiError.BadRequest(null, `Can not create comment with user id ${userId}`)); return;
       }
 
-      const result = await CommentService.createComment(postId, userId, content);
+      const result = await this.commentService.createComment(postId, userId, content);
 
       response.status(ResponseStatusCodesEnum.Created).send(result);
     } catch (error) {
@@ -52,14 +53,14 @@ export class CommentController {
     }
   }
 
-  static async getById(
+  async getById(
     request: RequestType<CommentsParams, {}>,
     response: Response,
     next: NextFunction,
   ) {
     try {
       const commentId = request.params.id;
-      const result = await CommentService.getComment(commentId);
+      const result = await this.commentService.getComment(commentId);
 
       if (result) {
         response.send(result);
@@ -71,7 +72,7 @@ export class CommentController {
     }
   }
 
-  static async put(
+  async put(
     request: RequestType<CommentsParams, UpdateCommentType>,
     response: Response,
     next: NextFunction,
@@ -80,7 +81,7 @@ export class CommentController {
       const commentId = request.params.id;
       const content = request.body.content;
 
-      const result = await CommentService.update(commentId, content);
+      const result = await this.commentService.update(commentId, content);
 
       if (result) {
         response.sendStatus(ResponseStatusCodesEnum.NoContent);
@@ -94,7 +95,7 @@ export class CommentController {
     }
   }
 
-  static async delete(
+  async delete(
     request: RequestType<CommentsParams, {}>,
     response: Response,
     next: NextFunction,
@@ -102,7 +103,7 @@ export class CommentController {
     try {
       const commentId = request.params.id;
 
-      const result = await CommentService.delete(commentId);
+      const result = await this.commentService.delete(commentId);
 
       if (result) {
         response.sendStatus(ResponseStatusCodesEnum.NoContent);

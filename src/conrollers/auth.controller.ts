@@ -4,7 +4,7 @@ import { type NextFunction, type Response } from 'express';
 import { ApiError } from '../exeptions/api.error';
 import { type RequestType } from '../types/common';
 import { type UserAuthQueryType } from '../types/user/output';
-import { UserService } from '../domain/user.service';
+
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { JWTService } from '../application/jwt.service';
 import { UserQueryRepository } from '../repositories/user/user.query-repository';
@@ -16,9 +16,11 @@ import {
   type AuthCreateNewPasswordByRecoveryCodeInputType,
 } from '../types/auth/input';
 import { SessionService } from '../domain/session.service';
+import { UserService } from '../domain/user.service';
 
 export class AuthController {
-  static async postLogin(
+  constructor(protected userService: UserService, protected userQueryRepository: UserQueryRepository) {}
+  async postLogin(
     request: RequestType<{}, UserAuthQueryType>,
     response: Response,
     next: NextFunction,
@@ -31,7 +33,7 @@ export class AuthController {
         browser: { name: browserName, major: browserVersion },
         os: { name: osName, version: osVersion },
       } = userAgent;
-      const userId = await UserService.checkCredentials(loginOrEmail, password);
+      const userId = await this.userService.checkCredentials(loginOrEmail, password);
 
       if (userId) {
         const accessToken = JWTService.generateToken({ userId }, '10s');
@@ -67,7 +69,7 @@ export class AuthController {
     }
   }
 
-  static async getUser(request: RequestType<{}, {}>, response: Response, next: NextFunction) {
+  async getUser(request: RequestType<{}, {}>, response: Response, next: NextFunction) {
     try {
       const userId = request.userId;
 
@@ -76,7 +78,7 @@ export class AuthController {
         return;
       }
 
-      const user = await UserQueryRepository.findUserById(userId);
+      const user = await this.userQueryRepository.findUserById(userId);
 
       if (!user) {
         next(ApiError.UnauthorizedError());
@@ -85,11 +87,13 @@ export class AuthController {
 
       response.send(user);
     } catch (error) {
+      console.error(error);
+      
       next(error);
     }
   }
 
-  static async postRegistration(
+  async postRegistration(
     request: RequestType<{}, AuthCreateUserInputType>,
     response: Response,
     next: NextFunction,
@@ -97,7 +101,7 @@ export class AuthController {
     try {
       const { email, login, password } = request.body;
 
-      const result = await UserService.createUser(login, email, password, false);
+      const result = await this.userService.createUser(login, email, password, false);
 
       if (!result) {
         next(ApiError.BadRequest(null));
@@ -112,13 +116,13 @@ export class AuthController {
     }
   }
 
-  static async confirmRegistration(
+  async confirmRegistration(
     request: RequestType<{}, AuthConfirmEmailInputType>,
     response: Response,
     next: NextFunction,
   ) {
     try {
-      const result = await UserService.confirmEmail(request.body.code);
+      const result = await this.userService.confirmEmail(request.body.code);
       if (result) {
         response.sendStatus(ResponseStatusCodesEnum.NoContent);
       } else {
@@ -132,7 +136,7 @@ export class AuthController {
     }
   }
 
-  static async resendEmail(
+  async resendEmail(
     request: RequestType<{}, AuthResendEmailInputType>,
     response: Response,
     next: NextFunction,
@@ -140,7 +144,7 @@ export class AuthController {
     try {
       const email = request.body.email;
 
-      const result = await UserService.resendEmail(email);
+      const result = await this.userService.resendEmail(email);
 
       if (result) {
         response.sendStatus(ResponseStatusCodesEnum.NoContent);
@@ -157,7 +161,7 @@ export class AuthController {
     }
   }
 
-  static async refresh(request: RequestType<{}, {}>, response: Response, next: NextFunction) {
+  async refresh(request: RequestType<{}, {}>, response: Response, next: NextFunction) {
     try {
       const oldRefreshToken: string = request.cookies.refreshToken;
 
@@ -196,7 +200,7 @@ export class AuthController {
     }
   }
 
-  static async logout(request: RequestType<{}, {}>, response: Response, next: NextFunction) {
+  async logout(request: RequestType<{}, {}>, response: Response, next: NextFunction) {
     try {
       const sessionId: string | null = request.sessionId;
 
@@ -216,7 +220,7 @@ export class AuthController {
     }
   }
 
-  static async recoveryPassword(
+  async recoveryPassword(
     request: RequestType<{}, AuthRecoveryPasswordByEmailInputType>,
     response: Response,
     next: NextFunction,
@@ -224,7 +228,7 @@ export class AuthController {
     try {
       const email = request.body.email;
 
-      const result = await UserService.recoveryPassword(email);
+      const result = await this.userService.recoveryPassword(email);
 
       if (result) {
         response.sendStatus(ResponseStatusCodesEnum.NoContent);
@@ -241,7 +245,7 @@ export class AuthController {
     }
   }
 
-  static async createNewPassword(
+  async createNewPassword(
     request: RequestType<{}, AuthCreateNewPasswordByRecoveryCodeInputType>,
     response: Response,
     next: NextFunction,
@@ -255,7 +259,7 @@ export class AuthController {
         throw ApiError.BadRequest(null, 'Recovery code is wrong');
       }
 
-      const result = await UserService.createPassword(newPassword, jwtPayload.email as string);
+      const result = await this.userService.createPassword(newPassword, jwtPayload.email as string);
 
       if (result) {
         response.send(ResponseStatusCodesEnum.NoContent);

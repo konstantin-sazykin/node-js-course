@@ -7,7 +7,7 @@ import { type WithPaginationDataType } from '../../types/common';
 import { type CommentSortData } from '../../utils/SortData';
 
 export class CommentQueryRepository {
-  static async getAllByPostId(
+  async getAllByPostId(
     postId: string,
     sortData: CommentSortData,
   ): Promise<WithPaginationDataType<CommentRepositoryType>> {
@@ -34,7 +34,7 @@ export class CommentQueryRepository {
     };
   }
 
-  static async find(id: string): Promise<CommentRepositoryType | null> {
+  async find(id: string): Promise<CommentRepositoryType | null> {
     const result = await commentCollection.findOne({ _id: new ObjectId(id) });
 
     if (!result) {

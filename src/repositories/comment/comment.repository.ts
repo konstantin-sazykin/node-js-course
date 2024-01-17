@@ -5,7 +5,7 @@ import { CommentDbMapper } from '../../types/comment/mapper';
 import { type CommentRepositoryType } from '../../types/comment/output';
 
 export class CommentRepository {
-  static async create(
+  async create(
     postId: string,
     commentatorId: string,
     content: string,
@@ -32,7 +32,7 @@ export class CommentRepository {
     }
   }
 
-  static async update(id: string, content: string): Promise<boolean> {
+  async update(id: string, content: string): Promise<boolean> {
     try {
       const result = await commentCollection.updateOne({ _id: new ObjectId(id) }, { $set: { content } });
 
@@ -43,7 +43,7 @@ export class CommentRepository {
     }
   }
 
-  static async remove(id: string): Promise<boolean> {
+  async remove(id: string): Promise<boolean> {
     try {
       const result = await commentCollection.deleteOne({ _id: new ObjectId(id) });
 

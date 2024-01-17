@@ -8,7 +8,7 @@ import { type UserDataBaseType } from '../../types/user/output';
 import { UserMapper } from './../../types/user/mapper';
 
 export class UserRepository {
-  static async createUser(user: CreateUserServiceModel): Promise<QueryUserOutputModel | null> {
+  async createUser(user: CreateUserServiceModel): Promise<QueryUserOutputModel | null> {
     try {
       const result = await userCollection.insertOne({
         login: user.login,
@@ -33,7 +33,7 @@ export class UserRepository {
     }
   }
 
-  static async checkUserByLoginOrEmail(loginOrEmail: string): Promise<UserDataBaseType | null> {
+  async checkUserByLoginOrEmail(loginOrEmail: string): Promise<UserDataBaseType | null> {
     try {
       const user = await userCollection.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] });
 
@@ -49,7 +49,7 @@ export class UserRepository {
     }
   }
 
-  static async deleteUser(id: string): Promise<boolean> {
+  async deleteUser(id: string): Promise<boolean> {
     try {
       const result = await userCollection.deleteOne({ _id: new ObjectId(id) });
 
@@ -61,7 +61,7 @@ export class UserRepository {
     }
   }
 
-  static async confirmEmail(email: string): Promise<boolean> {
+  async confirmEmail(email: string): Promise<boolean> {
     try {
       const result = await userCollection.updateOne({ email }, { $set: { isConfirmed: true } });
 
@@ -73,7 +73,7 @@ export class UserRepository {
     }
   }
 
-  static async changePassword(email: string, passwordHash: string, passwordSalt: string): Promise<boolean> {
+  async changePassword(email: string, passwordHash: string, passwordSalt: string): Promise<boolean> {
     try {
       const result = await userCollection.updateOne({ email }, { $set: { passwordHash, passwordSalt } });
 

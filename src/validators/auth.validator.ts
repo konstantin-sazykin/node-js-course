@@ -2,8 +2,8 @@ import { type NextFunction, type Request, type Response } from 'express';
 import { type ValidationChain, body } from 'express-validator';
 
 import { inputModelValidation } from '../exeptions/validation.error';
-import { UserRepository } from '../repositories/user/user.repository';
 import { JWTService } from '../application/jwt.service';
+import { userRepository } from '../composition-root';
 
 const loginOrEmailValidation = body('loginOrEmail').isString().trim().isLength({ min: 3, max: 30 });
 
@@ -22,7 +22,7 @@ const newRegistrationEmailFormatValidation = body('email')
   .withMessage('Invalid value');
 
 const newRegistrationEmailExistValidation = body('email').custom(async (email: string) => {
-  const isEmailAlreadyInUse = await UserRepository.checkUserByLoginOrEmail(email);
+  const isEmailAlreadyInUse = await userRepository.checkUserByLoginOrEmail(email);
 
   if (isEmailAlreadyInUse) {
     throw new Error('Адрес электронной почты уже используется');
@@ -43,7 +43,7 @@ const newRegistrationPasswordFormatValidation = body('password')
   .withMessage('Invalid value');
 
 const newRegistrationLoginExistValidation = body('login').custom(async (email: string) => {
-  const isEmailAlreadyInUse = await UserRepository.checkUserByLoginOrEmail(email);
+  const isEmailAlreadyInUse = await userRepository.checkUserByLoginOrEmail(email);
 
   if (isEmailAlreadyInUse) {
     throw new Error('Логин уже используется');
@@ -79,7 +79,7 @@ const confirmationCodeValidation = body('code')
 
     const email: string = typeof tokenInfo === 'string' ? tokenInfo : tokenInfo.email;
 
-    const user = await UserRepository.checkUserByLoginOrEmail(email);
+    const user = await userRepository.checkUserByLoginOrEmail(email);
 
     if (!user) {
       throw new Error('Не найден пользователь');
@@ -100,7 +100,7 @@ const emailValidation = body('email')
   .trim()
   .isEmail()
   .custom(async (email: string) => {
-    const user = await UserRepository.checkUserByLoginOrEmail(email);
+    const user = await userRepository.checkUserByLoginOrEmail(email);
 
     if (!user) {
       throw new Error('Не найден пользователь');
@@ -130,7 +130,7 @@ const recoveryCodeValidation = body('recoveryCode')
 
     const email: string = typeof tokenInfo === 'string' ? tokenInfo : tokenInfo.email;
 
-    const user = await UserRepository.checkUserByLoginOrEmail(email);
+    const user = await userRepository.checkUserByLoginOrEmail(email);
 
     if (!user) {
       throw new Error('Не найден пользователь');

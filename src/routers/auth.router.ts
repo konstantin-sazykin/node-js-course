@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { Router } from 'express';
 
-import { AuthController } from '../conrollers/auth.controller';
 import {
   authConfirmationCodeValidation,
   authPostValidation,
@@ -13,40 +12,41 @@ import {
 import { authMiddleware } from '../middlewares/auth/auth.middleware';
 import { rateLimitMiddleware } from '../middlewares/rateLimit/rateLimit.middleware';
 import { refreshTokenMiddleware } from '../middlewares/refreshToken/refreshToken.middleware';
+import { authController } from '../composition-root';
 
 export const authRouter = Router();
 
-authRouter.post('/login', rateLimitMiddleware, authPostValidation(), AuthController.postLogin);
-authRouter.get('/me', authMiddleware, AuthController.getUser);
+authRouter.post('/login', rateLimitMiddleware, authPostValidation(), authController.postLogin.bind(authController));
+authRouter.get('/me', authMiddleware, authController.getUser.bind(authController));
 authRouter.post(
   '/registration',
   rateLimitMiddleware,
   authRegistrationDataValidation(),
-  AuthController.postRegistration,
+  authController.postRegistration.bind(authController),
 );
 authRouter.post(
   '/registration-confirmation',
   rateLimitMiddleware,
   authConfirmationCodeValidation(),
-  AuthController.confirmRegistration,
+  authController.confirmRegistration.bind(authController),
 );
 authRouter.post(
   '/registration-email-resending',
   rateLimitMiddleware,
   authResendEmailConfirmationValidation(),
-  AuthController.resendEmail,
+  authController.resendEmail.bind(authController),
 );
-authRouter.post('/refresh-token', AuthController.refresh);
-authRouter.post('/logout', refreshTokenMiddleware, AuthController.logout);
+authRouter.post('/refresh-token', authController.refresh);
+authRouter.post('/logout', refreshTokenMiddleware, authController.logout);
 authRouter.post(
   '/password-recovery',
   rateLimitMiddleware,
   emailForPasswordRecoveryValidation(),
-  AuthController.recoveryPassword,
+  authController.recoveryPassword.bind(authController),
 );
 authRouter.post(
   '/new-password',
   rateLimitMiddleware,
   passwordForRecoveryValidation(),
-  AuthController.createNewPassword,
+  authController.createNewPassword.bind(authController),
 );

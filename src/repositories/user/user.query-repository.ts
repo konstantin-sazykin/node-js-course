@@ -10,7 +10,7 @@ import { type UserSortData } from '../../utils/SortData';
 import { type QueryUserShortInfoOutputModel } from './../../types/user/output';
 
 export class UserQueryRepository {
-  static async findAll(
+  async findAll(
     sortData: UserSortData,
   ): Promise<WithPaginationDataType<QueryUserOutputType>> {
     const { searchEmailTerm, searchLoginTerm, sortBy, sortDirection, skip, limit, pageNumber } =
@@ -70,7 +70,7 @@ export class UserQueryRepository {
     };
   }
 
-  static async findUserById(id: string): Promise<QueryUserShortInfoOutputModel | null> {
+  async findUserById(id: string): Promise<QueryUserShortInfoOutputModel | null> {
     try {
       const userResult = await userCollection.findOne({ _id: new ObjectId(id) });
 

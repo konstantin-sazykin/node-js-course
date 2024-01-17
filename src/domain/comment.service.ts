@@ -7,13 +7,14 @@ import { type WithPaginationDataType } from '../types/common';
 import { type CommentSortData } from '../utils/SortData';
 
 export class CommentService {
-  static async getComment(id: string): Promise<CommentOutputType | null> {
-    const comment = await CommentQueryRepository.find(id);
+  constructor(protected userQueryRepository: UserQueryRepository, protected commentRepository: CommentRepository, protected commentQueryRepository: CommentQueryRepository) {};
+  async getComment(id: string): Promise<CommentOutputType | null> {
+    const comment = await this.commentQueryRepository.find(id);
 
     if (!comment) {
       return null;
     }
-    const user = await UserQueryRepository.findUserById(comment.commentatorId);
+    const user = await this.userQueryRepository.findUserById(comment.commentatorId);
 
     return {
       ...new CommentMapper({
@@ -24,13 +25,13 @@ export class CommentService {
     };
   }
 
-  static async createComment(
+  async createComment(
     postId: string,
     userId: string,
     content: string,
   ): Promise<CommentOutputType | null> {
-    const createdComment = await CommentRepository.create(postId, userId, content);
-    const user = await UserQueryRepository.findUserById(userId);
+    const createdComment = await this.commentRepository.create(postId, userId, content);
+    const user = await this.userQueryRepository.findUserById(userId);
 
     if (!createdComment || !user) {
       return null;
@@ -41,14 +42,14 @@ export class CommentService {
     };
   }
 
-  static async findCommentsForPost(
+  async findCommentsForPost(
     postId: string,
     sortData: CommentSortData,
   ): Promise<WithPaginationDataType<CommentOutputType>> {
-    const result = await CommentQueryRepository.getAllByPostId(postId, sortData);
+    const result = await this.commentQueryRepository.getAllByPostId(postId, sortData);
 
     const promises = result.items.map(async (comm) => {
-      const user = await UserQueryRepository.findUserById(comm.commentatorId);
+      const user = await this.userQueryRepository.findUserById(comm.commentatorId);
 
       if (!user) {
         throw Error(`Не найден юзер с id ${comm.commentatorId}`);
@@ -70,14 +71,14 @@ export class CommentService {
     };
   }
 
-  static async update(id: string, content: string): Promise<boolean> {
-    const result = await CommentRepository.update(id, content);
+  async update(id: string, content: string): Promise<boolean> {
+    const result = await this.commentRepository.update(id, content);
 
     return result;
   }
 
-  static async delete(id: string): Promise<boolean> {
-    const result = await CommentRepository.remove(id);
+  async delete(id: string): Promise<boolean> {
+    const result = await this.commentRepository.remove(id);
 
     return result;
   }

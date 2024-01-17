@@ -1,21 +1,22 @@
 import bcrypt from 'bcrypt';
 
 import { type CreateUserServiceModel, type QueryUserOutputModel } from '../types/user/input';
-import { UserRepository } from '../repositories/user/user.repository';
 import { EmailAdapter } from '../adapters/email.adapter';
 import { EmailViewCreator } from '../utils/emailViewCreator';
 import { JWTService } from '../application/jwt.service';
+import { type UserRepository } from '../repositories/user/user.repository';
 
 export class UserService {
-  static async createUser(
+  constructor(protected userRepository: UserRepository) {}
+  async createUser(
     login: string,
     email: string,
     password: string,
     createdBySuperAdmin: boolean = false,
   ): Promise<QueryUserOutputModel | null> {
     try {
-      const isLoginAlreadyExists = await UserRepository.checkUserByLoginOrEmail(login);
-      const isEmailAlreadyExists = await UserRepository.checkUserByLoginOrEmail(email);
+      const isLoginAlreadyExists = await this.userRepository.checkUserByLoginOrEmail(login);
+      const isEmailAlreadyExists = await this.userRepository.checkUserByLoginOrEmail(email);
 
       if (isEmailAlreadyExists || isLoginAlreadyExists) {
         return null;
@@ -45,7 +46,7 @@ export class UserService {
         createdAt: new Date(),
       };
 
-      const result = await UserRepository.createUser(newUser);
+      const result = await this.userRepository.createUser(newUser);
 
       return result;
     } catch (error) {
@@ -55,8 +56,8 @@ export class UserService {
     }
   }
 
-  static async checkCredentials(loginOrEmail: string, password: string): Promise<string | null> {
-    const user = await UserRepository.checkUserByLoginOrEmail(loginOrEmail);
+  async checkCredentials(loginOrEmail: string, password: string): Promise<string | null> {
+    const user = await this.userRepository.checkUserByLoginOrEmail(loginOrEmail);
 
     if (!user) {
       return null;
@@ -70,19 +71,19 @@ export class UserService {
     return null;
   }
 
-  static async confirmEmail(code: string): Promise<boolean> {
+  async confirmEmail(code: string): Promise<boolean> {
     const validationResult = JWTService.validateToken(code);
 
     if (!validationResult || typeof validationResult === 'string') {
       return false;
     }
     const email: string = validationResult.email;
-    const isConfirmed = await UserRepository.confirmEmail(email);
+    const isConfirmed = await this.userRepository.confirmEmail(email);
 
     return isConfirmed;
   }
 
-  static async resendEmail(email: string): Promise<boolean> {
+  async resendEmail(email: string): Promise<boolean> {
     const token = JWTService.generateToken({ email }, '24h');
 
     const { subject, template } = EmailViewCreator.confirmation(token);
@@ -96,19 +97,19 @@ export class UserService {
     return isEmailSended;
   }
 
-  private static async createHash(password: string, salt: string): Promise<string> {
+  private async createHash(password: string, salt: string): Promise<string> {
     const hash = await bcrypt.hash(password, salt);
 
     return hash;
   }
 
-  static async remove(id: string): Promise<boolean> {
-    const isDeleted = await UserRepository.deleteUser(id);
+  async remove(id: string): Promise<boolean> {
+    const isDeleted = await this.userRepository.deleteUser(id);
 
     return isDeleted;
   }
 
-  static async recoveryPassword(email: string): Promise<boolean> {
+  async recoveryPassword(email: string): Promise<boolean> {
     const token = JWTService.generateToken({ email }, '24h');
 
     const { subject, template } = EmailViewCreator.recovery(token);
@@ -122,8 +123,8 @@ export class UserService {
     return isEmailSended;
   }
 
-  static async createPassword(newPassword: string, email: string): Promise<boolean> {
-    const isUserDefined = await UserRepository.checkUserByLoginOrEmail(email);
+  async createPassword(newPassword: string, email: string): Promise<boolean> {
+    const isUserDefined = await this.userRepository.checkUserByLoginOrEmail(email);
 
     if (!isUserDefined) {
       return false;
@@ -132,7 +133,7 @@ export class UserService {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await this.createHash(newPassword, passwordSalt);
 
-    const isChanged = await UserRepository.changePassword(email, passwordHash, passwordSalt);
+    const isChanged = await this.userRepository.changePassword(email, passwordHash, passwordSalt);
 
     return isChanged;
   }

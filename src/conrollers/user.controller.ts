@@ -2,20 +2,21 @@ import { type NextFunction, type Response } from 'express';
 
 import { type QueryRequestType, type RequestType } from '../types/common';
 import { type CreateUserControllerType, type UserQuerySortDataType } from '../types/user/input';
-import { UserService } from '../domain/user.service';
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { UserSortData } from '../utils/SortData';
 import { UserQueryRepository } from '../repositories/user/user.query-repository';
 import { ApiError } from '../exeptions/api.error';
+import { UserService } from '../domain/user.service';
 
 export class UserController {
-  static async post(
+  constructor(protected userService: UserService, protected userQueryRepository: UserQueryRepository) {};
+  async post(
     request: RequestType<{}, CreateUserControllerType>,
     response: Response,
     next: NextFunction,
   ) {
     try {
-      const result = await UserService.createUser(
+      const result = await this.userService.createUser(
         request.body.login,
         request.body.email,
         request.body.password,
@@ -34,7 +35,7 @@ export class UserController {
     }
   }
 
-  static async delete(
+  async delete(
     request: RequestType<{ id: string; }, {}>,
     response: Response,
     next: NextFunction,
@@ -42,7 +43,7 @@ export class UserController {
     try {
       const id = request.params.id;
 
-      const result = await UserService.remove(id);
+      const result = await this.userService.remove(id);
 
       if (result) {
         response.sendStatus(ResponseStatusCodesEnum.NoContent);
@@ -54,7 +55,7 @@ export class UserController {
     }
   }
 
-  static async getAll(
+  async getAll(
     request: QueryRequestType<{}, UserQuerySortDataType>,
     response: Response,
     next: NextFunction,
@@ -62,7 +63,7 @@ export class UserController {
     try {
       const sortData = new UserSortData(request.query);
 
-      const result = await UserQueryRepository.findAll(sortData);
+      const result = await this.userQueryRepository.findAll(sortData);
 
       response.send(result);
     } catch (error) {

@@ -1,14 +1,14 @@
 // @ts-nocheck
 import { Router } from 'express';
 
-import { CommentController } from '../conrollers/comment.controller';
 import { commentIdParamValidation, commentUpdateValidation } from '../validators/comment.validator';
 import { authMiddleware } from '../middlewares/auth/auth.middleware';
 import { commentAuthorMiddleware } from '../middlewares/commentAuthor/commentAuthor.middleware';
+import { commentController } from '../composition-root';
 
 export const commentRouter = Router();
 
-commentRouter.get('/:id', commentIdParamValidation(), CommentController.getById);
+commentRouter.get('/:id', commentIdParamValidation(), commentController.getById.bind(commentController));
 
 commentRouter.put(
   '/:id',
@@ -16,7 +16,7 @@ commentRouter.put(
   authMiddleware,
   commentAuthorMiddleware,
   commentUpdateValidation(),
-  CommentController.put,
+  commentController.put.bind(commentController),
 );
 
 commentRouter.delete(
@@ -24,5 +24,5 @@ commentRouter.delete(
   commentIdParamValidation(),
   authMiddleware,
   commentAuthorMiddleware,
-  CommentController.delete,
+  commentController.delete.bind(commentController),
 );

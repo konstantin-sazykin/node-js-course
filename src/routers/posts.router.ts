@@ -8,9 +8,9 @@ import {
 } from '../validators/post.validator';
 import { paramValidation } from '../validators/common';
 import { PostController } from '../conrollers/post.controller';
-import { CommentController } from '../conrollers/comment.controller';
 import { authMiddleware } from '../middlewares/auth/auth.middleware';
 import { commentCreateValidation } from '../validators/comment.validator';
+import { commentController } from '../composition-root';
 
 export const postsRouter = Router();
 
@@ -25,11 +25,11 @@ postsRouter.put(
   PostController.put,
 );
 postsRouter.delete('/:id', adminMiddleware, paramValidation(), PostController.delete);
-postsRouter.get('/:id/comments', postGetParamValidation(), CommentController.getCommentsByPostId);
+postsRouter.get('/:id/comments', postGetParamValidation(), commentController.getCommentsByPostId.bind(commentController));
 postsRouter.post(
   '/:id/comments',
   authMiddleware,
   postGetParamValidation(),
   commentCreateValidation(),
-  CommentController.postCommentByPostId,
+  commentController.postCommentByPostId.bind(commentController),
 );
