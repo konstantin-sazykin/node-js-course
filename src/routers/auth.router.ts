@@ -36,8 +36,8 @@ authRouter.post(
   authResendEmailConfirmationValidation(),
   authController.resendEmail.bind(authController),
 );
-authRouter.post('/refresh-token', authController.refresh);
-authRouter.post('/logout', refreshTokenMiddleware, authController.logout);
+authRouter.post('/refresh-token', authController.refresh.bind(authController));
+authRouter.post('/logout', refreshTokenMiddleware, authController.logout.bind(authController));
 authRouter.post(
   '/password-recovery',
   rateLimitMiddleware,
