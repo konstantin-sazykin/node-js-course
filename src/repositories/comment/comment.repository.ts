@@ -1,30 +1,24 @@
 import { ObjectId } from 'mongodb';
 
-import { commentCollection } from '../../db/db';
-import { CommentDbMapper } from '../../types/comment/mapper';
-import { type CommentRepositoryType } from '../../types/comment/output';
+import { CommentDataBaseDto } from '../../types/comment/mapper';
+import { CommentModel } from '../../models/comment.model';
 
 export class CommentRepository {
   async create(
     postId: string,
     commentatorId: string,
     content: string,
-  ): Promise<CommentRepositoryType | null> {
+  ): Promise<CommentDataBaseDto | null> {
     try {
-      const result = await commentCollection.insertOne({
+      const createdComment = await CommentModel.create({
         commentatorId,
         postId,
         content,
         createdAt: new Date(),
+        likes: [],
       });
 
-      const createdComment = await commentCollection.findOne({ _id: result.insertedId });
-
-      if (!createdComment) {
-        return null;
-      }
-
-      return { ...new CommentDbMapper(createdComment) };
+      return { ...new CommentDataBaseDto(createdComment) };
     } catch (error) {
       console.error(error);
 
@@ -34,7 +28,7 @@ export class CommentRepository {
 
   async update(id: string, content: string): Promise<boolean> {
     try {
-      const result = await commentCollection.updateOne({ _id: new ObjectId(id) }, { $set: { content } });
+      const result = await CommentModel.updateOne({ _id: new ObjectId(id) }, { content });
 
       return !!result.modifiedCount;
     } catch (error) {
@@ -45,7 +39,7 @@ export class CommentRepository {
 
   async remove(id: string): Promise<boolean> {
     try {
-      const result = await commentCollection.deleteOne({ _id: new ObjectId(id) });
+      const result = await CommentModel.deleteOne({ _id: new ObjectId(id) });
 
       return !!result.deletedCount;
     } catch (error) {

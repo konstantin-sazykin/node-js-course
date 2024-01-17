@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { userCollection } from '../../db/db';
 
 import { type WithPaginationDataType } from '../../types/common';
-import { UserMapper, UserShortInfoMapper } from '../../types/user/mapper';
+import { UserMapper, UserShortInfoDto } from '../../types/user/mapper';
 import { type QueryUserOutputType } from '../../types/user/output';
 import { type UserSortData } from '../../utils/SortData';
 
@@ -78,7 +78,7 @@ export class UserQueryRepository {
         return null;
       }
 
-      return { ...new UserShortInfoMapper(userResult) };
+      return { ...new UserShortInfoDto(userResult) };
     } catch (error) {
       console.error(error);
 

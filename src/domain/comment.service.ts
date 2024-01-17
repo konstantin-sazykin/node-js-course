@@ -1,14 +1,14 @@
-import { CommentQueryRepository } from '../repositories/comment/comment.query-repository';
-import { CommentRepository } from '../repositories/comment/comment.repository';
-import { UserQueryRepository } from '../repositories/user/user.query-repository';
-import { CommentMapper } from '../types/comment/mapper';
+import { type CommentQueryRepository } from '../repositories/comment/comment.query-repository';
+import { type CommentRepository } from '../repositories/comment/comment.repository';
+import { type UserQueryRepository } from '../repositories/user/user.query-repository';
+import { CommentOutputDto } from '../types/comment/mapper';
 import { type CommentOutputType } from '../types/comment/output';
 import { type WithPaginationDataType } from '../types/common';
 import { type CommentSortData } from '../utils/SortData';
 
 export class CommentService {
   constructor(protected userQueryRepository: UserQueryRepository, protected commentRepository: CommentRepository, protected commentQueryRepository: CommentQueryRepository) {};
-  async getComment(id: string): Promise<CommentOutputType | null> {
+  async getComment(id: string, currentUserId: string | null): Promise<CommentOutputType | null> {
     const comment = await this.commentQueryRepository.find(id);
 
     if (!comment) {
@@ -16,11 +16,15 @@ export class CommentService {
     }
     const user = await this.userQueryRepository.findUserById(comment.commentatorId);
 
+    if (!user) {
+      return null;
+    }
+
     return {
-      ...new CommentMapper({
+      ...new CommentOutputDto({
         ...comment,
-        userId: user?.userId ?? 'Unknown user',
-        userLogin: user?.login ?? 'Unknown user',
+        currentUserId,
+        user,
       }),
     };
   }
@@ -38,13 +42,14 @@ export class CommentService {
     }
 
     return {
-      ...new CommentMapper({ ...createdComment, userId: user.userId, userLogin: user.login }),
+      ...new CommentOutputDto({ ...createdComment, user, currentUserId: userId }),
     };
   }
 
   async findCommentsForPost(
     postId: string,
     sortData: CommentSortData,
+    currentUserId: string | null,
   ): Promise<WithPaginationDataType<CommentOutputType>> {
     const result = await this.commentQueryRepository.getAllByPostId(postId, sortData);
 
@@ -54,10 +59,8 @@ export class CommentService {
       if (!user) {
         throw Error(`Не найден юзер с id ${comm.commentatorId}`);
       }
-      const userLogin = user?.login;
-      const userId = user?.userId;
 
-      return { ...new CommentMapper({ ...comm, userId, userLogin }) };
+      return { ...new CommentOutputDto({ ...comm, user, currentUserId }) };
     });
 
     const items = await Promise.all(promises);

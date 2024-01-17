@@ -11,6 +11,7 @@ import { PostController } from '../conrollers/post.controller';
 import { authMiddleware } from '../middlewares/auth/auth.middleware';
 import { commentCreateValidation } from '../validators/comment.validator';
 import { commentController } from '../composition-root';
+import { userDataMiddleware } from '../middlewares/userData/userData.middleware';
 
 export const postsRouter = Router();
 
@@ -25,7 +26,7 @@ postsRouter.put(
   PostController.put,
 );
 postsRouter.delete('/:id', adminMiddleware, paramValidation(), PostController.delete);
-postsRouter.get('/:id/comments', postGetParamValidation(), commentController.getCommentsByPostId.bind(commentController));
+postsRouter.get('/:id/comments', postGetParamValidation(), userDataMiddleware, commentController.getCommentsByPostId.bind(commentController));
 postsRouter.post(
   '/:id/comments',
   authMiddleware,

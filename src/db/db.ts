@@ -32,10 +32,10 @@ export const launchDb = async (): Promise<void> => {
     await client.connect();
     await mongoose.connect(mongoUrl, { dbName });
 
-    console.log(colors.green(`Client connected to DB with URL ${mongoUrl}`));
+    console.info(colors.green(`Client connected to DB with URL ${mongoUrl}`));
   } catch (error) {
     if (error) {
-      console.log(colors.red(String(error)));
+      console.info(colors.red(String(error)));
     }
 
     await client.close();

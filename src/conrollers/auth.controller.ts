@@ -7,7 +7,7 @@ import { type UserAuthQueryType } from '../types/user/output';
 
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { JWTService } from '../application/jwt.service';
-import { UserQueryRepository } from '../repositories/user/user.query-repository';
+import { type UserQueryRepository } from '../repositories/user/user.query-repository';
 import {
   type AuthRecoveryPasswordByEmailInputType,
   type AuthConfirmEmailInputType,
@@ -16,7 +16,7 @@ import {
   type AuthCreateNewPasswordByRecoveryCodeInputType,
 } from '../types/auth/input';
 import { SessionService } from '../domain/session.service';
-import { UserService } from '../domain/user.service';
+import { type UserService } from '../domain/user.service';
 
 export class AuthController {
   constructor(protected userService: UserService, protected userQueryRepository: UserQueryRepository, protected accessExpiresIn: string) {}
@@ -88,7 +88,7 @@ export class AuthController {
       response.send(user);
     } catch (error) {
       console.error(error);
-      
+
       next(error);
     }
   }

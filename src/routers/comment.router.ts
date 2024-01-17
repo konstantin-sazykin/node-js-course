@@ -5,10 +5,11 @@ import { commentIdParamValidation, commentUpdateValidation } from '../validators
 import { authMiddleware } from '../middlewares/auth/auth.middleware';
 import { commentAuthorMiddleware } from '../middlewares/commentAuthor/commentAuthor.middleware';
 import { commentController } from '../composition-root';
+import { userDataMiddleware } from '../middlewares/userData/userData.middleware';
 
 export const commentRouter = Router();
 
-commentRouter.get('/:id', commentIdParamValidation(), commentController.getById.bind(commentController));
+commentRouter.get('/:id', commentIdParamValidation(), userDataMiddleware, commentController.getById.bind(commentController));
 
 commentRouter.put(
   '/:id',

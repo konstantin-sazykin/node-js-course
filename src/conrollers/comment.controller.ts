@@ -10,7 +10,7 @@ import { type QueryRequestType, type RequestType } from '../types/common';
 import { CommentSortData } from '../utils/SortData';
 import { ApiError } from '../exeptions/api.error';
 import { ResponseStatusCodesEnum } from '../utils/constants';
-import { CommentService } from '../domain/comment.service';
+import { type CommentService } from '../domain/comment.service';
 
 export class CommentController {
   constructor(protected commentService: CommentService) {};
@@ -23,7 +23,9 @@ export class CommentController {
       const postId = request.params.id;
       const sortData = new CommentSortData(request.query);
 
-      const result = await this.commentService.findCommentsForPost(postId, sortData);
+      const userId = request.userId;
+
+      const result = await this.commentService.findCommentsForPost(postId, sortData, userId);
 
       response.send(result);
     } catch (error) {
@@ -60,7 +62,10 @@ export class CommentController {
   ) {
     try {
       const commentId = request.params.id;
-      const result = await this.commentService.getComment(commentId);
+
+      const userId = request.userId;
+
+      const result = await this.commentService.getComment(commentId, userId);
 
       if (result) {
         response.send(result);

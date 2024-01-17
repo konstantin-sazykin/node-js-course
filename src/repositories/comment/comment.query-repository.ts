@@ -1,29 +1,27 @@
 import { ObjectId } from 'mongodb';
 
-import { commentCollection } from '../../db/db';
-import { CommentDbMapper } from '../../types/comment/mapper';
-import { type CommentRepositoryType } from '../../types/comment/output';
+import { CommentDataBaseDto } from '../../types/comment/mapper';
 import { type WithPaginationDataType } from '../../types/common';
 import { type CommentSortData } from '../../utils/SortData';
+import { CommentModel } from '../../models/comment.model';
 
 export class CommentQueryRepository {
   async getAllByPostId(
     postId: string,
     sortData: CommentSortData,
-  ): Promise<WithPaginationDataType<CommentRepositoryType>> {
+  ): Promise<WithPaginationDataType<CommentDataBaseDto>> {
     const { sortBy, sortDirection, skip, limit, pageNumber } = sortData;
 
-    const comments = await commentCollection
+    const comments = await CommentModel
       .find({ postId })
-      .sort(sortBy, sortDirection)
+      .sort({ [sortBy]: sortDirection })
       .skip(skip)
-      .limit(limit)
-      .toArray();
+      .limit(limit);
 
-    const totalCount = await commentCollection.countDocuments({ postId });
+    const totalCount = await CommentModel.countDocuments({ postId });
     const pagesCount = Math.ceil(totalCount / limit);
 
-    const items = comments.map((comm) => ({ ...new CommentDbMapper(comm) }));
+    const items = comments.map((comm) => ({ ...new CommentDataBaseDto(comm) }));
 
     return {
       pagesCount,
@@ -34,12 +32,12 @@ export class CommentQueryRepository {
     };
   }
 
-  async find(id: string): Promise<CommentRepositoryType | null> {
-    const result = await commentCollection.findOne({ _id: new ObjectId(id) });
+  async find(id: string): Promise<CommentDataBaseDto | null> {
+    const result = await CommentModel.findOne({ _id: new ObjectId(id) });
 
     if (!result) {
       return null;
     }
-    return { ...new CommentDbMapper(result) };
+    return { ...new CommentDataBaseDto(result) };
   }
 }

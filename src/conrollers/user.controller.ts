@@ -4,9 +4,9 @@ import { type QueryRequestType, type RequestType } from '../types/common';
 import { type CreateUserControllerType, type UserQuerySortDataType } from '../types/user/input';
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { UserSortData } from '../utils/SortData';
-import { UserQueryRepository } from '../repositories/user/user.query-repository';
+import { type UserQueryRepository } from '../repositories/user/user.query-repository';
 import { ApiError } from '../exeptions/api.error';
-import { UserService } from '../domain/user.service';
+import { type UserService } from '../domain/user.service';
 
 export class UserController {
   constructor(protected userService: UserService, protected userQueryRepository: UserQueryRepository) {};

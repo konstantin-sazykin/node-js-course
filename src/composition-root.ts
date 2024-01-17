@@ -20,7 +20,6 @@ const userService = new UserService(userRepository);
 
 export const userController = new UserController(userService, userQueryRepository);
 
-
 const commentRepository = new CommentRepository();
 export const commentQueryRepository = new CommentQueryRepository();
 const commentService = new CommentService(userQueryRepository, commentRepository, commentQueryRepository);
