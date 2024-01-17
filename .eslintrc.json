@@ -24,7 +24,7 @@
     "no-dupe-keys": "error",
     "no-duplicate-case": "error",
     "no-duplicate-imports": "error",
-    "no-empty-pattern": ["error", { "allowObjectPatternsAsParameters": true }],
+    "no-empty-pattern": ["error", { "allowObjectPatternsAsParameters": true }, { "allow": ["constructors"] }],
     "no-fallthrough": ["error", { "allowEmptyCase": true }],
     "no-import-assign": "error",
     "no-self-assign": "error",
