@@ -1,10 +1,25 @@
-import { type ObjectId } from 'mongodb';
+export enum LikesInfoEnum {
+  None = 'None',
+  Like = 'Like',
+  Dislike = 'DisLike',
+}
 
+export interface LikesInfoType {
+  status: LikesInfoEnum;
+  userId: string;
+}
 export interface CommentType {
   content: string;
   postId: string;
   commentatorId: string;
   createdAt: Date;
+  likes: LikesInfoType[];
+};
+
+export interface LikesInfoOutputType {
+  likesCount: number;
+  dislikesCount: number;
+  myStatus: LikesInfoEnum;
 }
 
 export interface CommentOutputType {
@@ -15,26 +30,5 @@ export interface CommentOutputType {
     userLogin: string;
   };
   createdAt: string;
-}
-
-export interface CommentMapModelType {
-  id: string;
-  content: string;
-  userId: string;
-  userLogin: string;
-  createdAt: Date;
-}
-
-export interface CommentReadDbType {
-  _id: ObjectId;
-  content: string;
-  commentatorId: string;
-  createdAt: Date;
-};
-
-export interface CommentRepositoryType {
-  id: string;
-  content: string;
-  commentatorId: string;
-  createdAt: Date;
+  likesInfo: LikesInfoOutputType;
 }

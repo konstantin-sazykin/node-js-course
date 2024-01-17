@@ -14,7 +14,7 @@ export class UserMapper {
   }
 }
 
-export class UserShortInfoMapper {
+export class UserShortInfoDto {
   userId: string;
   login: string;
   email: string;
