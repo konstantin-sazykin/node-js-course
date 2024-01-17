@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 
 import { type PostType } from '../types/post/output';
 import { type UserType } from '../types/user/output';
-import { type CommentType } from '../types/comment/output';
 import { type SessionType } from '../types/session/output';
 import { type AttemptType } from '../types/attempt/output';
 import { MongoCollections } from '../utils/constants';
@@ -25,7 +24,6 @@ const db = client.db(dbName);
 
 export const postCollection = db.collection<PostType>(MongoCollections.posts);
 export const userCollection = db.collection<UserType>(MongoCollections.users);
-export const commentCollection = db.collection<CommentType>(MongoCollections.comments);
 export const sessionCollection = db.collection<SessionType>(MongoCollections.sessions);
 export const attemptCollection = db.collection<AttemptType>(MongoCollections.attempts);
 
