@@ -1,7 +1,7 @@
 export enum LikesInfoEnum {
   None = 'None',
   Like = 'Like',
-  Dislike = 'DisLike',
+  Dislike = 'Dislike',
 }
 
 export interface LikeType {
