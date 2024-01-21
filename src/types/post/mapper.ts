@@ -18,7 +18,7 @@ export class PostDataBaseDto {
     post: WithId<PostType>,
     currentUserId?: string | null,
     likes: PostLikeDataBaseOutputType[] = [],
-    lastLikes: NewestLikeInfoOutputType[] | null = null,
+    lastLikes: NewestLikeInfoOutputType[] | null = [],
   ) {
     const {
       _id,
