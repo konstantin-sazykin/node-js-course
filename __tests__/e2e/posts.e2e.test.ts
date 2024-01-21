@@ -156,6 +156,15 @@ describe(RoutesPathsEnum.posts, () => {
     const blogResult = await request(app)
       .put(`${RoutesPathsEnum.posts}/${newPost?.id}/like-status`)
       .send({ likeStatus: LikesInfoEnum.Like })
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
+
+    expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
+  });
+
+  it(`should create like for new post`, async () => {
+    const blogResult = await request(app)
+      .put(`${RoutesPathsEnum.posts}/${newPost?.id}/like-status`)
+      .send({ likeStatus: LikesInfoEnum.Like })
       .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserBToken));
 
     expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
