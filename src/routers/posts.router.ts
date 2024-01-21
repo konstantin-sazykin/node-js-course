@@ -26,7 +26,12 @@ postsRouter.put(
   PostController.put,
 );
 postsRouter.delete('/:id', adminMiddleware, paramValidation(), PostController.delete);
-postsRouter.get('/:id/comments', postGetParamValidation(), userDataMiddleware, commentController.getCommentsByPostId.bind(commentController));
+postsRouter.get(
+  '/:id/comments',
+  postGetParamValidation(),
+  userDataMiddleware,
+  commentController.getCommentsByPostId.bind(commentController),
+);
 postsRouter.post(
   '/:id/comments',
   authMiddleware,

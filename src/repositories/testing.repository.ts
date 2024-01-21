@@ -9,10 +9,10 @@ export class TestingRepository {
       videoDb.videos = [];
 
       await BlogModel.deleteMany({});
+      await CommentModel.deleteMany({});
 
       await postCollection.deleteMany({});
       await userCollection.deleteMany({});
-      await CommentModel.deleteMany({});
       await sessionCollection.deleteMany({});
 
       return true;

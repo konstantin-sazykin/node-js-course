@@ -4,4 +4,8 @@ export class CommentPaths {
   static commentById(id: string) {
     return `${RoutesPathsEnum.comments}/${id}`;
   }
+
+  static likeForCommentById(id: string) {
+    return `${RoutesPathsEnum.comments}/${id}/like-status`;
+  }
 }

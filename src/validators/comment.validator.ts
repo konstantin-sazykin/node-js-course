@@ -4,8 +4,11 @@ import { type NextFunction, type Request, type Response } from 'express';
 
 import { inputModelValidation } from '../exeptions/validation.error';
 
-import { requestParamsValidation } from './common';
 import { commentQueryRepository } from '../composition-root';
+
+import { LikesInfoEnum } from '../types/like/output';
+
+import { requestParamsValidation } from './common';
 
 const commentContentValidation = body('content').isString().trim().isLength({ min: 20, max: 300 });
 
@@ -30,3 +33,10 @@ export const commentIdParamValidation = (): [
   ValidationChain,
   (request: Request, response: Response, next: NextFunction) => void,
 ] => [idValidation, requestParamsValidation];
+
+const likeStatusValidation = body('likeStatus').isString().trim().isIn([LikesInfoEnum.Dislike, LikesInfoEnum.Like, LikesInfoEnum.None]);
+
+export const likeInputValidation = (): [
+  ValidationChain,
+  (request: Request, response: Response, next: NextFunction) => void,
+] => [likeStatusValidation, inputModelValidation];

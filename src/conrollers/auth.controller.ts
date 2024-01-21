@@ -262,7 +262,7 @@ export class AuthController {
       const result = await this.userService.createPassword(newPassword, jwtPayload.email as string);
 
       if (result) {
-        response.send(ResponseStatusCodesEnum.NoContent);
+        response.sendStatus(ResponseStatusCodesEnum.NoContent);
       } else {
         response.sendStatus(ResponseStatusCodesEnum.BadRequest);
       }

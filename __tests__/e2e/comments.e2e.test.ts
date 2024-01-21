@@ -17,6 +17,7 @@ import { CommentDataManager } from './dataManager/comment.data-manager';
 import { UserDataManager } from './dataManager/user.data-manager';
 import { CommentOutputType } from '../../src/types/comment/output';
 import { PostRepository } from '../../src/repositories/post/post.repository';
+import { LikesInfoEnum } from '../../src/types/like/output';
 
 describe('/comments', () => {
   let newPost: QueryPostOutputModel | null = null;
@@ -92,8 +93,8 @@ describe('/comments', () => {
     } else {
       throw new Error('Can`t create new Blog for testing comments');
     }
-    
-    newPost = await PostRepository.create({ ...createdPost, blogName: newBlog.name  });
+
+    newPost = await PostRepository.create({ ...createdPost, blogName: newBlog.name });
   });
 
   afterAll(async () => {
@@ -228,6 +229,75 @@ describe('/comments', () => {
     const result = await request(app).delete(CommentPaths.commentById(newComment.id));
 
     expect(result.statusCode).toBe(ResponseStatusCodesEnum.Unathorized);
+  });
+
+  it('should return likes data for new comment', async () => {
+    const result = await request(app).get(CommentPaths.commentById(newComment.id));
+
+    expect(result.body.likesInfo).toEqual({
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: LikesInfoEnum.None,
+    });
+  });
+
+  it('should return 204 status after adding new like for new comment', async () => {
+    const result = await request(app)
+      .put(CommentPaths.likeForCommentById(newComment.id))
+      .send({ likeStatus: LikesInfoEnum.Like })
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
+
+    expect(result.statusCode).toEqual(ResponseStatusCodesEnum.NoContent);
+  });
+
+  it('should return likes data for new comment', async () => {
+    const result = await request(app).get(CommentPaths.commentById(newComment.id));
+
+    expect(result.body.likesInfo).toEqual({
+      likesCount: 1,
+      dislikesCount: 0,
+      myStatus: LikesInfoEnum.None,
+    });
+  });
+
+  it('should return 204 status after update like for new comment', async () => {
+    const result = await request(app)
+      .put(CommentPaths.likeForCommentById(newComment.id))
+      .send({ likeStatus: LikesInfoEnum.Dislike })
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
+
+    expect(result.statusCode).toEqual(ResponseStatusCodesEnum.NoContent);
+  });
+
+  it('should return likes data for new comment', async () => {
+    const result = await request(app).get(CommentPaths.commentById(newComment.id));
+
+    expect(result.body.likesInfo).toEqual({
+      likesCount: 0,
+      dislikesCount: 1,
+      myStatus: LikesInfoEnum.None,
+    });
+  });
+
+  it('should return likes data for new comment', async () => {
+    const result = await request(app)
+      .get(CommentPaths.commentById(newComment.id))
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
+
+    expect(result.body.likesInfo).toEqual({
+      likesCount: 0,
+      dislikesCount: 1,
+      myStatus: LikesInfoEnum.Dislike,
+    });
+  });
+
+  it('should return 204 status after update like for new comment', async () => {
+    const result = await request(app)
+      .put(CommentPaths.likeForCommentById(newComment.id))
+      .send({ likeStatus: LikesInfoEnum.None })
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
+
+    expect(result.statusCode).toEqual(ResponseStatusCodesEnum.NoContent);
   });
 
   it('should not delete someone`s else comment ', async () => {

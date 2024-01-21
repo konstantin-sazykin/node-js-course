@@ -1,5 +1,6 @@
 import { type CommentQueryRepository } from '../repositories/comment/comment.query-repository';
 import { type CommentRepository } from '../repositories/comment/comment.repository';
+import { type LikeQueryRepository } from '../repositories/like/like.query-repository';
 import { type UserQueryRepository } from '../repositories/user/user.query-repository';
 import { CommentOutputDto } from '../types/comment/mapper';
 import { type CommentOutputType } from '../types/comment/output';
@@ -7,7 +8,13 @@ import { type WithPaginationDataType } from '../types/common';
 import { type CommentSortData } from '../utils/SortData';
 
 export class CommentService {
-  constructor(protected userQueryRepository: UserQueryRepository, protected commentRepository: CommentRepository, protected commentQueryRepository: CommentQueryRepository) {};
+  constructor(
+    protected userQueryRepository: UserQueryRepository,
+    protected commentRepository: CommentRepository,
+    protected commentQueryRepository: CommentQueryRepository,
+    protected likeQueryRepository: LikeQueryRepository,
+  ) {}
+
   async getComment(id: string, currentUserId: string | null): Promise<CommentOutputType | null> {
     const comment = await this.commentQueryRepository.find(id);
 
@@ -15,7 +22,7 @@ export class CommentService {
       return null;
     }
     const user = await this.userQueryRepository.findUserById(comment.commentatorId);
-
+    const likes = await this.likeQueryRepository.getLikesByCommentId(id);
     if (!user) {
       return null;
     }
@@ -25,6 +32,7 @@ export class CommentService {
         ...comment,
         currentUserId,
         user,
+        likes,
       }),
     };
   }
@@ -42,7 +50,7 @@ export class CommentService {
     }
 
     return {
-      ...new CommentOutputDto({ ...createdComment, user, currentUserId: userId }),
+      ...new CommentOutputDto({ ...createdComment, user, currentUserId: userId, likes: [] }),
     };
   }
 
@@ -60,7 +68,8 @@ export class CommentService {
         throw Error(`Не найден юзер с id ${comm.commentatorId}`);
       }
 
-      return { ...new CommentOutputDto({ ...comm, user, currentUserId }) };
+      const likes = await this.likeQueryRepository.getLikesByCommentId(comm.id);
+      return { ...new CommentOutputDto({ ...comm, user, currentUserId, likes }) };
     });
 
     const items = await Promise.all(promises);

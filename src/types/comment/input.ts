@@ -1,4 +1,5 @@
 import { type QuerySortDataType } from '../common';
+import { type LikesInfoEnum } from '../like/output';
 
 export interface CommentsParams { id: string; }
 
@@ -10,4 +11,8 @@ export interface CreateCommentType {
 
 export interface UpdateCommentType {
   content: string;
+}
+
+export interface UpdateLikeInfoType {
+  likeStatus: LikesInfoEnum;
 }

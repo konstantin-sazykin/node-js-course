@@ -9,6 +9,9 @@ import { CommentQueryRepository } from './repositories/comment/comment.query-rep
 import { CommentRepository } from './repositories/comment/comment.repository';
 import { UserQueryRepository } from './repositories/user/user.query-repository';
 import { UserRepository } from './repositories/user/user.repository';
+import { LikeQueryRepository } from './repositories/like/like.query-repository';
+import { LikeService } from './domain/like.service';
+import { LikeRepository } from './repositories/like/like.repository';
 
 dotenv.config();
 
@@ -20,10 +23,23 @@ const userService = new UserService(userRepository);
 
 export const userController = new UserController(userService, userQueryRepository);
 
+const likeQueryRepository = new LikeQueryRepository();
+const likeRepository = new LikeRepository();
+const likeService = new LikeService(likeRepository);
+
 const commentRepository = new CommentRepository();
 export const commentQueryRepository = new CommentQueryRepository();
-const commentService = new CommentService(userQueryRepository, commentRepository, commentQueryRepository);
+const commentService = new CommentService(
+  userQueryRepository,
+  commentRepository,
+  commentQueryRepository,
+  likeQueryRepository,
+);
 
-export const commentController = new CommentController(commentService);
+export const commentController = new CommentController(commentService, likeService);
 
-export const authController = new AuthController(userService, userQueryRepository, ACCESS_TOKEN_EXPIRES_IN);
+export const authController = new AuthController(
+  userService,
+  userQueryRepository,
+  ACCESS_TOKEN_EXPIRES_IN,
+);

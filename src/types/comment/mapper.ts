@@ -2,11 +2,12 @@ import { type WithId } from 'mongodb';
 
 import { type UserShortInfoDto } from '../user/mapper';
 
+import { LikesInfoEnum, type LikesInfoOutputType } from '../like/output';
+
+import { type CommentLikeDataBaseDto } from '../like/mapper';
+
 import {
-  type LikesInfoType,
-  type LikesInfoOutputType,
   type CommentType,
-  LikesInfoEnum,
 } from './output';
 
 export class CommentOutputDto {
@@ -27,7 +28,7 @@ export class CommentOutputDto {
     likes,
     currentUserId,
     user,
-  }: CommentDataBaseDto & { user: UserShortInfoDto; currentUserId: string | null; }) {
+  }: CommentDataBaseDto & { user: UserShortInfoDto; currentUserId: string | null; likes: CommentLikeDataBaseDto[]; }) {
     this.id = id;
     this.content = content;
     this.commentatorInfo = {
@@ -53,13 +54,11 @@ export class CommentDataBaseDto {
   content: string;
   commentatorId: string;
   createdAt: Date;
-  likes: LikesInfoType[];
 
-  constructor({ _id, content, commentatorId, createdAt, likes }: WithId<CommentType>) {
+  constructor({ _id, content, commentatorId, createdAt }: WithId<CommentType>) {
     this.id = _id.toString();
     this.content = content;
     this.createdAt = createdAt;
     this.commentatorId = commentatorId;
-    this.likes = likes;
   }
 }

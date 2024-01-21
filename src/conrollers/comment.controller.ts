@@ -1,6 +1,7 @@
 import { type NextFunction, type Response } from 'express';
 
 import {
+  type UpdateLikeInfoType,
   type CommentsParams,
   type CreateCommentType,
   type QuerySortedCommentsType,
@@ -11,9 +12,10 @@ import { CommentSortData } from '../utils/SortData';
 import { ApiError } from '../exeptions/api.error';
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { type CommentService } from '../domain/comment.service';
+import { type LikeService } from '../domain/like.service';
 
 export class CommentController {
-  constructor(protected commentService: CommentService) {};
+  constructor(protected commentService: CommentService, protected likeService: LikeService) {};
   async getCommentsByPostId(
     request: QueryRequestType<CommentsParams, QuerySortedCommentsType>,
     response: Response,
@@ -114,6 +116,34 @@ export class CommentController {
         response.sendStatus(ResponseStatusCodesEnum.NoContent);
       } else {
         next(new ApiError(ResponseStatusCodesEnum.InternalError, 'Не удалось удалить комментарий'));
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async putLikeForComment(
+    request: RequestType<CommentsParams, UpdateLikeInfoType>,
+    response: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const commentId = request.params.id;
+      const userId = request.userId;
+      const likeStatus = request.body.likeStatus;
+
+      if (!userId) {
+        throw ApiError.UnauthorizedError();
+      }
+
+      const result = await this.likeService.createOrUpdateLike(commentId, userId, likeStatus, 'comment');
+
+      if (result) {
+        response.sendStatus(ResponseStatusCodesEnum.NoContent);
+      } else {
+        next(
+          new ApiError(ResponseStatusCodesEnum.InternalError, 'Не удалось обновить комментарий'),
+        );
       }
     } catch (error) {
       next(error);

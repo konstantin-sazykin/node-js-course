@@ -25,6 +25,7 @@ export enum MongoCollections {
   blogs = 'blogs',
   posts = 'posts',
   users = 'users',
+  likes = 'likes',
   comments = 'comments',
   sessions = 'sessions',
   attempts = 'attempts',
