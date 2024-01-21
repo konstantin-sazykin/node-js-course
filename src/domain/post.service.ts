@@ -1,7 +1,7 @@
 import { PostRepository } from '../repositories/post/post.repository';
 import { type CreatePostWithBlogIdInputModel, type UpdatePostInputModel } from '../types/post/input';
 import { type QueryPostOutputModel } from '../types/post/output';
-import { BlogQueryRepository } from '../repositories/blog/blog.query.repository';
+import { BlogQueryRepository } from '../repositories/blog/blog.query-repository';
 
 import { type CreatePostInputModel } from './../types/post/input';
 

@@ -2,7 +2,7 @@ import { type NextFunction, type Request, type Response } from 'express';
 import { type ValidationChain, body, param } from 'express-validator';
 
 import { inputModelValidation } from '../exeptions/validation.error';
-import { BlogQueryRepository } from '../repositories/blog/blog.query.repository';
+import { BlogQueryRepository } from '../repositories/blog/blog.query-repository';
 
 import { requestParamsValidation } from './common';
 
