@@ -7,19 +7,32 @@ import {
   type UpdateBlogInputModel,
 } from '../types/blog/input';
 import { type QueryBlogOutputModel } from '../types/blog/output';
-import { type QueryRequestType, type RequestType, type ResponseWithPagination } from '../types/common';
+import {
+  type QueryRequestType,
+  type RequestType,
+  type ResponseWithPagination,
+} from '../types/common';
 import { BlogSortData, PostSortData } from '../utils/SortData';
-import { BlogQueryRepository } from '../repositories/blog/blog.query-repository';
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { ApiError } from '../exeptions/api.error';
 import { BlogService } from '../domain/blog.service';
-import { type CreatePostWithBlogIdInputModel, type QuerySortedPostsType } from '../types/post/input';
+import {
+  type CreatePostWithBlogIdInputModel,
+  type QuerySortedPostsType,
+} from '../types/post/input';
 import { type QueryPostOutputModel } from '../types/post/output';
-import { PostService } from '../domain/post.service';
-import { PostQueryRepository } from '../repositories/post/post.query.repository';
+import { type PostQueryRepository } from '../repositories/post/post.query.repository';
+import { type BlogQueryRepository } from '../repositories/blog/blog.query-repository';
+import { type PostService } from '../domain/post.service';
 
 export class BlogController {
-  static async getAll(
+  constructor(
+    protected blogQueryRepository: BlogQueryRepository,
+    protected postService: PostService,
+    protected postQueryRepository: PostQueryRepository,
+  ) {}
+
+  async getAll(
     request: QueryRequestType<{}, QuerySortedBlogsType>,
     response: ResponseWithPagination<QueryBlogOutputModel>,
     next: NextFunction,
@@ -27,7 +40,7 @@ export class BlogController {
     try {
       const sortData = new BlogSortData(request.query);
 
-      const blogs = await BlogQueryRepository.getAllBlogs(sortData);
+      const blogs = await this.blogQueryRepository.getAllBlogs(sortData);
 
       if (!blogs) {
         throw new ApiError(ResponseStatusCodesEnum.NotFound, null);
@@ -39,14 +52,14 @@ export class BlogController {
     }
   }
 
-  static async getById(
+  async getById(
     request: RequestType<BlogParams, {}>,
     response: Response<QueryBlogOutputModel>,
     next: NextFunction,
   ) {
     try {
       const { id } = request.params;
-      const blog = await BlogQueryRepository.getBlogById(id);
+      const blog = await this.blogQueryRepository.getBlogById(id);
 
       if (!blog) {
         throw new ApiError(ResponseStatusCodesEnum.NotFound, 'Блог с указанны id не найден');
@@ -58,7 +71,7 @@ export class BlogController {
     }
   }
 
-  static async post(
+  async post(
     request: RequestType<{}, CreateBlogInputModel>,
     response: Response<QueryBlogOutputModel>,
     next: NextFunction,
@@ -75,7 +88,7 @@ export class BlogController {
     }
   }
 
-  static async put(
+  async put(
     request: RequestType<BlogParams, UpdateBlogInputModel>,
     response: Response,
     next: NextFunction,
@@ -93,11 +106,7 @@ export class BlogController {
     }
   }
 
-  static async delete(
-    request: RequestType<BlogParams, {}>,
-    response: Response,
-    next: NextFunction,
-  ) {
+  async delete(request: RequestType<BlogParams, {}>, response: Response, next: NextFunction) {
     try {
       const blogId = request.params.id;
 
@@ -112,7 +121,7 @@ export class BlogController {
     }
   }
 
-  static async postForId(
+  async postForId(
     request: RequestType<BlogParams, CreatePostWithBlogIdInputModel>,
     response: Response<QueryPostOutputModel>,
     next: NextFunction,
@@ -120,7 +129,7 @@ export class BlogController {
     try {
       const blogId = request.params.id;
 
-      const newPost = await PostService.createPostByBlogId(blogId, request.body);
+      const newPost = await this.postService.createPostByBlogId(blogId, request.body);
 
       if (!newPost) {
         throw new ApiError(ResponseStatusCodesEnum.InternalError, 'Не удалось создать блог');
@@ -132,7 +141,7 @@ export class BlogController {
     }
   }
 
-  static async getPostsForBlogById(
+  async getPostsForBlogById(
     request: QueryRequestType<BlogParams, QuerySortedPostsType>,
     response: ResponseWithPagination<QueryPostOutputModel>,
     next: NextFunction,
@@ -140,7 +149,7 @@ export class BlogController {
     try {
       const blogId = request.params.id;
       const sortData = new PostSortData(request.query);
-      const posts = await PostQueryRepository.getAllByBlogId(blogId, sortData);
+      const posts = await this.postQueryRepository.getAllByBlogId(blogId, sortData);
 
       response.send(posts);
     } catch (error) {

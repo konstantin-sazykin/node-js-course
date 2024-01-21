@@ -7,25 +7,24 @@ import {
   postWithBlogIdCreateValidation,
 } from '../validators/post.validator';
 import { paramValidation } from '../validators/common';
-import { PostController } from '../conrollers/post.controller';
 import { authMiddleware } from '../middlewares/auth/auth.middleware';
-import { commentCreateValidation } from '../validators/comment.validator';
-import { commentController } from '../composition-root';
+import { commentCreateValidation, likeInputValidation } from '../validators/comment.validator';
+import { commentController, postController } from '../composition-root';
 import { userDataMiddleware } from '../middlewares/userData/userData.middleware';
 
 export const postsRouter = Router();
 
-postsRouter.get('/', PostController.getAll);
-postsRouter.get('/:id', paramValidation(), PostController.getById);
-postsRouter.post('/', adminMiddleware, postWithBlogIdCreateValidation(), PostController.post);
+postsRouter.get('/', postController.getAll.bind(postController));
+postsRouter.get('/:id', paramValidation(), postController.getById.bind(postController));
+postsRouter.post('/', adminMiddleware, postWithBlogIdCreateValidation(), postController.post.bind(postController));
 postsRouter.put(
   '/:id',
   adminMiddleware,
   paramValidation(),
   postWithBlogIdCreateValidation(),
-  PostController.put,
+  postController.put.bind(postController),
 );
-postsRouter.delete('/:id', adminMiddleware, paramValidation(), PostController.delete);
+postsRouter.delete('/:id', adminMiddleware, paramValidation(), postController.delete.bind(postController));
 postsRouter.get(
   '/:id/comments',
   postGetParamValidation(),
@@ -37,5 +36,12 @@ postsRouter.post(
   authMiddleware,
   postGetParamValidation(),
   commentCreateValidation(),
+  commentController.postCommentByPostId.bind(commentController),
+);
+postsRouter.put(
+  '/:id/like-status',
+  authMiddleware,
+  postGetParamValidation(),
+  likeInputValidation(),
   commentController.postCommentByPostId.bind(commentController),
 );

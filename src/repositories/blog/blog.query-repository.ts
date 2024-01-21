@@ -7,7 +7,7 @@ import { type BlogSortData } from '../../utils/SortData';
 import { BlogModel } from '../../models/blog.model';
 
 export class BlogQueryRepository {
-  static async getAllBlogs(
+  async getAllBlogs(
     sortData: BlogSortData,
   ): Promise<WithPaginationDataType<QueryBlogOutputModel>> {
     const { searchNameTerm, sortDirection, sortBy, skip, limit, pageNumber } = sortData;
@@ -39,7 +39,7 @@ export class BlogQueryRepository {
     };
   }
 
-  static async getBlogById(id: string): Promise<null | BlogMapper> {
+  async getBlogById(id: string): Promise<null | BlogMapper> {
     const blog = await BlogModel.findOne({ _id: new ObjectId(id) });
 
     if (!blog) {

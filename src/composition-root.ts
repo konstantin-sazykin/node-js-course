@@ -12,6 +12,11 @@ import { UserRepository } from './repositories/user/user.repository';
 import { LikeQueryRepository } from './repositories/like/like.query-repository';
 import { LikeService } from './domain/like.service';
 import { LikeRepository } from './repositories/like/like.repository';
+import { PostController } from './conrollers/post.controller';
+import { PostQueryRepository } from './repositories/post/post.query.repository';
+import { PostService } from './domain/post.service';
+import { BlogQueryRepository } from './repositories/blog/blog.query-repository';
+import { BlogController } from './conrollers/blog.controller';
 
 dotenv.config();
 
@@ -38,8 +43,16 @@ const commentService = new CommentService(
 
 export const commentController = new CommentController(commentService, likeService);
 
+export const blogQueryRepository = new BlogQueryRepository();
+
 export const authController = new AuthController(
   userService,
   userQueryRepository,
   ACCESS_TOKEN_EXPIRES_IN,
 );
+
+export const postQueryRepository = new PostQueryRepository();
+const postService = new PostService(blogQueryRepository);
+
+export const postController = new PostController(postQueryRepository, postService, likeService);
+export const blogController = new BlogController(blogQueryRepository, postService, postQueryRepository);

@@ -2,7 +2,8 @@ import { type NextFunction, type Request, type Response } from 'express';
 import { type ValidationChain, body, param } from 'express-validator';
 
 import { inputModelValidation } from '../exeptions/validation.error';
-import { BlogQueryRepository } from '../repositories/blog/blog.query-repository';
+
+import { blogQueryRepository } from '../composition-root';
 
 import { requestParamsValidation } from './common';
 
@@ -54,7 +55,7 @@ const blogIdValidation = param('id')
   .trim()
   .isMongoId()
   .custom(async (blogId: string) => {
-    const isBlogDefined = await BlogQueryRepository.getBlogById(blogId);
+    const isBlogDefined = await blogQueryRepository.getBlogById(blogId);
 
     if (!isBlogDefined) {
       throw new Error(`Блог с id ${blogId} не найден`);

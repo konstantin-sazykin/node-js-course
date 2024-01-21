@@ -7,7 +7,7 @@ import { type WithPaginationDataType } from '../../types/common';
 import { type PostSortData } from '../../utils/SortData';
 
 export class PostQueryRepository {
-  static async getAll(
+  async getAll(
     sortData: PostSortData,
   ): Promise<WithPaginationDataType<QueryPostOutputModel>> {
     const { sortBy, sortDirection, skip, limit, pageNumber } = sortData;
@@ -30,7 +30,7 @@ export class PostQueryRepository {
     };
   }
 
-  static async getById(id: string): Promise<QueryPostOutputModel | null> {
+  async getById(id: string): Promise<QueryPostOutputModel | null> {
     try {
       const post = await postCollection.findOne({ _id: new ObjectId(id) });
 
@@ -48,7 +48,7 @@ export class PostQueryRepository {
     }
   }
 
-  static async getAllByBlogId(
+  async getAllByBlogId(
     blogId: string,
     sortData: PostSortData,
   ): Promise<WithPaginationDataType<QueryPostOutputModel>> {

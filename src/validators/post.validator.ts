@@ -3,8 +3,8 @@ import { type ValidationChain, body, param } from 'express-validator';
 import { type NextFunction, type Request, type Response } from 'express';
 
 import { inputModelValidation } from '../exeptions/validation.error';
-import { BlogQueryRepository } from '../repositories/blog/blog.query-repository';
-import { PostQueryRepository } from '../repositories/post/post.query.repository';
+
+import { blogQueryRepository, postQueryRepository } from '../composition-root';
 
 import { requestParamsValidation } from './common';
 
@@ -31,7 +31,7 @@ const blogIdValidation = body('blogId')
   .trim()
   .isMongoId()
   .custom(async (blogId: string) => {
-    const isBlogDefined = await BlogQueryRepository.getBlogById(blogId);
+    const isBlogDefined = await blogQueryRepository.getBlogById(blogId);
 
     if (!isBlogDefined) {
       throw new Error(`Блог с id ${blogId} не найден`);
@@ -40,7 +40,7 @@ const blogIdValidation = body('blogId')
   .withMessage('Invalid blogId field');
 
 const postIdValidation = param('id').custom(async (postId: string) => {
-  const isPostDefined = await PostQueryRepository.getById(postId);
+  const isPostDefined = await postQueryRepository.getById(postId);
 
   if (!isPostDefined) {
     throw new Error(`Пост с id ${postId} не найден`);
