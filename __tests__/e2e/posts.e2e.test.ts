@@ -11,15 +11,29 @@ import { BlogRepository } from '../../src/repositories/blog/blog.repository';
 import { TestingRepository } from '../../src/repositories/testing.repository';
 import { PostDataManager } from './dataManager/post.data-manager';
 import { BlogDataManager } from './dataManager/blog.data-manager';
+import { LikesInfoEnum } from '../../src/types/like/output';
+import { UserDataManager } from './dataManager/user.data-manager';
+import { AuthPaths } from './Routes/auth.paths';
 
 describe(RoutesPathsEnum.posts, () => {
   const authHeaderString = `Basic ${btoa('admin:qwerty')}`;
   let newPost: QueryPostOutputModel | null = null;
   let newBlog: QueryBlogOutputModel;
+  let accessUserAToken: string;
+  let accessUserBToken: string;
+  const UserA = {
+    login: '',
+    password: '',
+  };
+
+  const UserB = {
+    login: '',
+    password: '',
+  };
 
   beforeAll(async () => {
     await launchDb();
-    
+
     await TestingRepository.clearAllData();
 
     const createdBlog: CreateBlogInputModel = BlogDataManager.createCorrectBlog();
@@ -29,10 +43,48 @@ describe(RoutesPathsEnum.posts, () => {
     if (blogResult) {
       newBlog = { ...blogResult };
     } else {
-      throw new Error('Can`t create new Blog for testing posts')
+      throw new Error('Can`t create new Blog for testing posts');
     }
 
     request(app).delete(RoutesPathsEnum.testingAllData).expect(204);
+
+    const userAData = UserDataManager.usersForTestingSearch.userA;
+    const userBData = UserDataManager.usersForTestingSearch.userB;
+
+    const userAResult = await request(app)
+      .post(RoutesPathsEnum.user)
+      .send(UserDataManager.usersForTestingSearch.userA)
+      .set(...UserDataManager.adminHeader);
+
+    const userBResult = await request(app)
+      .post(RoutesPathsEnum.user)
+      .send(UserDataManager.usersForTestingSearch.userB)
+      .set(...UserDataManager.adminHeader);
+
+    if (userAResult && userBResult) {
+      UserA.login = userAData.login;
+      UserA.password = userAData.password;
+
+      UserB.login = userBData.login;
+      UserB.password = userBData.password;
+    } else {
+      throw new Error('Can`t create users for testing comments');
+    }
+
+    const authUserAResult = await request(app)
+      .post(AuthPaths.index)
+      .send({ loginOrEmail: UserA.login, password: UserA.password });
+
+    const authUserBResult = await request(app)
+      .post(AuthPaths.index)
+      .send({ loginOrEmail: UserB.login, password: UserB.password });
+
+    if (authUserAResult && authUserBResult) {
+      accessUserAToken = authUserAResult.body.accessToken;
+      accessUserBToken = authUserBResult.body.accessToken;
+    } else {
+      throw new Error('Can`t create new Blog for testing comments');
+    }
   });
 
   afterAll(async () => {
@@ -52,7 +104,8 @@ describe(RoutesPathsEnum.posts, () => {
   });
 
   it(`should'nt create post without auth header`, async () => {
-    const incorrectPost: CreatePostWithBlogIdInputModel = PostDataManager.createWithIncorrectBlogIdPost();
+    const incorrectPost: CreatePostWithBlogIdInputModel =
+      PostDataManager.createWithIncorrectBlogIdPost();
 
     const postResult = await request(app).post(RoutesPathsEnum.posts).send(incorrectPost);
 
@@ -60,7 +113,9 @@ describe(RoutesPathsEnum.posts, () => {
   });
 
   it('should create post with correct data', async () => {
-    const createdPost: CreatePostWithBlogIdInputModel = PostDataManager.createCorrectPostWithBlogId(newBlog.id);
+    const createdPost: CreatePostWithBlogIdInputModel = PostDataManager.createCorrectPostWithBlogId(
+      newBlog.id
+    );
 
     const postResult = await request(app)
       .post(RoutesPathsEnum.posts)
@@ -79,16 +134,43 @@ describe(RoutesPathsEnum.posts, () => {
     }).toEqual(createdPost);
   });
 
+  it(`should not create like for new post`, async () => {
+    const blogResult = await request(app)
+      .put(`${RoutesPathsEnum.posts}/${newPost?.id}/like-status`)
+      .send({ likeStatus: [] })
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
+
+    expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.BadRequest);
+  });
+
+  it(`should create dislike for new post`, async () => {
+    const blogResult = await request(app)
+      .put(`${RoutesPathsEnum.posts}/${newPost?.id}/like-status`)
+      .send({ likeStatus: LikesInfoEnum.Dislike })
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
+
+    expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
+  });
+
+  it(`should create like for new post`, async () => {
+    const blogResult = await request(app)
+      .put(`${RoutesPathsEnum.posts}/${newPost?.id}/like-status`)
+      .send({ likeStatus: LikesInfoEnum.Like })
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserBToken));
+
+    expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.NoContent);
+  });
+
   it('should return empty list if incorrect page', async () => {
-    const result = await request(app).get(`${RoutesPathsEnum.posts}?pageSize=10&pageNumber=2`)
-    
+    const result = await request(app).get(`${RoutesPathsEnum.posts}?pageSize=10&pageNumber=2`);
+
     expect(result.body?.items).toEqual([]);
   });
 
   it('should return list with new post', async () => {
-    const result = await request(app).get(`${RoutesPathsEnum.posts}?pageSize=10&pageNumber=1`)
+    const result = await request(app).get(`${RoutesPathsEnum.posts}?pageSize=10&pageNumber=1`);
 
-    expect(result.body?.items[0]).toEqual(newPost);
+    expect(result.body?.items[0].id).toBe(newPost?.id);
   });
 
   it('should`nt update post with incorrect data', async () => {
@@ -107,11 +189,13 @@ describe(RoutesPathsEnum.posts, () => {
   });
 
   it(`should return post with correct id`, async () => {
-    const blogResult = await request(app).get(`${RoutesPathsEnum.posts}/${newPost?.id}`);
+    const blogResult = await request(app)
+      .get(`${RoutesPathsEnum.posts}/${newPost?.id}`)
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserBToken));
 
     expect(blogResult.statusCode).toBe(ResponseStatusCodesEnum.Ok);
 
-    expect(blogResult.body).toEqual(newPost);
+    expect(blogResult.body.id).toEqual(newPost?.id);
   });
 
   it('should update post with correct data', async () => {
@@ -190,5 +274,4 @@ describe(RoutesPathsEnum.posts, () => {
 
     expect(deletedPost.statusCode).toBe(ResponseStatusCodesEnum.NotFound);
   });
-
 });

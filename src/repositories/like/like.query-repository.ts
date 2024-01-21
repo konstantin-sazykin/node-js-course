@@ -14,11 +14,11 @@ export class LikeQueryRepository {
     }));
   }
 
-  async getLikesBuPostId(postId: string): Promise<PostLikeDataBaseOutputType[]> {
+  async getLikesByPostId(postId: string): Promise<PostLikeDataBaseOutputType[]> {
     const likes: PostLikeDataBaseDto[] = await LikeModel.find({ postId });
 
     return likes.map((like) => ({
-      ...new PostLikeDataBaseDto(like.postId, like.status, like.userId),
+      ...new PostLikeDataBaseDto(like.postId, like.status, like.userId, like.addedAt),
     }));
   }
 }

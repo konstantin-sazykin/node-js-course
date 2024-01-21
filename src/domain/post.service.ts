@@ -1,12 +1,23 @@
 import { PostRepository } from '../repositories/post/post.repository';
-import { type CreatePostWithBlogIdInputModel, type UpdatePostInputModel } from '../types/post/input';
+import {
+  type CreatePostWithBlogIdInputModel,
+  type UpdatePostInputModel,
+} from '../types/post/input';
 import { type QueryPostOutputModel } from '../types/post/output';
 import { type BlogQueryRepository } from '../repositories/blog/blog.query-repository';
+
+import { type PostQueryRepository } from '../repositories/post/post.query.repository';
+import { type LikeQueryRepository } from '../repositories/like/like.query-repository';
 
 import { type CreatePostInputModel } from './../types/post/input';
 
 export class PostService {
-  constructor(protected blogQueryRepository: BlogQueryRepository) {}
+  constructor(
+    protected blogQueryRepository: BlogQueryRepository,
+    protected postQueryRepository: PostQueryRepository,
+    protected likeQueryRepository: LikeQueryRepository,
+  ) {}
+
   async createPost(data: CreatePostWithBlogIdInputModel): Promise<QueryPostOutputModel | null> {
     const relatedBlog = await this.blogQueryRepository.getBlogById(data.blogId);
 
@@ -25,7 +36,10 @@ export class PostService {
     return createdBlog;
   }
 
-  async createPostByBlogId(blogId: string, data: CreatePostInputModel): Promise<QueryPostOutputModel | null> {
+  async createPostByBlogId(
+    blogId: string,
+    data: CreatePostInputModel,
+  ): Promise<QueryPostOutputModel | null> {
     const relatedBlog = await this.blogQueryRepository.getBlogById(blogId);
 
     if (!relatedBlog) {

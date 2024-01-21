@@ -17,6 +17,7 @@ import { ApiError } from '../exeptions/api.error';
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { type PostService } from '../domain/post.service';
 import { type LikeService } from '../domain/like.service';
+import { type UpdateLikeInfoType } from '../types/comment/input';
 
 export class PostController {
   constructor(
@@ -32,8 +33,8 @@ export class PostController {
   ) {
     try {
       const sortData = new PostSortData(request.query);
-
-      const posts = await this.postQueryRepository.getAll(sortData);
+      const userId = request.userId;
+      const posts = await this.postQueryRepository.getAll(sortData, userId);
 
       response.send(posts);
     } catch (error) {
@@ -43,7 +44,8 @@ export class PostController {
 
   async getById(request: RequestType<PostParams, {}>, response: Response, next: NextFunction) {
     try {
-      const findedPost = await this.postQueryRepository.getById(request.params.id);
+      const userId = request.userId;
+      const findedPost = await this.postQueryRepository.getById(request.params.id, userId);
 
       if (!findedPost) {
         throw new ApiError(ResponseStatusCodesEnum.NotFound, 'Пост с указанныи id не найден');
@@ -112,26 +114,38 @@ export class PostController {
     }
   }
 
-  /* Async putLikeForPost(
-       request: RequestType<PostParams, UpdateLikeInfoType>,
-       response: Response,
-       next: NextFunction,
-     ) {
-       try {
-         const postId = request.params.id;
-         const userId = request.userId;
-         const likeStatus = request.body.likeStatus; */
+  async putLikeForPost(
+    request: RequestType<PostParams, UpdateLikeInfoType>,
+    response: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const postId = request.params.id;
+      const userId = request.userId;
+      const likeStatus = request.body.likeStatus;
 
-  /*     If (!userId) {
-           throw ApiError.UnauthorizedError();
-         } */
+      if (!userId) {
+        throw ApiError.UnauthorizedError();
+      }
 
-  /*     Const result = await this.likeService.createOrUpdateLike(
-           commentId,
-           userId,
-           likeStatus,
-           'comment',
-         );
-       } catch (error) {}
-     } */
+      const result = await this.likeService.createOrUpdateLike(
+        postId,
+        userId,
+        likeStatus,
+        'post',
+      );
+
+      if (result) {
+        response.sendStatus(ResponseStatusCodesEnum.NoContent);
+      } else {
+        next(
+          new ApiError(ResponseStatusCodesEnum.InternalError, 'Не удалось обновить комментарий'),
+        );
+      }
+    } catch (error) {
+      console.error(error);
+
+      next(error);
+    }
+  }
 }

@@ -13,5 +13,6 @@ export class PostLikeDataBaseDto {
     public postId: string,
     public status: LikesInfoEnum,
     public userId: string,
+    public addedAt: string,
   ) {}
 }

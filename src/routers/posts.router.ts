@@ -14,8 +14,8 @@ import { userDataMiddleware } from '../middlewares/userData/userData.middleware'
 
 export const postsRouter = Router();
 
-postsRouter.get('/', postController.getAll.bind(postController));
-postsRouter.get('/:id', paramValidation(), postController.getById.bind(postController));
+postsRouter.get('/', userDataMiddleware, postController.getAll.bind(postController));
+postsRouter.get('/:id', paramValidation(), userDataMiddleware, postController.getById.bind(postController));
 postsRouter.post('/', adminMiddleware, postWithBlogIdCreateValidation(), postController.post.bind(postController));
 postsRouter.put(
   '/:id',
@@ -43,5 +43,5 @@ postsRouter.put(
   authMiddleware,
   postGetParamValidation(),
   likeInputValidation(),
-  commentController.postCommentByPostId.bind(commentController),
+  postController.putLikeForPost.bind(postController),
 );

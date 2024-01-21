@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 
-import { PostMapper } from '../../types/post/mapper';
+import { PostDataBaseDto } from '../../types/post/mapper';
 import { postCollection } from '../../db/db';
 import { type CreatePostRepositoryInputModel, type UpdatePostInputModel } from '../../types/post/input';
 import { type QueryPostOutputModel } from '../../types/post/output';
@@ -21,7 +21,7 @@ export class PostRepository {
         const createdPost = await postCollection.findOne({ _id: result.insertedId });
 
         if (createdPost) {
-          return { ...new PostMapper(createdPost) };
+          return { ...new PostDataBaseDto(createdPost) };
         }
         return null;
       }

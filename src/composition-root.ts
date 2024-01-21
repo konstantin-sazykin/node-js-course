@@ -52,7 +52,7 @@ export const authController = new AuthController(
 );
 
 export const postQueryRepository = new PostQueryRepository();
-const postService = new PostService(blogQueryRepository);
+const postService = new PostService(blogQueryRepository, postQueryRepository, likeQueryRepository);
 
 export const postController = new PostController(postQueryRepository, postService, likeService);
 export const blogController = new BlogController(blogQueryRepository, postService, postQueryRepository);
