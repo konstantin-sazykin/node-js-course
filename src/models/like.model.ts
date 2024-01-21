@@ -10,7 +10,7 @@ const LikeSchema = new Schema<LikeType>(
     commentId: { type: String },
     postId: { type: String },
   },
-  { timestamps: { createdAt: 'addedAt', updatedAt: false } },
+  { timestamps: { createdAt: 'addedAt', updatedAt: 'addedAt' } },
 );
 
 export const LikeModel = Mongoose.model<LikeType>(MongoCollections.likes, LikeSchema);
