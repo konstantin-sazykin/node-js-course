@@ -250,11 +250,20 @@ describe('/comments', () => {
     expect(result.statusCode).toEqual(ResponseStatusCodesEnum.NoContent);
   });
 
+  it('should return 204 status after adding new like for new comment', async () => {
+    const result = await request(app)
+      .put(CommentPaths.likeForCommentById(newComment.id))
+      .send({ likeStatus: LikesInfoEnum.Like })
+      .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserBToken));
+
+    expect(result.statusCode).toEqual(ResponseStatusCodesEnum.NoContent);
+  });
+
   it('should return likes data for new comment', async () => {
     const result = await request(app).get(CommentPaths.commentById(newComment.id));
 
     expect(result.body.likesInfo).toEqual({
-      likesCount: 1,
+      likesCount: 2,
       dislikesCount: 0,
       myStatus: LikesInfoEnum.None,
     });
@@ -273,7 +282,7 @@ describe('/comments', () => {
     const result = await request(app).get(CommentPaths.commentById(newComment.id));
 
     expect(result.body.likesInfo).toEqual({
-      likesCount: 0,
+      likesCount: 1,
       dislikesCount: 1,
       myStatus: LikesInfoEnum.None,
     });
@@ -285,7 +294,7 @@ describe('/comments', () => {
       .set('Authorization', UserDataManager.getCorrectAuthHeader(accessUserAToken));
 
     expect(result.body.likesInfo).toEqual({
-      likesCount: 0,
+      likesCount: 1,
       dislikesCount: 1,
       myStatus: LikesInfoEnum.Dislike,
     });

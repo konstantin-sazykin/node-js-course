@@ -1,6 +1,7 @@
 import { postCollection, sessionCollection, userCollection } from '../db/db';
 import { BlogModel } from '../models/blog.model';
 import { CommentModel } from '../models/comment.model';
+import { LikeModel } from '../models/like.model';
 import { videoDb } from '../routers/videos.router';
 
 export class TestingRepository {
@@ -10,6 +11,7 @@ export class TestingRepository {
 
       await BlogModel.deleteMany({});
       await CommentModel.deleteMany({});
+      await LikeModel.deleteMany({});
 
       await postCollection.deleteMany({});
       await userCollection.deleteMany({});
