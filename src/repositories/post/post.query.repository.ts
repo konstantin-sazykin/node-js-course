@@ -7,6 +7,7 @@ import { type PostSortData } from '../../utils/SortData';
 import { type PostType } from '../../types/post/output';
 import { LikeQueryRepository } from '../like/like.query-repository';
 import { UserQueryRepository } from '../user/user.query-repository';
+import { LikesInfoEnum } from '../../types/like/output';
 
 export class PostQueryRepository {
   async getAll(
@@ -27,7 +28,7 @@ export class PostQueryRepository {
     const promises = posts.map(async (post: WithId<PostType>): Promise<PostDataBaseDto> => {
       const likes = await new LikeQueryRepository().getLikesByPostId(post._id.toString());
 
-      const lastLikesPromises = likes.slice(-3).map(async (like) => {
+      const lastLikesPromises = likes.filter(l => l.status === LikesInfoEnum.Like).slice(-3).map(async (like) => {
         const user = await new UserQueryRepository().findUserById(like.userId);
 
         return {
@@ -64,7 +65,7 @@ export class PostQueryRepository {
       }
       const likes = await new LikeQueryRepository().getLikesByPostId(post._id.toString());
 
-      const lastLikesPromises = likes.slice(-3).map(async (like) => {
+      const lastLikesPromises = likes.filter(l => l.status === LikesInfoEnum.Like).slice(-3).map(async (like) => {
         const user = await new UserQueryRepository().findUserById(like.userId);
 
         return {
