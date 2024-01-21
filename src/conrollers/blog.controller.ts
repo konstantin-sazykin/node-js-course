@@ -9,7 +9,7 @@ import {
 import { type QueryBlogOutputModel } from '../types/blog/output';
 import { type QueryRequestType, type RequestType, type ResponseWithPagination } from '../types/common';
 import { BlogSortData, PostSortData } from '../utils/SortData';
-import { BlogQueryRepository } from '../repositories/blog/blog.query.repository';
+import { BlogQueryRepository } from '../repositories/blog/blog.query-repository';
 import { ResponseStatusCodesEnum } from '../utils/constants';
 import { ApiError } from '../exeptions/api.error';
 import { BlogService } from '../domain/blog.service';
