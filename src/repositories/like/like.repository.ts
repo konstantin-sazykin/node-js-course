@@ -32,10 +32,10 @@ export class LikeRepository {
     status: LikesInfoEnum,
   ): Promise<boolean> {
     try {
-      const updated = await LikeModel.findOneAndUpdate({ postId, userId }, { status, addedAt: (new Date()).toISOString() });
+      const updated = await LikeModel.findOneAndUpdate({ postId, userId }, { status, addedAt: String((new Date()).getTime()) });
 
       if (!updated) {
-        const created = await LikeModel.create({ postId, userId, status, addedAt: (new Date()).toISOString() });
+        const created = await LikeModel.create({ postId, userId, status, addedAt: String((new Date()).getTime()) });
 
         if (!created) {
           return false;
