@@ -6,12 +6,18 @@ import { blogParamValidation, blogPostValidation } from '../validators/blog.vali
 import { paramValidation } from '../validators/common';
 import { postCreateValidation } from '../validators/post.validator';
 import { blogController } from '../composition-root';
+import { userDataMiddleware } from '../middlewares/userData/userData.middleware';
 
 export const blogsRouter = Router();
 
 blogsRouter.get('/', blogController.getAll.bind(blogController));
 blogsRouter.get('/:id', paramValidation(), blogController.getById.bind(blogController));
-blogsRouter.post('/', adminMiddleware, blogPostValidation(), blogController.post.bind(blogController));
+blogsRouter.post(
+  '/',
+  adminMiddleware,
+  blogPostValidation(),
+  blogController.post.bind(blogController),
+);
 blogsRouter.put(
   '/:id',
   adminMiddleware,
@@ -19,7 +25,12 @@ blogsRouter.put(
   blogPostValidation(),
   blogController.put.bind(blogController),
 );
-blogsRouter.delete('/:id', adminMiddleware, paramValidation(), blogController.delete.bind(blogController));
+blogsRouter.delete(
+  '/:id',
+  adminMiddleware,
+  paramValidation(),
+  blogController.delete.bind(blogController),
+);
 blogsRouter.post(
   '/:id/posts',
   adminMiddleware,
@@ -27,4 +38,9 @@ blogsRouter.post(
   postCreateValidation(),
   blogController.postForId.bind(blogController),
 );
-blogsRouter.get('/:id/posts', blogParamValidation(), blogController.getPostsForBlogById.bind(blogController));
+blogsRouter.get(
+  '/:id/posts',
+  blogParamValidation(),
+  userDataMiddleware,
+  blogController.getPostsForBlogById.bind(blogController),
+);

@@ -90,6 +90,7 @@ export class PostQueryRepository {
   async getAllByBlogId(
     blogId: string,
     sortData: PostSortData,
+    userId: string | null,
   ): Promise<WithPaginationDataType<PostDataBaseDto>> {
     const { sortBy, sortDirection, skip, limit, pageNumber } = sortData;
     const posts = await postCollection
@@ -102,12 +103,34 @@ export class PostQueryRepository {
     const totalCount = await postCollection.countDocuments({ blogId });
     const pagesCount = Math.ceil(totalCount / limit);
 
+    const promises = posts.map(async (post: WithId<PostType>): Promise<PostDataBaseDto> => {
+      const likes = await new LikeQueryRepository().getLikesByPostId(post._id.toString());
+
+      const lastLikesPromises = likes.filter(l => l.status === LikesInfoEnum.Like).slice(-3).reverse().map(async (like) => {
+        const user = await new UserQueryRepository().findUserById(like.userId);
+
+        return {
+          addedAt: like.addedAt,
+          userId: like.userId,
+          login: user?.login ?? 'Unknown user',
+        };
+      });
+
+      const newestLikes = await Promise.all(lastLikesPromises);
+
+      return {
+        ...new PostDataBaseDto(post, userId, likes, newestLikes),
+      };
+    });
+
+    const items = await Promise.all(promises);
+
     return {
       pagesCount,
       totalCount,
       page: pageNumber,
       pageSize: limit,
-      items: posts.map((video) => ({ ...new PostDataBaseDto(video) })),
+      items,
     };
   }
 }

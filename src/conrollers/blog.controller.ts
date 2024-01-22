@@ -149,7 +149,8 @@ export class BlogController {
     try {
       const blogId = request.params.id;
       const sortData = new PostSortData(request.query);
-      const posts = await this.postQueryRepository.getAllByBlogId(blogId, sortData);
+      const userId = request.userId;
+      const posts = await this.postQueryRepository.getAllByBlogId(blogId, sortData, userId);
 
       response.send(posts);
     } catch (error) {
