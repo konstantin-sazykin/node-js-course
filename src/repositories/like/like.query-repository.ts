@@ -18,7 +18,7 @@ export class LikeQueryRepository {
 
   async getLikesByPostId(postId: string): Promise<PostLikeDataBaseOutputType[]> {
     // @ts-expect-error
-    const likes: Array<WithId<PostLikeDataBaseOutputType>> = await LikeModel.find({ postId }).sort({ addedAt: -1 });
+    const likes: Array<WithId<PostLikeDataBaseOutputType>> = await LikeModel.find({ postId }).sort({ addedAt: 1 });
 
     return likes.map((like) => ({
       ...new PostLikeDataBaseDto(like.postId, like.status, like.userId, like.addedAt),

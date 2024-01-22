@@ -28,7 +28,7 @@ export class PostQueryRepository {
     const promises = posts.map(async (post: WithId<PostType>): Promise<PostDataBaseDto> => {
       const likes = await new LikeQueryRepository().getLikesByPostId(post._id.toString());
 
-      const lastLikesPromises = likes.filter(l => l.status === LikesInfoEnum.Like).slice(-3).map(async (like) => {
+      const lastLikesPromises = likes.filter(l => l.status === LikesInfoEnum.Like).slice(-3).reverse().map(async (like) => {
         const user = await new UserQueryRepository().findUserById(like.userId);
 
         return {
@@ -65,7 +65,7 @@ export class PostQueryRepository {
       }
       const likes = await new LikeQueryRepository().getLikesByPostId(post._id.toString());
 
-      const lastLikesPromises = likes.filter(l => l.status === LikesInfoEnum.Like).slice(-3).map(async (like) => {
+      const lastLikesPromises = likes.filter(l => l.status === LikesInfoEnum.Like).slice(-3).reverse().map(async (like) => {
         const user = await new UserQueryRepository().findUserById(like.userId);
 
         return {
